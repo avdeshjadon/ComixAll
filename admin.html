@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="https://res.cloudinary.com/comixall/image/upload/favicon/favicon.ico" type="image/x-icon">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4A55A2;
+            --secondary: #3A4282;
+            --error: #E53E3E;
+            --success: #38A169;
+            --warning: #DD6B20;
+
+            /* Light Theme */
+            --text-dark: #2D3748;
+            --text-light: #F7FAFC;
+            --text-gray: #718096;
+            --bg-main: #EDF2F7;
+            --bg-card: #FFFFFF;
+            --border-color: #E2E8F0;
+
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html[data-theme='dark'] {
+            --primary: #90CDF4;
+            --secondary: #63B3ED;
+
+            /* Dark Theme */
+            --text-dark: #EDF2F7;
+            --text-light: #1A202C;
+            --text-gray: #A0AEC0;
+            --bg-main: #1A202C;
+            --bg-card: #2D3748;
+            --border-color: #4A5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 420px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out forwards;
+        }
+
+        .auth-header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        #search-comics {
+            margin-bottom: 20px;
+        }
+
+        .auth-header h2 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .auth-body {
+            padding: 2rem 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+            background-color: var(--bg-card);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            box-shadow: var(--box-shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #C53030;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-main);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+
+        #login-spinner {
+            margin-left: 0;
+            margin-right: 8px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--bg-card);
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 1100;
+            transition: transform 0.3s ease-out;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header h2 i {
+            margin-right: 0.75rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            margin: 0.25rem 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: var(--primary);
+            background: color-mix(in srgb, var(--primary) 8%, transparent);
+        }
+
+        .menu-item.active {
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.3s ease-out;
+        }
+
+        .section-content {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-right: auto;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .theme-toggle-btn,
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+
+        .theme-toggle-btn:hover,
+        .logout-btn:hover {
+            color: var(--primary);
+            background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+        }
+
+        .logout-btn:hover {
+            color: var(--error);
+            background-color: color-mix(in srgb, var(--error) 10%, transparent);
+        }
+
+        .stats-container {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .comics-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            align-items: stretch;
+        }
+
+        .stat-card,
+        .comic-card,
+        .form-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .comic-card {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stats-container .stat-card,
+        .comics-grid .comic-card {
+            animation-delay: calc(0.1s * var(--i));
+        }
+
+        .stat-card:hover,
+        .comic-card:hover,
+        .form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-lg);
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-card .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .form-card {
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-card h2 {
+            font-size: 1.5rem;
+            margin: 0 0 1.5rem 0;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .comic-card .image-container {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            overflow: hidden;
+            background-color: var(--bg-main);
+        }
+
+        .comic-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .comic-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .comic-card .comic-body {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .comic-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 2.25rem;
+        }
+
+        .comic-author {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .thumbnail-input-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .thumbnail-input-grid .separator {
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .file-upload-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            height: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            background: var(--bg-main);
+            color: var(--text-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--bg-card);
+        }
+
+        .thumbnail-preview {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .thumbnail-preview img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            animation: scaleIn 0.3s ease;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: var(--border-color);
+            border-radius: 20px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 20px;
+            transition: width 0.4s ease;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow-lg);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+            background-color: var(--bg-main);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            min-width: 320px;
+            opacity: 0;
+            animation: slideInRight 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast.hide {
+            transition: all 0.4s ease-in;
+            opacity: 0;
+            transform: translateX(110%);
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+
+        .toast-success::before {
+            background: var(--success);
+        }
+
+        .toast-error::before {
+            background: var(--error);
+        }
+
+        .toast-warning::before {
+            background: var(--warning);
+        }
+
+        .toast-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--error);
+        }
+
+        .toast-warning .toast-icon {
+            color: var(--warning);
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+        }
+
+        /* === NEW STYLES FOR CATEGORY LIST === */
+        .category-admin-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .category-admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-main);
+            padding: 0.75rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.75rem;
+            transition: var(--transition);
+            animation: fadeInUp 0.3s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(0.05s * var(--i));
+        }
+
+        .category-admin-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+            border-color: var(--primary);
+        }
+
+        .category-admin-item span {
+            font-weight: 500;
+        }
+
+        /* === END CATEGORY LIST STYLES === */
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .auth-body,
+            .auth-header {
+                padding: 1.5rem;
+            }
+
+            .form-row,
+            .thumbnail-input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .thumbnail-input-grid .separator {
+                display: flex;
+                align-items: center;
+                text-align: center;
+            }
+
+            .thumbnail-input-grid .separator::before,
+            .thumbnail-input-grid .separator::after {
+                content: '';
+                flex: 1;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .thumbnail-input-grid .separator::before {
+                margin-right: .5em;
+            }
+
+            .thumbnail-input-grid .separator::after {
+                margin-left: .5em;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #comics-section .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #comics-section .header .form-group {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .user-profile {
+                gap: 0.5rem;
+            }
+
+            .user-profile img {
+                width: 35px;
+                height: 35px;
+            }
+
+            .theme-toggle-btn,
+            .logout-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+
+            .toast {
+                width: calc(100% - 2rem);
+                right: 1rem;
+                top: 1rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Admin Login</h2>
+            </div>
+            <div class="auth-body">
+                <div id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-control"
+                            placeholder="Enter your password">
+                    </div>
+                    <button id="login-btn" class="btn btn-primary btn-block">
+                        <span id="login-spinner" class="loading-spinner" style="display: none;"></span>
+                        <span id="login-text">Login</span>
+                    </button>
+                    <p id="login-error" class="error-message mt-3"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-dashboard" class="admin-container hidden">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-shield-alt"></i> <span>ComixAll</span></h2>
+            </div>
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="dashboard"><i
+                        class="fas fa-home"></i><span>Dashboard</span></a>
+                <a href="#" class="menu-item" data-section="comics"><i class="fas fa-book"></i><span>Comics</span></a>
+                <a href="#" class="menu-item" data-section="categories"><i
+                        class="fas fa-tags"></i><span>Categories</span></a>
+                <a href="#" class="menu-item" data-section="users"><i class="fas fa-users"></i><span>Users</span></a>
+                <a href="#" class="menu-item" data-section="settings"><i
+                        class="fas fa-cog"></i><span>Settings</span></a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 id="section-title">Dashboard</h1>
+                <div class="user-profile">
+                    <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=4A55A2&color=fff&font-size=0.5"
+                        alt="Admin">
+                    <button class="logout-btn" id="logout-btn" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="dashboard-section" class="section-content">
+                <div class="stats-container">
+                    <div class="stat-card" style="--i: 1;">
+                        <div class="stat-title">Total Comics</div>
+                        <div class="stat-value" id="total-comics">0</div>
+                    </div>
+                    <div class="stat-card" style="--i: 2;">
+                        <div class="stat-title">Total Users</div>
+                        <div class="stat-value" id="active-users">0</div>
+                    </div>
+                    <div class="stat-card" style="--i: 3;">
+                        <div class="stat-title">Total Views</div>
+                        <div class="stat-value" id="page-views">0</div>
+                    </div>
+                    <div class="stat-card" style="--i: 4;">
+                        <div class="stat-title">Storage Used</div>
+                        <div class="stat-value" id="storage-used">0 MB</div>
+                    </div>
+                </div>
+                <div class="form-card" style="margin-top: 2rem; animation-delay: 0.5s">
+                    <h2>Recent Activity</h2>
+                    <div id="recent-activity">
+                        <p>Loading recent activity...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="comics-section" class="section-content" style="display: none;">
+                <div class="form-card">
+                    <h2>Add New Comic</h2>
+                    <form id="comic-form">
+                        <div class="form-row">
+                            <div class="form-group"><label for="comic-title">Title</label><input type="text"
+                                    id="comic-title" class="form-control" placeholder="e.g., Milftoon" required></div>
+                            <div class="form-group"><label for="comic-author">Author</label><input type="text"
+                                    id="comic-author" class="form-control" placeholder="e.g., CrazyDad3d" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="comic-folder">Folder Name</label>
+                                <input type="text" id="comic-folder" class="form-control"
+                                    placeholder="e.g., Satisfying_Needs" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="comic-category">Category</label>
+                                <select id="comic-category" class="form-control" required>
+                                    <option value="">Loading categories...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label for="comic-tags">Tags (comma-separated)</label><input
+                                    type="text" id="comic-tags" class="form-control"
+                                    placeholder="e.g., brest, BigBoob, Incest"></div>
+                        </div>
+                        <div class="form-group"><label for="comic-manifest-url">Manifest JSON URL</label><input
+                                type="url" id="comic-manifest-url" class="form-control"
+                                placeholder="Paste GitHub Gist Raw URL here" required></div>
+
+                        <div class="form-group">
+                            <label>Thumbnail</label>
+                            <div class="thumbnail-input-grid">
+                                <div>
+                                    <input type="url" id="comic-thumbnail" class="form-control"
+                                        placeholder="Paste image URL here">
+                                </div>
+                                <div class="separator">OR</div>
+                                <div>
+                                    <label class="file-upload-btn" for="thumbnail-upload">
+                                        <i class="fas fa-cloud-upload-alt"></i> Upload
+                                    </label>
+                                    <input type="file" id="thumbnail-upload" accept="image/*" style="display:none">
+                                </div>
+                            </div>
+                            <div class="thumbnail-preview" id="thumbnail-preview"><img id="thumbnail-preview-img" src=""
+                                    alt="Thumbnail Preview"></div>
+                            <div class="progress-container" id="upload-progress">
+                                <div class="progress-bar" id="progress-bar"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group"><label for="comic-description">Description</label><textarea
+                                id="comic-description" class="form-control"
+                                placeholder="A brief summary of the comic..."></textarea></div>
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-outline">Clear</button>
+                            <button type="submit" id="submit-comic" class="btn btn-primary"><span id="submit-spinner"
+                                    class="loading-spinner" style="display: none;"></span><span id="submit-text">Add
+                                    Comic</span></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="form-card">
+                    <div class="header">
+                        <h2>Comics Library</h2>
+                        <div class="form-group" style="margin-bottom: 0;"><input type="text" id="search-comics"
+                                class="form-control" placeholder="Search comics..."></div>
+                    </div>
+                    <div id="admin-comics-grid" class="comics-grid"></div>
+                </div>
+            </div>
+
+            <div id="categories-section" class="section-content" style="display: none;">
+                <div class="form-card">
+                    <h2>Add New Category</h2>
+                    <form id="category-form" style="display: flex; gap: 1rem; align-items: center;">
+                        <div class="form-group" style="flex-grow: 1; margin-bottom: 0;">
+                            <label for="category-name-input" class="hidden">Category Name</label>
+                            <input type="text" id="category-name-input" class="form-control"
+                                placeholder="Enter new category name (e.g., Parody)" required>
+                        </div>
+                        <button type="submit" id="add-category-btn" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
+                <div class="form-card">
+                    <h2>Existing Categories</h2>
+                    <ul id="categories-list-admin" class="category-admin-list"></ul>
+                </div>
+            </div>
+
+            <div id="users-section" class="section-content"
+                style="display: none; flex-direction: column; align-items: center; justify-content: center;">
+                <i class="fas fa-users-cog" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
+                <h2>User Management</h2>
+                <p style="color: var(--text-gray);">This feature is currently under construction. Stay tuned!</p>
+            </div>
+            <div id="settings-section" class="section-content"
+                style="display: none; flex-direction: column; align-items: center; justify-content: center;">
+                <i class="fas fa-tools" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
+                <h2>Settings Panel</h2>
+                <p style="color: var(--text-gray);">This feature is currently under construction. Stay tuned!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Deletion</h3><button class="modal-close"
+                    id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this comic? This action is permanent and cannot be undone.</p>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" id="cancel-delete">Cancel</button><button
+                    class="btn btn-danger" id="confirm-delete">Delete</button></div>
+        </div>
+    </div>
+
+    <div class="modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Comic</h3><button class="modal-close"
+                    id="edit-modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-comic-form" class="edit-form">
+                    <input type="hidden" id="edit-comic-id">
+                    <div class="form-group">
+                        <label for="edit-comic-title">Title</label>
+                        <input type="text" id="edit-comic-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-author">Author</label>
+                        <input type="text" id="edit-comic-author" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-folder">Cloudinary Folder</label>
+                        <input type="text" id="edit-comic-folder" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-category">Category</label>
+                        <select id="edit-comic-category" class="form-control" required>
+                            <option value="">Loading categories...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-manifest-url">Manifest JSON URL</label>
+                        <input type="url" id="edit-comic-manifest-url" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-tags">Tags</label>
+                        <input type="text" id="edit-comic-tags" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-comic-thumbnail">Thumbnail URL</label>
+                        <input type="url" id="edit-comic-thumbnail" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="edit-comic-description">Description</label>
+                        <textarea id="edit-comic-description" class="form-control"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="delete-from-modal-btn" style="margin-right: auto;">Delete</button>
+                <button class="btn btn-outline" id="cancel-edit">Cancel</button>
+                <button class="btn btn-primary" id="save-edit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+   <script>
+    const firebaseConfig = {
+            apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM",
+            authDomain: "comix-9be69.firebaseapp.com",
+            projectId: "comix-9be69",
+            storageBucket: "comix-9be69.appspot.com",
+            messagingSenderId: "346083786632",
+            appId: "1:346083786632:web:f95c8c3dacafe47f23843d"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let currentComicToDelete = null;
+        let currentComicToEdit = null;
+        let comics = [];
+        let unsubscribeComics = null;
+        let allCategories = [];
+
+        const authContainer = document.getElementById('auth-container');
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const loginBtn = document.getElementById('login-btn');
+        const loginForm = document.getElementById('login-form');
+        const loginSpinner = document.getElementById('login-spinner');
+        const loginText = document.getElementById('login-text');
+        const loginError = document.getElementById('login-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const comicForm = document.getElementById('comic-form');
+        const submitComic = document.getElementById('submit-comic');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const comicsGrid = document.getElementById('admin-comics-grid');
+        const searchInput = document.getElementById('search-comics');
+        const deleteModal = document.getElementById('delete-modal');
+        const confirmDelete = document.getElementById('confirm-delete');
+        const cancelDelete = document.getElementById('cancel-delete');
+        const modalClose = document.getElementById('modal-close');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        const totalComicsEl = document.getElementById('total-comics');
+        const activeUsersEl = document.getElementById('active-users');
+        const pageViewsEl = document.getElementById('page-views');
+        const storageUsedEl = document.getElementById('storage-used');
+        const toastContainer = document.getElementById('toast-container');
+        const editModal = document.getElementById('edit-modal');
+        const saveEditBtn = document.getElementById('save-edit');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        const editModalClose = document.getElementById('edit-modal-close');
+        const thumbnailUpload = document.getElementById('thumbnail-upload');
+        const comicThumbnailUrlInput = document.getElementById('comic-thumbnail');
+        const thumbnailPreview = document.getElementById('thumbnail-preview');
+        const thumbnailPreviewImg = document.getElementById('thumbnail-preview-img');
+        const uploadProgress = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+        const sectionTitle = document.getElementById('section-title');
+        const categoryForm = document.getElementById('category-form');
+        const categoryNameInput = document.getElementById('category-name-input');
+        const categoriesListAdmin = document.getElementById('categories-list-admin');
+        const comicCategorySelect = document.getElementById('comic-category');
+        const editComicCategorySelect = document.getElementById('edit-comic-category');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const deleteFromModalBtn = document.getElementById('delete-from-modal-btn');
+
+
+        const sectionContents = {
+            dashboard: document.getElementById('dashboard-section'),
+            comics: document.getElementById('comics-section'),
+            categories: document.getElementById('categories-section'),
+            users: document.getElementById('users-section'),
+            settings: document.getElementById('settings-section')
+        };
+
+        const applyInitialTheme = () => {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            setTheme(theme);
+        };
+
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            const icon = theme === 'dark' ? 'fa-sun' : 'fa-moon';
+            themeToggleBtn.innerHTML = `<i class="fas ${icon}"></i>`;
+        };
+
+        const toggleTheme = () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+        };
+
+        function init() {
+            applyInitialTheme();
+            themeToggleBtn.addEventListener('click', toggleTheme);
+
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    authContainer.classList.add('hidden');
+                    adminDashboard.classList.remove('hidden');
+                    loadDashboardData();
+                    setupComicsListener();
+                    loadAdminCategories();
+                    loadCategoriesIntoSelects();
+                } else {
+                    adminDashboard.classList.add('hidden');
+                    authContainer.classList.remove('hidden');
+                    if (unsubscribeComics) {
+                        unsubscribeComics();
+                        unsubscribeComics = null;
+                    }
+                }
+            });
+
+            loginBtn.addEventListener('click', adminLogin);
+            loginForm.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') adminLogin();
+            });
+            logoutBtn.addEventListener('click', adminLogout);
+            comicForm.addEventListener('submit', handleComicSubmit);
+            comicForm.addEventListener('reset', () => {
+                thumbnailPreview.style.display = 'none';
+                uploadProgress.style.display = 'none';
+                progressBar.style.width = '0%';
+                comicThumbnailUrlInput.value = '';
+                thumbnailUpload.value = '';
+            });
+            searchInput.addEventListener('input', filterComics);
+            confirmDelete.addEventListener('click', deleteComic);
+            cancelDelete.addEventListener('click', closeDeleteModal);
+            modalClose.addEventListener('click', closeDeleteModal);
+            mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('show'));
+            saveEditBtn.addEventListener('click', saveComicEdit);
+            cancelEditBtn.addEventListener('click', closeEditModal);
+            editModalClose.addEventListener('click', closeEditModal);
+            thumbnailUpload.addEventListener('change', handleThumbnailUpload);
+            comicThumbnailUrlInput.addEventListener('input', handleThumbnailUrlInput);
+            categoryForm.addEventListener('submit', handleAddCategory);
+            deleteFromModalBtn.addEventListener('click', () => {
+                if (currentComicToEdit) {
+                    currentComicToDelete = currentComicToEdit.id;
+                    closeEditModal();
+                    openDeleteModal();
+                }
+            });
+
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.dataset.section;
+                    showSection(section);
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('show');
+                    }
+                });
+            });
+
+            showSection('dashboard');
+        }
+
+        function showSection(section) {
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.toggle('active', item.dataset.section === section));
+            Object.keys(sectionContents).forEach(key => {
+                const el = sectionContents[key];
+                if (el) el.style.display = (key === 'dashboard' || key === 'comics' || key === 'categories') ? 'block' : 'flex';
+                if (key !== section) el.style.display = 'none';
+            });
+            const titles = { dashboard: 'Dashboard', comics: 'Comics Management', categories: 'Category Management', users: 'User Management', settings: 'Settings' };
+            sectionTitle.textContent = titles[section];
+        }
+
+        async function adminLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            if (!email || !password) {
+                loginError.textContent = 'Please fill all fields';
+                return;
+            }
+            loginText.style.display = 'none';
+            loginSpinner.style.display = 'inline-block';
+            loginBtn.disabled = true;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showToast('success', 'Login Successful', 'Welcome back!');
+            } catch (err) {
+                loginError.textContent = getAuthError(err.code);
+            } finally {
+                loginText.style.display = 'inline-block';
+                loginSpinner.style.display = 'none';
+                loginBtn.disabled = false;
+            }
+        }
+
+        function adminLogout() {
+            auth.signOut().then(() => {
+                showToast('success', 'Logged Out', 'You have been successfully logged out.');
+            });
+        }
+
+        async function handleComicSubmit(e) {
+            e.preventDefault();
+            // User is using Cloudinary, so we don't need the complex upload logic here.
+            // We just need the thumbnail URL.
+            const thumbnailUrl = document.getElementById('comic-thumbnail').value;
+            
+            const comicData = {
+                title: document.getElementById('comic-title').value,
+                author: document.getElementById('comic-author').value,
+                folderName: document.getElementById('comic-folder').value,
+                manifestUrl: document.getElementById('comic-manifest-url').value,
+                category: document.getElementById('comic-category').value,
+                tags: document.getElementById('comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+                description: document.getElementById('comic-description').value,
+                thumbnailUrl: thumbnailUrl, // Using the URL from the input field
+                totalViews: 0, // Shuruwat mein totalViews 0 honge
+                views: 0, // Aapne kaha tha aap `views` field istemal nahi kar rahe, lekin agar purana data hai to error na aaye.
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (!comicData.title || !comicData.author || !comicData.folderName || !comicData.manifestUrl || !comicData.category || !comicData.thumbnailUrl) {
+                return showToast('error', 'Error', 'Please fill all required fields, including thumbnail URL.');
+            }
+
+            submitText.style.display = 'none';
+            submitSpinner.style.display = 'inline-block';
+            submitComic.disabled = true;
+
+            try {
+                await db.collection('comics').add(comicData);
+                showToast('success', 'Success', 'Comic added successfully!');
+                comicForm.reset();
+            } catch (err) {
+                console.error('Error adding comic:', err);
+                showToast('error', 'Error', 'Failed to add comic: ' + err.message);
+            } finally {
+                submitText.style.display = 'inline-block';
+                submitSpinner.style.display = 'none';
+                submitComic.disabled = false;
+            }
+        }
+
+        // This function is for the Firebase Storage uploader, which you are not using.
+        // It's safe to keep it here, but the form won't use it effectively without Firebase Storage setup.
+        function uploadThumbnail(file) {
+            return new Promise((resolve, reject) => {
+                uploadProgress.style.display = 'block';
+                progressBar.style.width = '0%';
+                const fileRef = storage.ref().child(`thumbnails/${Date.now()}_${file.name}`);
+                const uploadTask = fileRef.put(file);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = `${progress}%`;
+                    },
+                    (error) => reject(error),
+                    async () => {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        resolve(downloadURL);
+                    }
+                );
+            });
+        }
+        
+        function handleThumbnailUrlInput() {
+            const url = comicThumbnailUrlInput.value;
+            if (url) {
+                thumbnailUpload.value = '';
+                thumbnailPreviewImg.src = url;
+                thumbnailPreview.style.display = 'block';
+            } else {
+                thumbnailPreview.style.display = 'none';
+            }
+        }
+
+        function handleThumbnailUpload(e) {
+            const file = e.target.files[0];
+            if (!file || !file.type.match('image.*')) return;
+            comicThumbnailUrlInput.value = '';
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                thumbnailPreviewImg.src = event.target.result;
+                thumbnailPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+            showToast('warning', 'Using Cloudinary Recommended', 'For local upload to work, Firebase Storage setup is needed. It is recommended to upload to Cloudinary and paste the URL.');
+        }
+
+        function setupComicsListener() {
+            if (unsubscribeComics) unsubscribeComics();
+            unsubscribeComics = db.collection('comics').orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    comics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderAllComics(comics);
+                    // Update stats that depend on the comics collection
+                    totalComicsEl.textContent = snapshot.size;
+                    updateTotalViews(comics);
+                }, err => {
+                    console.error('Error loading comics:', err);
+                    showToast('error', 'Error', 'Failed to load comics.');
+                });
+        }
+
+        function renderAllComics(comicArray) {
+            comicsGrid.innerHTML = '';
+            if (comicArray.length === 0) {
+                comicsGrid.innerHTML = `<p style="color: var(--text-gray);">No comics found. Add one!</p>`;
+                return;
+            }
+            comicArray.forEach((comic, index) => renderComicCard(comic, index));
+        }
+
+        function renderComicCard(comic, index) {
+            const card = document.createElement('div');
+            card.className = 'comic-card';
+            card.style.setProperty('--i', index + 1);
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
+                </div>
+                <div class="comic-body">
+                    <h3 class="comic-title" title="${comic.title}">${comic.title}</h3>
+                    <p class="comic-author">${comic.author || 'Unknown Author'}</p>
+                </div>
+            `;
+            comicsGrid.appendChild(card);
+            
+            card.addEventListener('click', () => {
+                currentComicToEdit = comic;
+                openEditModal(currentComicToEdit);
+            });
+        }
+
+        function filterComics() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filtered = comics.filter(comic =>
+                comic.title.toLowerCase().includes(searchTerm) ||
+                (comic.author && comic.author.toLowerCase().includes(searchTerm))
+            );
+            renderAllComics(filtered);
+        }
+
+        function openDeleteModal() { deleteModal.classList.add('show'); }
+        function closeDeleteModal() { deleteModal.classList.remove('show'); currentComicToDelete = null; }
+
+        async function deleteComic() {
+            if (!currentComicToDelete) return;
+            try {
+                await db.collection('comics').doc(currentComicToDelete).delete();
+                showToast('success', 'Success', 'Comic deleted.');
+                closeDeleteModal();
+            } catch (err) {
+                showToast('error', 'Error', 'Failed to delete comic.');
+            }
+        }
+
+        function openEditModal(comic) {
+            document.getElementById('edit-comic-id').value = comic.id;
+            document.getElementById('edit-comic-title').value = comic.title;
+            document.getElementById('edit-comic-author').value = comic.author || '';
+            document.getElementById('edit-comic-folder').value = comic.folderName;
+            document.getElementById('edit-comic-manifest-url').value = comic.manifestUrl || '';
+            document.getElementById('edit-comic-category').value = comic.category || '';
+            document.getElementById('edit-comic-tags').value = comic.tags?.join(', ') || '';
+            document.getElementById('edit-comic-thumbnail').value = comic.thumbnailUrl;
+            document.getElementById('edit-comic-description').value = comic.description || '';
+            editModal.classList.add('show');
+        }
+
+        function closeEditModal() { editModal.classList.remove('show'); currentComicToEdit = null; }
+
+        async function saveComicEdit() {
+            const id = document.getElementById('edit-comic-id').value;
+            const comicData = {
+                title: document.getElementById('edit-comic-title').value,
+                author: document.getElementById('edit-comic-author').value,
+                folderName: document.getElementById('edit-comic-folder').value,
+                manifestUrl: document.getElementById('edit-comic-manifest-url').value,
+                category: document.getElementById('edit-comic-category').value,
+                thumbnailUrl: document.getElementById('edit-comic-thumbnail').value,
+                tags: document.getElementById('edit-comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+                description: document.getElementById('edit-comic-description').value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection('comics').doc(id).update(comicData);
+                showToast('success', 'Success', 'Comic updated successfully!');
+                closeEditModal();
+            } catch (err) {
+                showToast('error', 'Error', 'Failed to update comic.');
+            }
+        }
+
+        // --- DASHBOARD FUNCTIONS ---
+
+        function updateTotalViews(comicsArray) {
+            // Hum `totalViews` field ko jodenge, jo aap apni user-site se update karenge
+            const totalViews = comicsArray.reduce((sum, comic) => sum + (comic.totalViews || 0), 0);
+            
+            if (totalViews >= 1000000) {
+                pageViewsEl.textContent = (totalViews / 1000000).toFixed(1) + 'M';
+            } else if (totalViews >= 1000) {
+                pageViewsEl.textContent = (totalViews / 1000).toFixed(1) + 'K';
+            } else {
+                pageViewsEl.textContent = totalViews;
+            }
+        }
+
+        async function updateTotalUsers() {
+            // Yeh `users` collection se ginti karke total users dikhayega
+            activeUsersEl.textContent = '...';
+            try {
+                const snapshot = await db.collection('users').get();
+                activeUsersEl.textContent = snapshot.size;
+            } catch (err) {
+                console.error("Error fetching user count:", err);
+                activeUsersEl.textContent = 'N/A';
+                showToast('error', 'User Count Error', 'Could not fetch total users.');
+            }
+        }
+
+        // --- CATEGORY FUNCTIONS ---
+
+        async function handleAddCategory(e) {
+            e.preventDefault();
+            const categoryName = categoryNameInput.value.trim();
+            if (!categoryName) return showToast('error', 'Error', 'Category name is required.');
+            const categoryValue = categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const query = await db.collection('categories').where('value', '==', categoryValue).get();
+            if (!query.empty) return showToast('warning', 'Duplicate', 'This category already exists.');
+            try {
+                await db.collection('categories').add({ name: categoryName, value: categoryValue, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                showToast('success', 'Success', `Category "${categoryName}" added.`);
+                categoryForm.reset();
+            } catch (err) { showToast('error', 'Error', 'Could not add category.'); }
+        }
+
+        async function handleDeleteCategory(id) {
+            if (confirm('Are you sure? This will delete the category permanently.')) {
+                try {
+                    await db.collection('categories').doc(id).delete();
+                    showToast('success', 'Deleted', 'Category removed.');
+                } catch (err) { showToast('error', 'Error', 'Failed to delete category.'); }
+            }
+        }
+
+        function loadAdminCategories() {
+            db.collection('categories').orderBy('name').onSnapshot(snapshot => {
+                categoriesListAdmin.innerHTML = '';
+                if (snapshot.empty) {
+                    categoriesListAdmin.innerHTML = '<p style="color: var(--text-gray);">No categories found.</p>';
+                    return;
+                }
+                let index = 0;
+                snapshot.forEach(doc => {
+                    const category = { id: doc.id, ...doc.data() };
+                    const item = document.createElement('li');
+                    item.className = 'category-admin-item';
+                    item.style.setProperty('--i', index++);
+                    item.innerHTML = `<span>${category.name}</span><button class="btn btn-danger btn-sm">Delete</button>`;
+                    item.querySelector('button').addEventListener('click', () => handleDeleteCategory(category.id));
+                    categoriesListAdmin.appendChild(item);
+                });
+            });
+        }
+
+        function loadCategoriesIntoSelects() {
+            db.collection('categories').orderBy('name').onSnapshot(snapshot => {
+                allCategories = snapshot.docs.map(doc => doc.data());
+                let optionsHtml = '<option value="" disabled selected>Select a Category</option>';
+                allCategories.forEach(cat => { optionsHtml += `<option value="${cat.value}">${cat.name}</option>`; });
+                comicCategorySelect.innerHTML = optionsHtml;
+                editComicCategorySelect.innerHTML = optionsHtml;
+            });
+        }
+
+        // --- MAIN DATA LOADING ---
+
+        async function loadDashboardData() {
+            // Hum sirf users aur recent activity load karenge.
+            // Storage ki zaroorat nahi kyunki aap Cloudinary istemal kar rahe hain.
+            updateTotalUsers();
+            loadRecentActivity();
+            storageUsedEl.textContent = 'N/A'; // Storage Not Applicable
+        }
+
+        async function loadRecentActivity() {
+            const activityEl = document.getElementById('recent-activity');
+            try {
+                const snapshot = await db.collection('comics').orderBy('createdAt', 'desc').limit(5).get();
+                if (snapshot.empty) return activityEl.innerHTML = '<p>No recent activity found.</p>';
+
+                let html = '<div style="display: grid; gap: 1rem;">';
+                snapshot.forEach(doc => {
+                    const comic = doc.data();
+                    html += `<div style="display: flex; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);"><img src="${comic.thumbnailUrl}" alt="${comic.title}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; margin-right: 1rem;" onerror="this.src='https://via.placeholder.com/40'"><div><div style="font-weight: 500;">${comic.title}</div><div style="font-size: 0.8rem; color: var(--text-gray);">${formatDate(comic.createdAt?.toDate())}</div></div></div>`;
+                });
+                activityEl.innerHTML = html.replace(/border-bottom[^>]+>$/, '>');
+            } catch (err) {
+                activityEl.innerHTML = '<p class="error-message">Error loading activity</p>';
+            }
+        }
+        
+        // --- UTILITY FUNCTIONS ---
+
+        function formatDate(date) {
+            if (!date) return 'recently';
+            const diff = new Date() - date;
+            const seconds = Math.floor(diff / 1000);
+            if (seconds < 60) return 'just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        }
+
+        function showToast(type, title, message) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
+            toast.innerHTML = `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close">&times;</button>`;
+            toastContainer.appendChild(toast);
+            const timer = setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                clearTimeout(timer);
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            });
+        }
+
+        function getAuthError(code) {
+            const messages = { 'auth/user-not-found': 'User not found.', 'auth/wrong-password': 'Invalid password.', 'auth/invalid-credential': 'Invalid email or password.', 'auth/too-many-requests': 'Too many attempts. Try again later.' };
+            return messages[code] || 'Authentication failed. Please try again.';
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+   </script>
+</body>
+
+</html>

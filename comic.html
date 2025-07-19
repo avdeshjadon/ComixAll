@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Details</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>ComixAll</h1>
+    <a href="index.html" class="back-btn">← Back to Comics</a>
+  </header>
+  <main>
+    <div class="comic-detail-header">
+      <img id="comic-detail-thumbnail" src="" alt="" class="detail-thumbnail">
+      <div class="comic-detail-info">
+        <h1 id="comic-title"></h1>
+        <p id="comic-description"></p>
+        <div class="tags-container" id="tags-container"></div>
+      </div>
+    </div>
+    <h2>Parts</h2>
+    <div class="parts-grid" id="parts-grid">
+      <div class="loading">Loading parts...</div>
+    </div>
+  </main>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

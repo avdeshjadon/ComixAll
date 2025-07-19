@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Reader</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .comic-reader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .comic-page {
+      max-width: 100%;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+    .reader-controls {
+      position: fixed;
+      bottom: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      gap: 10px;
+      color: white;
+    }
+    .reader-controls button {
+      background: white;
+      color: black;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .loading {
+      padding: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ComixAll Reader</h1>
+    <a href="#" id="back-to-comic" class="back-btn">← Back to Comic</a>
+  </header>
+  <div class="comic-reader" id="comic-reader">
+    <div class="loading">Loading comic pages...</div>
+  </div>
+  <div class="reader-controls hidden">
+    <button id="prev-page">Previous</button>
+    <span id="page-indicator">Page 1 of 1</span>
+    <button id="next-page">Next</button>
+  </div>
+  <script src="js/firebase.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
