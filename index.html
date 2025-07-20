@@ -59,7 +59,6 @@
             padding: 0 16px;
         }
 
-        /* Header Styles */
         header {
             background-color: rgba(10, 10, 10, 0.95);
             padding: 0.5rem 0;
@@ -174,7 +173,6 @@
             transform: scale(1.1);
         }
 
-        /* Categories Section */
         .categories-section {
             background-color: rgba(26, 26, 26, 0.8);
             padding: 0.5rem 0;
@@ -267,10 +265,37 @@
             opacity: 1;
         }
 
-        /* Main Content */
         main {
             flex: 1;
             padding: 1.5rem 0;
+        }
+        
+        .results-heading-badge {
+            display: none;
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .results-heading-badge h2 {
+            display: inline-block;
+            background-color: rgba(255, 45, 117, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent-light);
+            padding: 0.5rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(255, 45, 117, 0.15);
+        }
+        
+        .results-heading-badge h2 .filter-type {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        
+        .results-heading-badge h2 .filter-value {
+            color: var(--text-primary);
+            font-weight: 600;
         }
 
         .comics-grid {
@@ -378,7 +403,6 @@
             transition: var(--transition);
         }
 
-        /* Pagination Styles */
         .pagination {
             display: flex;
             justify-content: center;
@@ -439,7 +463,6 @@
             font-size: 0.9rem;
         }
 
-        /* Loading States */
         .loading,
         .empty-state {
             display: flex;
@@ -493,28 +516,35 @@
             animation: fadeIn 0.5s ease-out;
         }
 
-        /* Detail View */
         .comic-detail {
             padding-top: 1.5rem;
+        }
+        .comic-detail-header img{
+            margin-top: 0;
         }
 
         .comic-detail-header {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
             margin-bottom: 2rem;
             opacity: 0;
             animation: fadeInUp 0.6s ease-out forwards;
+            align-items: flex-start;
         }
 
         .detail-thumbnail-container {
-            flex: 0 0 250px;
+            flex: 1;
+            max-width: 350px; /* Increased max-width */
+            min-width: 280px; /* Increased min-width */
             border-radius: var(--radius-md);
             overflow: hidden;
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border-color);
             transition: var(--transition);
             will-change: transform;
+            align-self: flex-start;
         }
+
 
         .detail-thumbnail-container:hover {
             transform: translateY(-5px) scale(1.02);
@@ -524,6 +554,7 @@
         .detail-thumbnail {
             width: 100%;
             height: auto;
+            object-fit: cover;
             display: block;
             transition: transform 0.4s ease;
         }
@@ -533,7 +564,7 @@
         }
 
         .comic-detail-info {
-            flex: 1;
+            flex: 2;
         }
 
         .detail-title {
@@ -564,6 +595,32 @@
             max-width: 70ch;
             opacity: 0;
             animation: fadeInUp 0.5s ease-out 0.4s forwards;
+            transition: max-height 0.5s ease-in-out;
+        }
+
+        .detail-description.truncated {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .show-more-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--accent-light);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            margin-top: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .show-more-btn:hover {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
         }
 
         .parts-section {
@@ -642,7 +699,6 @@
             color: var(--text-secondary);
         }
 
-        /* Suggestions Section */
         .suggestions-section {
             margin-top: 2.5rem;
         }
@@ -654,7 +710,6 @@
             margin-top: 1rem;
         }
 
-        /* Back Button */
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -700,7 +755,6 @@
             opacity: 1;
         }
 
-        /* Scroll to Top Button */
         .scroll-to-top-btn {
             padding: 0.6rem;
             background-color: var(--bg-secondary);
@@ -757,7 +811,6 @@
             opacity: 1;
         }
 
-        /* Reader View - MODIFIED FOR RESPONSIVENESS */
         .reader-header {
             display: flex;
             justify-content: space-between;
@@ -927,7 +980,6 @@
             transform: scale(1.01);
         }
 
-        /* Responsive Styles */
         @media (max-width: 992px) {
             .comic-detail-header {
                 flex-direction: column;
@@ -938,8 +990,9 @@
             .detail-thumbnail-container {
                 flex-basis: auto;
                 width: 100%;
-                max-width: 300px;
-                margin-bottom: 1.5rem;
+                max-width: 320px;
+                margin-bottom: 2rem;
+                align-self: center;
             }
 
             .comic-detail-info {
@@ -969,7 +1022,6 @@
                 font-size: 0.85rem;
             }
 
-            /* MODIFICATION: Make reader-header stack vertically */
             .reader-header {
                 flex-direction: column;
                 align-items: center;
@@ -978,14 +1030,12 @@
 
             .reader-title-container {
                 order: 1;
-                /* Title first */
                 flex-direction: column;
                 gap: 0.5rem;
             }
 
             .reader-nav {
                 order: 2;
-                /* Nav second */
                 width: 100%;
                 justify-content: center;
             }
@@ -997,47 +1047,50 @@
 
             .reader-back-btn {
                 order: 3;
-                /* Back button last */
             }
         }
 
         @media (max-width: 576px) {
-    .footer-grid {
-        grid-template-columns: 1fr;
-        justify-items: start;
-        gap: 2.5rem;
-    }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                justify-items: start;
+                gap: 2.5rem;
+            }
 
-    /* Target the 'Explore' section only */
-    .footer-column h4:contains("Explore"),
-    .footer-column h4:has-text("Explore") {
-        text-align: left;
-        margin-left: 0;
-        padding-left: 0;
-    }
+            .footer-column h4:contains("Explore"),
+            .footer-column h4:has-text("Explore") {
+                text-align: left;
+                margin-left: 0;
+                padding-left: 0;
+            }
 
-    .footer-column h4:contains("Explore") + .footer-links,
-    .footer-column h4:has-text("Explore") + .footer-links {
-        text-align: left;
-        padding-left: 0;
-        margin-left: 0;
-        list-style-position: inside;
-    }
+            .footer-column h4:contains("Explore")+.footer-links,
+            .footer-column h4:has-text("Explore")+.footer-links {
+                text-align: left;
+                padding-left: 0;
+                margin-left: 0;
+                list-style-position: inside;
+            }
+  
+            ul.detail-meta-list{
+                display: none;
+            }
 
-    /* Backup if pseudo selector doesn't work: use nth-child */
-    .footer-column:nth-child(2) {
-        text-align: left;
-        align-items: flex-start;
-    }
+            #deatil-tags-container{
+                margin-top: 20px;
+            }
 
-    .footer-column:nth-child(2) .footer-links li,
-    .footer-column:nth-child(2) .footer-links li a {
-        text-align: left;
-    }
-}
+            .footer-column:nth-child(2) {
+                text-align: left;
+                align-items: flex-start;
+            }
 
+            .footer-column:nth-child(2) .footer-links li,
+            .footer-column:nth-child(2) .footer-links li a {
+                text-align: left;
+            }
+        }
 
-        /* Footer Styles */
         .site-footer {
             background-color: var(--bg-secondary);
             padding: 4rem 0 0;
@@ -1177,6 +1230,7 @@
             color: var(--text-secondary);
             text-decoration: none;
             opacity: 0;
+            transform: scale(1);
             animation: popIn 0.5s ease-out forwards;
         }
 
@@ -1295,6 +1349,62 @@
             text-decoration: underline;
             color: var(--accent);
         }
+
+        /* NAYE STYLES FOR RATING & TAGS */
+        .detail-rating {
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+            color: #f5b327;
+            /* Star color */
+        }
+
+        .detail-meta-list {
+            list-style: none;
+            padding: 0;
+            margin: 1.25rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-meta-list li {
+            background-color: var(--bg-secondary);
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-meta-list li strong {
+            color: var(--text-primary);
+            margin-right: 0.5em;
+        }
+
+        .detail-tags-container {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .tag-link {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.3rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .tag-link:hover, .tag-link.active { /* <<< MODIFIED: Added active state for tags */
+            background-color: var(--accent);
+            color: white;
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -1325,6 +1435,15 @@
                 <div class="categories-container">
                     <ul class="categories-list" id="categories-list-container"></ul>
                 </div>
+            </div>
+        </div>
+        
+        <div id="results-heading-container" class="container results-heading-badge">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <h2 id="results-heading-text" style="margin-bottom: 0;"></h2>
+                <button id="back-from-tag-btn" class="back-btn" style="display: none; margin: 0;">
+                    <i class="fas fa-arrow-left"></i> Back to Comic
+                </button>
             </div>
         </div>
 
@@ -1539,9 +1658,25 @@
             </div>
             <div class="comic-detail-info">
                 <h1 class="detail-title" id="detail-title"></h1>
+
+                <div class="detail-rating" id="detail-rating"></div>
                 <div class="detail-meta" id="detail-author"></div>
                 <div class="detail-meta" id="detail-views"><i class="fas fa-eye"></i> <span></span></div>
-                <p class="detail-description" id="detail-description"></p>
+
+                <ul class="detail-meta-list">
+                    <li id="detail-category"></li>
+                    <li id="detail-publish-date"></li>
+                    <li id="detail-status"></li>
+                </ul>
+
+                <div class="detail-tags-container" id="detail-tags-container">
+                    <span style="font-weight: 500; color: var(--text-primary);">Tags:</span>
+                </div>
+
+                <div class="description-wrapper">
+                    <p class="detail-description" id="detail-description"></p>
+                    <button class="show-more-btn" style="display: none;">Show More</button>
+                </div>
             </div>
         </div>
         <div class="parts-section">
@@ -1597,6 +1732,8 @@
         const backToDetailBtn = document.getElementById('back-to-detail-btn');
         const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
         const progressIndicator = document.getElementById('progress-indicator');
+        const resultsHeadingContainer = document.getElementById('results-heading-container');
+        const resultsHeadingText = document.getElementById('results-heading-text');
 
         // Global State
         let allComics = [];
@@ -1606,6 +1743,10 @@
         let totalParts = 0;
         const comicsPerPage = 12;
         let manifestCache = new Map();
+        let allPartsForCurrentComic = [];
+        let activeFilter = { type: 'category', value: 'all' };
+        let previousComicForTagFilter = null;
+
 
         // Debounce Utility
         function debounce(func, wait) {
@@ -1614,6 +1755,40 @@
                 clearTimeout(timeout);
                 timeout = setTimeout(() => func.apply(this, args), wait);
             };
+        }
+
+        // --- NAYE HELPER FUNCTIONS ---
+        function generateFakeRating(comicId) {
+            let hash = 0;
+            if (!comicId || comicId.length === 0) { return 4.0; }
+            for (let i = 0; i < comicId.length; i++) {
+                const char = comicId.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0; // Convert to 32bit integer
+            }
+            const rating = 3.5 + (Math.abs(hash) % 16 / 10); // 3.5 to 5.0
+            return parseFloat(rating.toFixed(1));
+        }
+
+        function renderStars(rating) {
+            let starsHtml = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating - fullStars >= 0.5;
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+            for (let i = 0; i < fullStars; i++) starsHtml += '<i class="fas fa-star"></i>';
+            if (hasHalfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
+            for (let i = 0; i < emptyStars; i++) starsHtml += '<i class="far fa-star"></i>';
+
+            return `${starsHtml} <span style="font-size: 0.8em; color: var(--text-secondary); vertical-align: middle; margin-left: 0.5em;">${rating}</span>`;
+        }
+
+        function filterComicsByTag(tag) {
+            const filtered = allComics.filter(comic => comic.tags && Array.isArray(comic.tags) && comic.tags.includes(tag));
+            activeFilter = { type: 'tag', value: tag };
+            showGridView();
+            updateActiveFilters();
+            renderComicsGrid(filtered);
         }
 
         // --- View Management ---
@@ -1635,44 +1810,29 @@
             removeKeyboardListeners();
         }
 
-        function showReaderView(comic, partNumber, totalPages) {
+        function showReaderView(comic, part) {
             currentComic = comic;
-            currentPartNumber = partNumber;
+            currentPartNumber = part.number;
             appView.style.display = 'none';
             comicDetailView.style.display = 'none';
             comicReaderView.style.display = 'block';
-            renderComicReader(comic, partNumber, totalPages);
+            renderComicReader(comic, part);
             window.scrollTo({ top: 0, behavior: 'smooth' });
             addKeyboardListeners();
-            preloadNextPart(comic, partNumber);
+            preloadNextPart(comic, part.number);
         }
 
         // --- UI Helper Functions ---
         function renderLoadingState(container, text) {
-            container.innerHTML = `
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text">${text}</div>
-                </div>
-            `;
+            container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div class="loading-text">${text}</div></div>`;
         }
 
         function renderEmptyState(container, text) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-search empty-icon"></i>
-                    <div class="empty-text">${text}</div>
-                </div>
-            `;
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-search empty-icon"></i><div class="empty-text">${text}</div></div>`;
         }
 
         function renderErrorState(container, text) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle empty-icon"></i>
-                    <div class="empty-text" style="color: var(--error);">${text}</div>
-                </div>
-            `;
+            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle empty-icon"></i><div class="empty-text" style="color: var(--error);">${text}</div></div>`;
         }
 
         // --- Pagination Functions ---
@@ -1725,10 +1885,7 @@
                     return;
                 }
 
-                allComics = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                allComics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderComicsGrid(allComics);
             } catch (err) {
                 renderErrorState(comicsGrid, 'Failed to load comics.');
@@ -1740,6 +1897,7 @@
             comicsGrid.innerHTML = '';
             if (comicsToRender.length === 0) {
                 renderEmptyState(comicsGrid, 'No comics match your search or category.');
+                paginationContainer.innerHTML = ''; // Clear pagination
                 return;
             }
 
@@ -1753,15 +1911,15 @@
                 card.className = 'comic-card';
                 card.style.animationDelay = `${index * 0.05}s`;
                 card.innerHTML = `
-                    <div class="comic-thumbnail-container">
-                        <img src="${comic.thumbnailUrl}" alt="${comic.title}" class="comic-thumbnail" 
-                            loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600/2a2a2a/ffffff?text=No+Image'">
-                    </div>
-                    <div class="comic-info">
-                        <h3 class="comic-title">${comic.title}</h3>
-                        <p class="comic-description">${(comic.description || '').substring(0, 60)}...</p>
-                    </div>
-                `;
+                <div class="comic-thumbnail-container">
+                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" class="comic-thumbnail" 
+                        loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600/2a2a2a/ffffff?text=No+Image'">
+                </div>
+                <div class="comic-info">
+                    <h3 class="comic-title">${comic.title}</h3>
+                    <p class="comic-description">${(comic.description || '').substring(0, 60)}...</p>
+                </div>
+            `;
                 card.addEventListener('click', () => showDetailView(comic));
                 fragment.appendChild(card);
             });
@@ -1769,16 +1927,16 @@
             renderPagination(comicsToRender);
         }
 
-        // --- Category Functions ---
+        // --- Category and Filter Functions ---
         async function loadAndRenderCategories() {
             categoriesListContainer.innerHTML = `<li class="category-item"><a href="#" class="category-link">Loading...</a></li>`;
             try {
                 const snapshot = await db.collection('categories').orderBy('name').get();
                 let categoriesHtml = `
-                    <li class="category-item"><a href="#" class="category-link active" data-category-value="all" data-tooltip="All Comics">All</a></li>
-                    <li class="category-item"><a href="#" class="category-link" data-category-value="trending" data-tooltip="Trending Comics">Trending</a></li>
-                    <li class="category-item"><a href="#" class="category-link" data-category-value="most-viewed" data-tooltip="Most Viewed Comics">Most Viewed</a></li>
-                `;
+                <li class="category-item"><a href="#" class="category-link active" data-category-value="all" data-tooltip="All Comics">All</a></li>
+                <li class="category-item"><a href="#" class="category-link" data-category-value="trending" data-tooltip="Trending Comics">Trending</a></li>
+                <li class="category-item"><a href="#" class="category-link" data-category-value="most-viewed" data-tooltip="Most Viewed Comics">Most Viewed</a></li>
+            `;
                 snapshot.forEach(doc => {
                     const cat = doc.data();
                     categoriesHtml += `<li class="category-item"><a href="#" class="category-link" data-category-value="${cat.value}" data-tooltip="${cat.name}">${cat.name}</a></li>`;
@@ -1790,23 +1948,66 @@
                 console.error("Failed to load categories:", err);
             }
         }
+        
+        function updateActiveFilters() {
+            const backBtn = document.getElementById('back-from-tag-btn');
+
+            // Update category tabs
+            const categoryLinks = categoriesListContainer.querySelectorAll('.category-link');
+            categoryLinks.forEach(link => {
+                if (activeFilter.type === 'category' && link.dataset.categoryValue === activeFilter.value) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            if (previousComicForTagFilter && activeFilter.type === 'tag') {
+                backBtn.style.display = 'inline-flex';
+            } else {
+                backBtn.style.display = 'none';
+            }
+            
+            // Update results heading
+            if (activeFilter.type === 'category' && activeFilter.value === 'all') {
+                 resultsHeadingContainer.style.display = 'none';
+            } else if (activeFilter.type === 'search' && !activeFilter.value) {
+                 resultsHeadingContainer.style.display = 'none';
+            } else {
+                resultsHeadingContainer.style.display = 'block';
+                let valueText = activeFilter.value;
+
+                if(activeFilter.type === 'tag') {
+                    resultsHeadingText.innerHTML = `<span class="filter-value">${valueText}</span>`;
+                } else {
+                    let typeText = activeFilter.type.charAt(0).toUpperCase() + activeFilter.type.slice(1);
+                    if (activeFilter.type === 'category') {
+                        const activeLink = document.querySelector(`.category-link[data-category-value="${valueText}"]`);
+                        if (activeLink) valueText = activeLink.textContent;
+                    }
+                    resultsHeadingText.innerHTML = `<span class="filter-type">${typeText}:</span> <span class="filter-value">"${valueText}"</span>`;
+                }
+            }
+        }
+
 
         function addCategoryLinkListeners() {
             const dynamicCategoryLinks = categoriesListContainer.querySelectorAll('.category-link');
             dynamicCategoryLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    dynamicCategoryLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
                     currentPage = 1;
+                    previousComicForTagFilter = null;
 
                     const categoryValue = link.dataset.categoryValue;
+                    activeFilter = { type: 'category', value: categoryValue };
+                    updateActiveFilters();
+                    
                     let filteredComics = allComics;
-
                     if (categoryValue === 'trending') {
                         filteredComics = [...allComics].sort((a, b) => (b.recentViews || 0) - (a.recentViews || 0));
                     } else if (categoryValue === 'most-viewed') {
-                        console.warn("Most Viewed sorting requires total views on the main comic document.");
+                        filteredComics = [...allComics].sort((a, b) => (b.totalViews || 0) - (a.totalViews || 0));
                     } else if (categoryValue !== 'all') {
                         filteredComics = allComics.filter(comic => comic.category === categoryValue);
                     }
@@ -1824,10 +2025,69 @@
             detailClone.getElementById('detail-thumbnail').src = comic.thumbnailUrl;
             detailClone.getElementById('detail-thumbnail').alt = comic.title;
             detailClone.getElementById('detail-title').textContent = comic.title;
-            detailClone.getElementById('detail-author').innerHTML = comic.author ? `Author: ${comic.author}` : '';
-            detailClone.getElementById('detail-description').textContent = comic.description || 'No description available.';
+            detailClone.getElementById('detail-author').innerHTML = comic.author ? `<strong>Author:</strong> ${comic.author}` : '<strong>Author:</strong> N/A';
+            
+            const descriptionElement = detailClone.getElementById('detail-description');
+            descriptionElement.textContent = comic.description || 'No description available.';
+            
+            const ratingValue = generateFakeRating(comic.id);
+            detailClone.getElementById('detail-rating').innerHTML = renderStars(ratingValue);
 
+            detailClone.getElementById('detail-category').innerHTML = `<strong>Category:</strong> ${comic.category || 'N/A'}`;
+            const publishDate = comic.createdAt?.toDate ? comic.createdAt.toDate().toLocaleDateString() : 'N/A';
+            detailClone.getElementById('detail-publish-date').innerHTML = `<strong>Published:</strong> ${publishDate}`;
+
+            const status = comic.title.length % 2 === 0 ? 'Completed' : 'Ongoing';
+            detailClone.getElementById('detail-status').innerHTML = `<strong>Status:</strong> ${status}`;
+
+            const tagsContainer = detailClone.getElementById('detail-tags-container');
+            const tagsLabel = tagsContainer.querySelector('span');
+            tagsContainer.innerHTML = ''; // Clear previous
+            tagsContainer.appendChild(tagsLabel); // Re-add the label
+
+            if (comic.tags && comic.tags.length > 0) {
+                comic.tags.forEach(tag => {
+                    const tagElement = document.createElement('a');
+                    tagElement.href = '#';
+                    tagElement.className = 'tag-link';
+                    tagElement.textContent = tag;
+                    if (activeFilter.type === 'tag' && activeFilter.value === tag) {
+                        tagElement.classList.add('active');
+                    }
+                    tagElement.onclick = (e) => {
+                        e.preventDefault();
+                        previousComicForTagFilter = currentComic;
+                        filterComicsByTag(tag);
+                    };
+                    tagsContainer.appendChild(tagElement);
+                });
+            } else {
+                tagsContainer.style.display = 'none'; // Hide if no tags
+            }
+
+            // ====[ "Show More" Logic STARTS here ]====
+            const showMoreBtn = detailClone.querySelector('.show-more-btn');
+            const descriptionWrapper = detailClone.querySelector('.description-wrapper');
+
+            // Temporarily append to check for overflow
             comicDetailContent.appendChild(detailClone);
+
+            // Check if description text is overflowing its container
+            // Use a small timeout to allow the DOM to render before checking height
+            setTimeout(() => {
+                if (descriptionElement.scrollHeight > descriptionElement.clientHeight) {
+                    descriptionElement.classList.add('truncated');
+                    showMoreBtn.style.display = 'inline-block';
+                    showMoreBtn.textContent = 'Show More';
+
+                    showMoreBtn.addEventListener('click', () => {
+                        descriptionElement.classList.toggle('truncated');
+                        showMoreBtn.textContent = descriptionElement.classList.contains('truncated') ? 'Show More' : 'Show Less';
+                    });
+                }
+            }, 100);
+            // ====[ "Show More" Logic ENDS here ]====
+
             loadAndDisplayPartsAndViews(comic);
             renderSuggestions(comicDetailContent.querySelector('#suggestions-grid'), comic);
         }
@@ -1835,15 +2095,13 @@
         async function loadAndDisplayPartsAndViews(comic) {
             const partsContainer = comicDetailContent.querySelector('#parts-list-container');
             const totalViewsContainer = comicDetailContent.querySelector('#detail-views span');
-
-            renderLoadingState(partsContainer, 'Loading comic parts...');
-            totalViewsContainer.textContent = '...';
+            totalViewsContainer.textContent = comic.totalViews || '0';
 
             if (!comic.manifestUrl) {
                 renderEmptyState(partsContainer, 'This comic does not have any parts listed.');
-                totalViewsContainer.textContent = '0';
                 return;
             }
+            renderLoadingState(partsContainer, 'Loading comic parts...');
 
             try {
                 let manifest = manifestCache.get(comic.manifestUrl);
@@ -1854,112 +2112,92 @@
                     manifestCache.set(comic.manifestUrl, manifest);
                 }
 
-                if (!manifest.parts || manifest.parts.length === 0) {
+                const partsFromManifest = manifest.parts || [];
+                if (partsFromManifest.length === 0) {
                     renderEmptyState(partsContainer, 'No parts found in the manifest file.');
-                    totalViewsContainer.textContent = '0';
                     return;
                 }
 
-                totalParts = manifest.parts.length;
-                const partViewsRef = db.collection('comics').doc(comic.id).collection('part_views');
-                const viewsSnapshot = await partViewsRef.get();
-                const firestoreViews = {};
-                viewsSnapshot.forEach(doc => {
-                    firestoreViews[doc.id] = doc.data().views || 0;
+                totalParts = partsFromManifest.length;
+
+                const [overridesSnapshot, viewsSnapshot] = await Promise.all([
+                    db.collection('comics').doc(comic.id).collection('part_overrides').get(),
+                    db.collection('comics').doc(comic.id).collection('part_views').get()
+                ]);
+
+                const overridesMap = new Map(overridesSnapshot.docs.map(doc => [doc.id, doc.data().title]));
+                const viewsMap = new Map(viewsSnapshot.docs.map(doc => [doc.id, doc.data().views || 0]));
+
+                allPartsForCurrentComic = partsFromManifest.map(part => {
+                    const partNumStr = String(part.number);
+                    const title = overridesMap.get(partNumStr) || `${comic.title} - Part ${part.number}`;
+                    const views = viewsMap.get(partNumStr) || 0;
+                    return { ...part, title, views };
                 });
 
-                let totalViews = 0;
-                const combinedParts = manifest.parts.map(part => {
-                    const dynamicViews = firestoreViews[String(part.number)] || 0;
-                    totalViews += dynamicViews;
-                    return {
-                        ...part,
-                        views: dynamicViews
-                    };
-                });
-
-                totalViewsContainer.textContent = totalViews;
-                renderPartsList(partsContainer, combinedParts, comic);
+                renderPartsList(partsContainer, allPartsForCurrentComic, comic);
             } catch (error) {
                 renderErrorState(partsContainer, 'Could not load comic parts info.');
-                totalViewsContainer.textContent = 'Error';
                 console.error(error);
             }
         }
 
-        function renderPartsList(container, partsFromManifest, comic) {
+        function renderPartsList(container, parts, comic) {
             container.innerHTML = '';
             const fragment = document.createDocumentFragment();
 
-            // Hum har part ke liye ek list item banayenge
-            partsFromManifest.forEach((part, index) => {
+            parts.forEach((part, index) => {
                 const partItem = document.createElement('div');
                 partItem.className = 'part-item';
                 partItem.style.animationDelay = `${index * 0.05}s`;
-                const uploadDate = comic.createdAt && comic.createdAt.toDate ? new Date(comic.createdAt.toDate().getTime()).toLocaleDateString() : 'Unknown';
+                const uploadDate = comic.createdAt?.toDate ? new Date(comic.createdAt.toDate().getTime()).toLocaleDateString() : 'Unknown';
 
                 partItem.innerHTML = `
-            <div class="part-content">
-                <div>${comic.title} - Part ${part.number}</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary);">${part.pages} pages</div>
-                <div class="part-meta">Uploaded: ${uploadDate}</div>
-            </div>
-            <div class="part-views">
-                <i class="fas fa-eye"></i> ${part.views || 0}
-            </div>
-        `;
+                <div class="part-content">
+                    <div>${part.title}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">${part.pages} pages</div>
+                    <div class="part-meta">Uploaded: ${uploadDate}</div>
+                </div>
+                <div class="part-views">
+                    <i class="fas fa-eye"></i> ${part.views || 0}
+                </div>
+            `;
 
-                // Click karne par view count update karne ka logic
                 partItem.addEventListener('click', async () => {
-                    try {
-                        const comicRef = db.collection('comics').doc(comic.id);
-                        const partRef = comicRef.collection('part_views').doc(String(part.number));
-
-                        // Dono (part view aur total view) ko ek saath update karein
-                        await db.runTransaction(async (transaction) => {
-                            transaction.set(partRef, { views: firebase.firestore.FieldValue.increment(1) }, { merge: true });
-                            transaction.update(comicRef, { totalViews: firebase.firestore.FieldValue.increment(1) });
-                        });
-
-                        console.log("Part view and total views updated successfully.");
-
-                    } catch (err) {
-                        console.error(`Failed to update views for part ${part.number}:`, err);
-                        // Agar 'totalViews' field nahi hai, to usko pehli baar banane ke liye fallback
-                        if (err.code === 'not-found' || err.message.includes("No document to update")) {
-                            const comicRef = db.collection('comics').doc(comic.id);
-                            await comicRef.set({ totalViews: 1 }, { merge: true });
-                        }
-                    }
-
-                    // Reader view kholein
-                    showReaderView(comic, part.number, part.pages);
+                    await updateViewCount(comic.id, part.number);
+                    showReaderView(comic, part);
                 });
-
-                // **SAHI CODE YAHAN HAI:** Har part item ko loop ke andar hi fragment mein add karna hai
                 fragment.appendChild(partItem);
             });
-
-            // Aakhir mein poore fragment ko container mein daal dein
             container.appendChild(fragment);
+        }
+
+        async function updateViewCount(comicId, partNumber) {
+            try {
+                const comicRef = db.collection('comics').doc(comicId);
+                const partRef = comicRef.collection('part_views').doc(String(partNumber));
+                await db.runTransaction(async (transaction) => {
+                    transaction.set(partRef, { views: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+                    transaction.update(comicRef, { totalViews: firebase.firestore.FieldValue.increment(1) });
+                });
+            } catch (err) {
+                if (err.code === 'not-found' || err.message.includes("No document to update")) {
+                    const comicRef = db.collection('comics').doc(comicId);
+                    await comicRef.set({ totalViews: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+                } else {
+                    console.error(`Failed to update views for part ${partNumber}:`, err);
+                }
+            }
         }
 
         function renderSuggestions(container, currentComic) {
             let maxSuggestions;
             const screenWidth = window.innerWidth;
-            if (screenWidth <= 576) {
-                maxSuggestions = 30;
-            } else if (screenWidth <= 992) {
-                maxSuggestions = 40;
-            } else {
-                maxSuggestions = 50;
-            }
+            if (screenWidth <= 576) maxSuggestions = 30;
+            else if (screenWidth <= 992) maxSuggestions = 40;
+            else maxSuggestions = 50;
 
-            const categorySuggestions = allComics
-                .filter(c => c.id !== currentComic.id && c.category === currentComic.category)
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 20);
-
+            const categorySuggestions = allComics.filter(c => c.id !== currentComic.id && c.category === currentComic.category).sort(() => 0.5 - Math.random()).slice(0, 20);
             let finalSuggestions = [...categorySuggestions];
             const suggestedIds = new Set(finalSuggestions.map(c => c.id));
             suggestedIds.add(currentComic.id);
@@ -1967,71 +2205,61 @@
             if (finalSuggestions.length < maxSuggestions) {
                 const currentTags = new Set(currentComic.tags || []);
                 if (currentTags.size > 0) {
-                    const potentialTagSuggestions = allComics
-                        .filter(c => !suggestedIds.has(c.id))
-                        .map(c => {
-                            const otherTags = new Set(c.tags || []);
-                            const commonTagsCount = [...currentTags].filter(tag => otherTags.has(tag)).length;
-                            return { comic: c, score: commonTagsCount };
-                        })
-                        .filter(item => item.score > 0)
-                        .sort((a, b) => b.score - a.score);
-
+                    const potentialTagSuggestions = allComics.filter(c => !suggestedIds.has(c.id)).map(c => {
+                        const otherTags = new Set(c.tags || []);
+                        const commonTagsCount = [...currentTags].filter(tag => otherTags.has(tag)).length;
+                        return { comic: c, score: commonTagsCount };
+                    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score);
                     const remainingSlots = maxSuggestions - finalSuggestions.length;
                     const tagBasedToAdd = potentialTagSuggestions.slice(0, remainingSlots).map(item => item.comic);
                     finalSuggestions.push(...tagBasedToAdd);
                 }
             }
-
             container.innerHTML = '';
             const suggestionsToRender = finalSuggestions.slice(0, maxSuggestions);
             if (suggestionsToRender.length === 0) {
                 renderEmptyState(container, 'No similar comics found.');
                 return;
             }
-
             const fragment = document.createDocumentFragment();
             suggestionsToRender.forEach((comic, index) => {
                 const card = document.createElement('div');
                 card.className = 'comic-card';
                 card.style.animationDelay = `${index * 0.05}s`;
                 card.innerHTML = `
-                    <div class="comic-thumbnail-container">
-                        <img src="${comic.thumbnailUrl}" alt="${comic.title}" class="comic-thumbnail" 
-                            loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600/2a2a2a/ffffff?text=No+Image'">
-                    </div>
-                    <div class="comic-info">
-                        <h3 class="comic-title">${comic.title}</h3>
-                        <p class="comic-description">${(comic.description || '').substring(0, 60)}...</p>
-                    </div>
-                `;
+                <div class="comic-thumbnail-container">
+                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" class="comic-thumbnail" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600/2a2a2a/ffffff?text=No+Image'">
+                </div>
+                <div class="comic-info">
+                    <h3 class="comic-title">${comic.title}</h3>
+                </div>`;
                 card.addEventListener('click', () => showDetailView(comic));
                 fragment.appendChild(card);
             });
             container.appendChild(fragment);
         }
 
-        async function renderComicReader(comic, partNumber, totalPages) {
-            document.getElementById('reader-title').textContent = `${comic.title} - Part ${partNumber}`;
-            progressIndicator.textContent = `Part ${partNumber} of ${totalParts}`;
+        async function renderComicReader(comic, part) {
+            document.getElementById('reader-title').textContent = part.title;
+            progressIndicator.textContent = `Part ${part.number} of ${totalParts}`;
             comicPagesContainer.innerHTML = '';
 
-            if (!totalPages || totalPages < 1) {
+            if (!part.pages || part.pages < 1) {
                 renderEmptyState(comicPagesContainer, 'No pages found for this part.');
                 return;
             }
 
             const fragment = document.createDocumentFragment();
-            for (let i = 1; i <= totalPages; i++) {
+            for (let i = 1; i <= part.pages; i++) {
                 const pageNumFormatted = String(i).padStart(3, '0');
-                const imageName = `part${partNumber}_image_${pageNumFormatted}`;
+                const imageName = `part${part.number}_image_${pageNumFormatted}`;
                 const imageUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_100,f_jpg/${comic.folderName}/${imageName}.jpg`;
 
                 const img = document.createElement('img');
                 img.src = imageUrl;
                 img.className = 'comic-page-img';
                 img.loading = 'lazy';
-                img.alt = `Page ${i} of Part ${partNumber}`;
+                img.alt = `Page ${i} of ${part.title}`;
                 img.style.animationDelay = `${i * 0.05}s`;
                 img.onerror = function () {
                     this.onerror = null;
@@ -2041,10 +2269,10 @@
             }
             comicPagesContainer.appendChild(fragment);
 
-            prevPartBtnTop.disabled = partNumber === 1;
-            nextPartBtnTop.disabled = partNumber === totalParts;
-            prevPartBtnBottom.disabled = partNumber === 1;
-            nextPartBtnBottom.disabled = partNumber === totalParts;
+            prevPartBtnTop.disabled = part.number === 1;
+            nextPartBtnTop.disabled = part.number === totalParts;
+            prevPartBtnBottom.disabled = part.number === 1;
+            nextPartBtnBottom.disabled = part.number === totalParts;
             scrollToTopBtn.classList.remove('visible');
 
             const handleScroll = () => {
@@ -2059,51 +2287,16 @@
             window.addEventListener('scroll', handleScroll);
         }
 
-        async function navigateToPart(comic, partNumber) {
-            if (!comic.manifestUrl) {
-                renderEmptyState(comicPagesContainer, 'This comic does not have any parts listed.');
-                return;
-            }
-
-            try {
-                let manifest = manifestCache.get(comic.manifestUrl);
-                if (!manifest) {
-                    const response = await fetch(comic.manifestUrl);
-                    if (!response.ok) throw new Error('Manifest file not found');
-                    manifest = await response.json();
-                    manifestCache.set(comic.manifestUrl, manifest);
-                }
-
-                if (!manifest.parts || manifest.parts.length === 0) {
-                    renderEmptyState(comicPagesContainer, 'No parts found in the manifest file.');
-                    return;
-                }
-
-                const part = manifest.parts.find(p => p.number === partNumber);
-                if (!part) {
-                    renderEmptyState(comicPagesContainer, `Part ${partNumber} not found.`);
-                    return;
-                }
-
-                try {
-                    const partRef = db.collection('comics').doc(comic.id).collection('part_views').doc(String(part.number));
-                    await partRef.set({
-                        views: firebase.firestore.FieldValue.increment(1)
-                    }, { merge: true });
-                } catch (err) {
-                    console.error(`Failed to update views for part ${part.number}:`, err);
-                }
-
-                showReaderView(comic, part.number, part.pages);
-            } catch (error) {
-                renderErrorState(comicPagesContainer, 'Could not load comic part.');
-                console.error(error);
+        async function navigateToPart(comic, newPartNumber) {
+            const partToNavigate = allPartsForCurrentComic.find(p => p.number === newPartNumber);
+            if (partToNavigate) {
+                await updateViewCount(comic.id, newPartNumber);
+                showReaderView(comic, partToNavigate);
             }
         }
 
         async function preloadNextPart(comic, currentPartNumber) {
             if (currentPartNumber >= totalParts) return;
-
             try {
                 let manifest = manifestCache.get(comic.manifestUrl);
                 if (!manifest) {
@@ -2112,31 +2305,28 @@
                     manifest = await response.json();
                     manifestCache.set(comic.manifestUrl, manifest);
                 }
-
                 const nextPart = manifest.parts.find(p => p.number === currentPartNumber + 1);
                 if (!nextPart) return;
-
                 for (let i = 1; i <= nextPart.pages; i++) {
                     const pageNumFormatted = String(i).padStart(3, '0');
                     const imageName = `part${nextPart.number}_image_${pageNumFormatted}`;
                     const imageUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_100,f_jpg/${comic.folderName}/${imageName}.jpg`;
-
-                    // Preload image
                     const img = new Image();
                     img.src = imageUrl;
-                    img.onerror = () => {
-                        console.warn(`Failed to preload image: ${imageUrl}`);
-                    };
                 }
             } catch (error) {
                 console.warn(`Failed to preload next part ${currentPartNumber + 1}:`, error);
             }
         }
 
-        // --- Search Functionality ---
         const handleSearch = debounce(() => {
             const query = searchInput.value.trim().toLowerCase() || searchInputDetail.value.trim().toLowerCase();
             currentPage = 1;
+            previousComicForTagFilter = null;
+            
+            activeFilter = { type: 'search', value: query };
+            updateActiveFilters();
+
             const filteredComics = allComics.filter(comic =>
                 comic.title.toLowerCase().includes(query) ||
                 (comic.description || '').toLowerCase().includes(query) ||
@@ -2146,25 +2336,28 @@
             renderComicsGrid(filteredComics);
         }, 300);
 
-        // --- Newsletter Subscription ---
+        function resetToHomeView() {
+            showGridView();
+            currentPage = 1;
+            previousComicForTagFilter = null;
+            activeFilter = { type: 'category', value: 'all' };
+            updateActiveFilters();
+            renderComicsGrid(allComics);
+        }
+
         async function handleSubscribeForm(e, formId) {
             e.preventDefault();
             const form = document.getElementById(formId);
             const emailInput = form.querySelector('.newsletter-input');
             const statusMessage = form.querySelector('.form-status-message');
             const email = emailInput.value.trim();
-
             if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 statusMessage.textContent = 'Please enter a valid email address.';
                 statusMessage.className = 'form-status-message error';
                 statusMessage.style.opacity = '1';
-                setTimeout(() => {
-                    statusMessage.style.opacity = '0';
-                    setTimeout(() => statusMessage.textContent = '', 300);
-                }, 3000);
+                setTimeout(() => { statusMessage.style.opacity = '0'; setTimeout(() => statusMessage.textContent = '', 300); }, 3000);
                 return;
             }
-
             try {
                 await db.collection('newsletter_subscribers').add({
                     email,
@@ -2174,23 +2367,16 @@
                 statusMessage.className = 'form-status-message success';
                 statusMessage.style.opacity = '1';
                 emailInput.value = '';
-                setTimeout(() => {
-                    statusMessage.style.opacity = '0';
-                    setTimeout(() => statusMessage.textContent = '', 300);
-                }, 3000);
+                setTimeout(() => { statusMessage.style.opacity = '0'; setTimeout(() => statusMessage.textContent = '', 300); }, 3000);
             } catch (err) {
                 statusMessage.textContent = 'Failed to subscribe. Try again later.';
                 statusMessage.className = 'form-status-message error';
                 statusMessage.style.opacity = '1';
                 console.error('Subscription error:', err);
-                setTimeout(() => {
-                    statusMessage.style.opacity = '0';
-                    setTimeout(() => statusMessage.textContent = '', 300);
-                }, 3000);
+                setTimeout(() => { statusMessage.style.opacity = '0'; setTimeout(() => statusMessage.textContent = '', 300); }, 3000);
             }
         }
 
-        // --- Keyboard Navigation ---
         function addKeyboardListeners() {
             document.addEventListener('keydown', handleKeyboardNavigation);
         }
@@ -2200,105 +2386,44 @@
         }
 
         function handleKeyboardNavigation(e) {
-            if (!comicReaderView.style.display === 'block') return;
-
+            if (comicReaderView.style.display !== 'block') return;
             switch (e.key) {
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    if (!prevPartBtnTop.disabled) {
-                        prevPartBtnTop.click();
-                    }
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    if (!nextPartBtnTop.disabled) {
-                        nextPartBtnTop.click();
-                    }
-                    break;
-                case 'Escape':
-                    e.preventDefault();
-                    backToDetailBtn.click();
-                    break;
-                case 'Home':
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    break;
-                case 'End':
-                    e.preventDefault();
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                    break;
+                case 'ArrowLeft': e.preventDefault(); if (!prevPartBtnTop.disabled) { prevPartBtnTop.click(); } break;
+                case 'ArrowRight': e.preventDefault(); if (!nextPartBtnTop.disabled) { nextPartBtnTop.click(); } break;
+                case 'Escape': e.preventDefault(); backToDetailBtn.click(); break;
+                case 'Home': e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+                case 'End': e.preventDefault(); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); break;
             }
         }
 
-        // --- Event Listeners ---
         function setupEventListeners() {
-            // Logo clicks
-            document.getElementById('logo-main').addEventListener('click', (e) => {
-                e.preventDefault();
-                showGridView();
-                currentPage = 1;
-                renderComicsGrid(allComics);
-            });
+            document.getElementById('logo-main').addEventListener('click', (e) => { e.preventDefault(); resetToHomeView(); });
+            logoMainDetail.addEventListener('click', (e) => { e.preventDefault(); resetToHomeView(); });
 
-            logoMainDetail.addEventListener('click', (e) => {
-                e.preventDefault();
-                showGridView();
-                currentPage = 1;
-                renderComicsGrid(allComics);
-            });
-
-            // Search
             searchInput.addEventListener('input', handleSearch);
             searchInputDetail.addEventListener('input', handleSearch);
             searchBtn.addEventListener('click', handleSearch);
 
-            // Navigation buttons
-            prevPartBtnTop.addEventListener('click', () => {
-                if (currentPartNumber > 1) {
-                    navigateToPart(currentComic, currentPartNumber - 1);
-                }
-            });
-
-            nextPartBtnTop.addEventListener('click', () => {
-                if (currentPartNumber < totalParts) {
-                    navigateToPart(currentComic, currentPartNumber + 1);
-                }
-            });
-
-            prevPartBtnBottom.addEventListener('click', () => {
-                if (currentPartNumber > 1) {
-                    navigateToPart(currentComic, currentPartNumber - 1);
-                }
-            });
-
-            nextPartBtnBottom.addEventListener('click', () => {
-                if (currentPartNumber < totalParts) {
-                    navigateToPart(currentComic, currentPartNumber + 1);
-                }
-            });
-
-            backToDetailBtn.addEventListener('click', (e) => {
+            document.getElementById('back-from-tag-btn').addEventListener('click', (e) => {
                 e.preventDefault();
-                showDetailView(currentComic);
+                if (previousComicForTagFilter) {
+                    const comicToReturnTo = previousComicForTagFilter;
+                    previousComicForTagFilter = null; // Clear state immediately
+                    showDetailView(comicToReturnTo);
+                }
             });
 
-            document.getElementById('back-to-grid-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                showGridView();
-                currentPage = 1;
-                renderComicsGrid(allComics);
-            });
+            prevPartBtnTop.addEventListener('click', () => { if (currentPartNumber > 1) { navigateToPart(currentComic, currentPartNumber - 1); } });
+            nextPartBtnTop.addEventListener('click', () => { if (currentPartNumber < totalParts) { navigateToPart(currentComic, currentPartNumber + 1); } });
+            prevPartBtnBottom.addEventListener('click', () => { if (currentPartNumber > 1) { navigateToPart(currentComic, currentPartNumber - 1); } });
+            nextPartBtnBottom.addEventListener('click', () => { if (currentPartNumber < totalParts) { navigateToPart(currentComic, currentPartNumber + 1); } });
+            backToDetailBtn.addEventListener('click', (e) => { e.preventDefault(); showDetailView(currentComic); });
 
-            // Scroll to top
-            scrollToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+            document.getElementById('back-to-grid-btn').addEventListener('click', (e) => { e.preventDefault(); resetToHomeView(); });
 
-            // Newsletter forms
+            scrollToTopBtn.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
             document.getElementById('newsletter-form-main').addEventListener('submit', (e) => handleSubscribeForm(e, 'newsletter-form-main'));
             document.getElementById('newsletter-form-detail').addEventListener('submit', (e) => handleSubscribeForm(e, 'newsletter-form-detail'));
-
-            // Lazy load observer
             const lazyImages = document.querySelectorAll('img[loading="lazy"]');
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -2309,10 +2434,7 @@
                     }
                 });
             }, { rootMargin: '200px' });
-
             lazyImages.forEach(img => observer.observe(img));
-
-            // Preload critical resources
             const preloadLink = document.createElement('link');
             preloadLink.rel = 'preload';
             preloadLink.as = 'image';
@@ -2320,7 +2442,6 @@
             document.head.appendChild(preloadLink);
         }
 
-        // --- Initialize App ---
         async function init() {
             try {
                 await loadComics();
@@ -2332,7 +2453,6 @@
             }
         }
 
-        // Start the app
         init();
     </script>
 </body>

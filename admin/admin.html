@@ -22,15 +22,12 @@
             --error: #E53E3E;
             --success: #38A169;
             --warning: #DD6B20;
-
-            /* Light Theme */
             --text-dark: #2D3748;
             --text-light: #F7FAFC;
             --text-gray: #718096;
             --bg-main: #EDF2F7;
             --bg-card: #FFFFFF;
             --border-color: #E2E8F0;
-
             --border-radius: 12px;
             --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -40,8 +37,6 @@
         html[data-theme='dark'] {
             --primary: #90CDF4;
             --secondary: #63B3ED;
-
-            /* Dark Theme */
             --text-dark: #EDF2F7;
             --text-light: #1A202C;
             --text-gray: #A0AEC0;
@@ -62,8 +57,6 @@
             color: var(--text-dark);
             line-height: 1.6;
             transition: background-color 0.3s, color 0.3s;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         @keyframes fadeInUp {
@@ -122,7 +115,6 @@
             max-width: 420px;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow-lg);
-            overflow: hidden;
             animation: scaleIn 0.5s ease-out forwards;
         }
 
@@ -194,6 +186,12 @@
         .btn-sm {
             padding: 0.4rem 0.8rem;
             font-size: 0.8rem;
+        }
+
+        .btn-xs {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
         }
 
         .btn:active {
@@ -546,71 +544,6 @@
             text-overflow: ellipsis;
         }
 
-        .thumbnail-input-grid {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 1rem;
-            margin-top: 0.5rem;
-        }
-
-        .thumbnail-input-grid .separator {
-            color: var(--text-gray);
-            font-weight: 500;
-        }
-
-        .file-upload-btn {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            width: 100%;
-            height: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px dashed var(--border-color);
-            border-radius: var(--border-radius);
-            background: var(--bg-main);
-            color: var(--text-gray);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .file-upload-btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background-color: var(--bg-card);
-        }
-
-        .thumbnail-preview {
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .thumbnail-preview img {
-            max-width: 100%;
-            max-height: 150px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            animation: scaleIn 0.3s ease;
-        }
-
-        .progress-container {
-            width: 100%;
-            background: var(--border-color);
-            border-radius: 20px;
-            margin-top: 1rem;
-            overflow: hidden;
-            display: none;
-        }
-
-        .progress-bar {
-            height: 10px;
-            background: var(--primary);
-            width: 0%;
-            border-radius: 20px;
-            transition: width 0.4s ease;
-        }
-
         .modal {
             position: fixed;
             top: 0;
@@ -636,7 +569,7 @@
             background: var(--bg-card);
             border-radius: var(--border-radius);
             width: 90%;
-            max-width: 500px;
+            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: var(--box-shadow-lg);
@@ -777,7 +710,6 @@
             padding: 0.5rem;
         }
 
-        /* === NEW STYLES FOR CATEGORY LIST === */
         .category-admin-list {
             list-style: none;
             padding: 0;
@@ -809,7 +741,37 @@
             font-weight: 500;
         }
 
-        /* === END CATEGORY LIST STYLES === */
+        /* NEW STYLES FOR RECENT ACTIVITY */
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-details {
+            font-size: 0.9rem;
+        }
+
+        .activity-details strong {
+            color: var(--primary);
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
 
         @media (max-width: 992px) {
             .sidebar {
@@ -834,39 +796,14 @@
                 font-size: 1.5rem;
             }
 
-            .form-card {
-                padding: 1.5rem;
-            }
-
+            .form-card,
             .auth-body,
             .auth-header {
                 padding: 1.5rem;
             }
 
-            .form-row,
-            .thumbnail-input-grid {
+            .form-row {
                 grid-template-columns: 1fr;
-            }
-
-            .thumbnail-input-grid .separator {
-                display: flex;
-                align-items: center;
-                text-align: center;
-            }
-
-            .thumbnail-input-grid .separator::before,
-            .thumbnail-input-grid .separator::after {
-                content: '';
-                flex: 1;
-                border-bottom: 1px solid var(--border-color);
-            }
-
-            .thumbnail-input-grid .separator::before {
-                margin-right: .5em;
-            }
-
-            .thumbnail-input-grid .separator::after {
-                margin-left: .5em;
             }
 
             .stats-container {
@@ -890,22 +827,6 @@
 
             .header h1 {
                 font-size: 1.25rem;
-            }
-
-            .user-profile {
-                gap: 0.5rem;
-            }
-
-            .user-profile img {
-                width: 35px;
-                height: 35px;
-            }
-
-            .theme-toggle-btn,
-            .logout-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
             }
 
             .toast {
@@ -942,7 +863,7 @@
                         <span id="login-spinner" class="loading-spinner" style="display: none;"></span>
                         <span id="login-text">Login</span>
                     </button>
-                    <p id="login-error" class="error-message mt-3"></p>
+                    <p id="login-error" class="error-message"></p>
                 </div>
             </div>
         </div>
@@ -966,22 +887,18 @@
         </div>
 
         <div class="main-content">
-            <div class="header">
-                <button class="mobile-menu-btn" id="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
+            <header class="header">
+                <button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
                 <h1 id="section-title">Dashboard</h1>
                 <div class="user-profile">
-                    <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
+                    <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme"><i
+                            class="fas fa-moon"></i></button>
                     <img src="https://ui-avatars.com/api/?name=Admin&background=4A55A2&color=fff&font-size=0.5"
                         alt="Admin">
-                    <button class="logout-btn" id="logout-btn" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </button>
+                    <button class="logout-btn" id="logout-btn" title="Logout"><i
+                            class="fas fa-sign-out-alt"></i></button>
                 </div>
-            </div>
+            </header>
 
             <div id="dashboard-section" class="section-content">
                 <div class="stats-container">
@@ -999,15 +916,17 @@
                     </div>
                     <div class="stat-card" style="--i: 4;">
                         <div class="stat-title">Storage Used</div>
-                        <div class="stat-value" id="storage-used">0 MB</div>
+                        <div class="stat-value" id="storage-used">N/A</div>
                     </div>
                 </div>
-                <div class="form-card" style="margin-top: 2rem; animation-delay: 0.5s">
+
+                <div class="form-card" style="margin-top: 2rem;">
                     <h2>Recent Activity</h2>
-                    <div id="recent-activity">
+                    <div id="recent-activity-list">
                         <p>Loading recent activity...</p>
                     </div>
                 </div>
+
             </div>
 
             <div id="comics-section" class="section-content" style="display: none;">
@@ -1022,52 +941,28 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label for="comic-folder">Folder Name</label>
-                                <input type="text" id="comic-folder" class="form-control"
-                                    placeholder="e.g., Satisfying_Needs" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="comic-category">Category</label>
-                                <select id="comic-category" class="form-control" required>
+                            <div class="form-group"><label for="comic-folder">Cloudinary Folder Name</label><input
+                                    type="text" id="comic-folder" class="form-control"
+                                    placeholder="e.g., Satisfying_Needs" required></div>
+                            <div class="form-group"><label for="comic-category">Category</label><select
+                                    id="comic-category" class="form-control" required>
                                     <option value="">Loading categories...</option>
-                                </select>
-                            </div>
+                                </select></div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group"><label for="comic-tags">Tags (comma-separated)</label><input
-                                    type="text" id="comic-tags" class="form-control"
-                                    placeholder="e.g., brest, BigBoob, Incest"></div>
-                        </div>
-                        <div class="form-group"><label for="comic-manifest-url">Manifest JSON URL</label><input
-                                type="url" id="comic-manifest-url" class="form-control"
-                                placeholder="Paste GitHub Gist Raw URL here" required></div>
-
-                        <div class="form-group">
-                            <label>Thumbnail</label>
-                            <div class="thumbnail-input-grid">
-                                <div>
-                                    <input type="url" id="comic-thumbnail" class="form-control"
-                                        placeholder="Paste image URL here">
-                                </div>
-                                <div class="separator">OR</div>
-                                <div>
-                                    <label class="file-upload-btn" for="thumbnail-upload">
-                                        <i class="fas fa-cloud-upload-alt"></i> Upload
-                                    </label>
-                                    <input type="file" id="thumbnail-upload" accept="image/*" style="display:none">
-                                </div>
-                            </div>
-                            <div class="thumbnail-preview" id="thumbnail-preview"><img id="thumbnail-preview-img" src=""
-                                    alt="Thumbnail Preview"></div>
-                            <div class="progress-container" id="upload-progress">
-                                <div class="progress-bar" id="progress-bar"></div>
-                            </div>
-                        </div>
-
+                        <div class="form-group"><label for="comic-tags">Tags (comma-separated)</label><input type="text"
+                                id="comic-tags" class="form-control" placeholder="e.g., brest, BigBoob, Incest"></div>
+                        <div class="form-group"><label>Thumbnail</label><input type="url" id="comic-thumbnail"
+                                class="form-control" placeholder="Paste Cloudinary image URL here" required></div>
                         <div class="form-group"><label for="comic-description">Description</label><textarea
                                 id="comic-description" class="form-control"
                                 placeholder="A brief summary of the comic..."></textarea></div>
+
+                        <div class="form-group">
+                            <label for="comic-manifest-url">Manifest JSON URL</label>
+                            <input type="url" id="comic-manifest-url" class="form-control"
+                                placeholder="Paste GitHub Gist Raw URL here" required>
+                        </div>
+
                         <div class="form-actions">
                             <button type="reset" class="btn btn-outline">Clear</button>
                             <button type="submit" id="submit-comic" class="btn btn-primary"><span id="submit-spinner"
@@ -1105,16 +1000,16 @@
             </div>
 
             <div id="users-section" class="section-content"
-                style="display: none; flex-direction: column; align-items: center; justify-content: center;">
-                <i class="fas fa-users-cog" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
+                style="display: none; flex-direction: column; align-items: center; justify-content: center;"><i
+                    class="fas fa-users-cog" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
                 <h2>User Management</h2>
-                <p style="color: var(--text-gray);">This feature is currently under construction. Stay tuned!</p>
+                <p style="color: var(--text-gray);">This feature is under construction.</p>
             </div>
             <div id="settings-section" class="section-content"
-                style="display: none; flex-direction: column; align-items: center; justify-content: center;">
-                <i class="fas fa-tools" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
+                style="display: none; flex-direction: column; align-items: center; justify-content: center;"><i
+                    class="fas fa-tools" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
                 <h2>Settings Panel</h2>
-                <p style="color: var(--text-gray);">This feature is currently under construction. Stay tuned!</p>
+                <p style="color: var(--text-gray);">This feature is under construction.</p>
             </div>
         </div>
     </div>
@@ -1122,13 +1017,12 @@
     <div class="toast-container" id="toast-container"></div>
 
     <div class="modal" id="delete-modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 500px">
             <div class="modal-header">
-                <h3 class="modal-title">Confirm Deletion</h3><button class="modal-close"
-                    id="modal-close">&times;</button>
+                <h3 class="modal-title">Confirm Deletion</h3><button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this comic? This action is permanent and cannot be undone.</p>
+                <p>Are you sure you want to delete this comic and all its parts? This action cannot be undone.</p>
             </div>
             <div class="modal-footer"><button class="btn btn-outline" id="cancel-delete">Cancel</button><button
                     class="btn btn-danger" id="confirm-delete">Delete</button></div>
@@ -1142,54 +1036,56 @@
                     id="edit-modal-close">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="edit-comic-form" class="edit-form">
+                <form id="edit-comic-form">
                     <input type="hidden" id="edit-comic-id">
-                    <div class="form-group">
-                        <label for="edit-comic-title">Title</label>
-                        <input type="text" id="edit-comic-title" class="form-control" required>
+                    <div class="form-group"><label for="edit-comic-title">Title</label><input type="text"
+                            id="edit-comic-title" class="form-control" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit-comic-author">Author</label><input type="text"
+                                id="edit-comic-author" class="form-control" required></div>
+                        <div class="form-group"><label for="edit-comic-folder">Cloudinary Folder</label><input
+                                type="text" id="edit-comic-folder" class="form-control" required></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-comic-author">Author</label>
-                        <input type="text" id="edit-comic-author" class="form-control" required>
+                    <div class="form-row">
+                        <div class="form-group"><label for="edit-comic-category">Category</label><select
+                                id="edit-comic-category" class="form-control" required></select></div>
+                        <div class="form-group"><label for="edit-comic-tags">Tags</label><input type="text"
+                                id="edit-comic-tags" class="form-control"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-comic-folder">Cloudinary Folder</label>
-                        <input type="text" id="edit-comic-folder" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-comic-category">Category</label>
-                        <select id="edit-comic-category" class="form-control" required>
-                            <option value="">Loading categories...</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label for="edit-comic-thumbnail">Thumbnail URL</label><input type="url"
+                            id="edit-comic-thumbnail" class="form-control" required></div>
+                    <div class="form-group"><label for="edit-comic-description">Description</label><textarea
+                            id="edit-comic-description" class="form-control"></textarea></div>
+
                     <div class="form-group">
                         <label for="edit-comic-manifest-url">Manifest JSON URL</label>
                         <input type="url" id="edit-comic-manifest-url" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-comic-tags">Tags</label>
-                        <input type="text" id="edit-comic-tags" class="form-control">
+
+                    <div class="parts-management-section">
+                        <h4 style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                            Part Name Overrides</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 1rem;">
+                            Yahan naam daalne se default naam ('Comic Title - Part X') ki jagah aapka diya hua naam
+                            dikhega. Box khaali chhodne par default naam istemal hoga.
+                        </p>
+                        <div id="part-overrides-container">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-comic-thumbnail">Thumbnail URL</label>
-                        <input type="url" id="edit-comic-thumbnail" class="form-control" required>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="edit-comic-description">Description</label>
-                        <textarea id="edit-comic-description" class="form-control"></textarea>
-                    </div>
+
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" id="delete-from-modal-btn" style="margin-right: auto;">Delete</button>
-                <button class="btn btn-outline" id="cancel-edit">Cancel</button>
-                <button class="btn btn-primary" id="save-edit">Save Changes</button>
+                <button type="button" class="btn btn-danger" id="delete-from-modal-btn"
+                    style="margin-right: auto;">Delete Comic</button>
+                <button type="button" class="btn btn-outline" id="cancel-edit">Cancel</button>
+                <button type="button" class="btn btn-primary" id="save-edit">Save Changes</button>
             </div>
         </div>
     </div>
 
-   <script>
-    const firebaseConfig = {
+    <script>
+        const firebaseConfig = {
             apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM",
             authDomain: "comix-9be69.firebaseapp.com",
             projectId: "comix-9be69",
@@ -1201,58 +1097,29 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
 
-        let currentComicToDelete = null;
+        let currentComicToDelete = null; // Changed to store the whole object
         let currentComicToEdit = null;
-        let comics = [];
+        let allComics = [];
         let unsubscribeComics = null;
-        let allCategories = [];
 
         const authContainer = document.getElementById('auth-container');
         const adminDashboard = document.getElementById('admin-dashboard');
         const loginBtn = document.getElementById('login-btn');
         const loginForm = document.getElementById('login-form');
-        const loginSpinner = document.getElementById('login-spinner');
-        const loginText = document.getElementById('login-text');
-        const loginError = document.getElementById('login-error');
         const logoutBtn = document.getElementById('logout-btn');
         const comicForm = document.getElementById('comic-form');
-        const submitComic = document.getElementById('submit-comic');
-        const submitText = document.getElementById('submit-text');
-        const submitSpinner = document.getElementById('submit-spinner');
         const comicsGrid = document.getElementById('admin-comics-grid');
         const searchInput = document.getElementById('search-comics');
         const deleteModal = document.getElementById('delete-modal');
-        const confirmDelete = document.getElementById('confirm-delete');
-        const cancelDelete = document.getElementById('cancel-delete');
-        const modalClose = document.getElementById('modal-close');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const sidebar = document.getElementById('sidebar');
+        const editModal = document.getElementById('edit-modal');
         const totalComicsEl = document.getElementById('total-comics');
         const activeUsersEl = document.getElementById('active-users');
         const pageViewsEl = document.getElementById('page-views');
-        const storageUsedEl = document.getElementById('storage-used');
         const toastContainer = document.getElementById('toast-container');
-        const editModal = document.getElementById('edit-modal');
-        const saveEditBtn = document.getElementById('save-edit');
-        const cancelEditBtn = document.getElementById('cancel-edit');
-        const editModalClose = document.getElementById('edit-modal-close');
-        const thumbnailUpload = document.getElementById('thumbnail-upload');
-        const comicThumbnailUrlInput = document.getElementById('comic-thumbnail');
-        const thumbnailPreview = document.getElementById('thumbnail-preview');
-        const thumbnailPreviewImg = document.getElementById('thumbnail-preview-img');
-        const uploadProgress = document.getElementById('upload-progress');
-        const progressBar = document.getElementById('progress-bar');
-        const sectionTitle = document.getElementById('section-title');
-        const categoryForm = document.getElementById('category-form');
-        const categoryNameInput = document.getElementById('category-name-input');
-        const categoriesListAdmin = document.getElementById('categories-list-admin');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
         const comicCategorySelect = document.getElementById('comic-category');
         const editComicCategorySelect = document.getElementById('edit-comic-category');
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const deleteFromModalBtn = document.getElementById('delete-from-modal-btn');
-
 
         const sectionContents = {
             dashboard: document.getElementById('dashboard-section'),
@@ -1263,477 +1130,436 @@
         };
 
         const applyInitialTheme = () => {
-            const savedTheme = localStorage.getItem('theme');
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            const theme = localStorage.getItem('theme') || 'light';
             setTheme(theme);
         };
 
         const setTheme = (theme) => {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
-            const icon = theme === 'dark' ? 'fa-sun' : 'fa-moon';
-            themeToggleBtn.innerHTML = `<i class="fas ${icon}"></i>`;
+            themeToggleBtn.innerHTML = `<i class="fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}"></i>`;
         };
 
-        const toggleTheme = () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-        };
-
-        function init() {
-            applyInitialTheme();
-            themeToggleBtn.addEventListener('click', toggleTheme);
-
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    authContainer.classList.add('hidden');
-                    adminDashboard.classList.remove('hidden');
-                    loadDashboardData();
-                    setupComicsListener();
-                    loadAdminCategories();
-                    loadCategoriesIntoSelects();
-                } else {
-                    adminDashboard.classList.add('hidden');
-                    authContainer.classList.remove('hidden');
-                    if (unsubscribeComics) {
-                        unsubscribeComics();
-                        unsubscribeComics = null;
-                    }
-                }
-            });
-
-            loginBtn.addEventListener('click', adminLogin);
-            loginForm.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') adminLogin();
-            });
-            logoutBtn.addEventListener('click', adminLogout);
-            comicForm.addEventListener('submit', handleComicSubmit);
-            comicForm.addEventListener('reset', () => {
-                thumbnailPreview.style.display = 'none';
-                uploadProgress.style.display = 'none';
-                progressBar.style.width = '0%';
-                comicThumbnailUrlInput.value = '';
-                thumbnailUpload.value = '';
-            });
-            searchInput.addEventListener('input', filterComics);
-            confirmDelete.addEventListener('click', deleteComic);
-            cancelDelete.addEventListener('click', closeDeleteModal);
-            modalClose.addEventListener('click', closeDeleteModal);
-            mobileMenuBtn.addEventListener('click', () => sidebar.classList.toggle('show'));
-            saveEditBtn.addEventListener('click', saveComicEdit);
-            cancelEditBtn.addEventListener('click', closeEditModal);
-            editModalClose.addEventListener('click', closeEditModal);
-            thumbnailUpload.addEventListener('change', handleThumbnailUpload);
-            comicThumbnailUrlInput.addEventListener('input', handleThumbnailUrlInput);
-            categoryForm.addEventListener('submit', handleAddCategory);
-            deleteFromModalBtn.addEventListener('click', () => {
-                if (currentComicToEdit) {
-                    currentComicToDelete = currentComicToEdit.id;
-                    closeEditModal();
-                    openDeleteModal();
-                }
-            });
-
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const section = item.dataset.section;
-                    showSection(section);
-                    if (window.innerWidth <= 992) {
-                        sidebar.classList.remove('show');
-                    }
-                });
-            });
-
-            showSection('dashboard');
-        }
-
-        function showSection(section) {
+        const showSection = (section) => {
             document.querySelectorAll('.menu-item').forEach(item => item.classList.toggle('active', item.dataset.section === section));
-            Object.keys(sectionContents).forEach(key => {
-                const el = sectionContents[key];
-                if (el) el.style.display = (key === 'dashboard' || key === 'comics' || key === 'categories') ? 'block' : 'flex';
-                if (key !== section) el.style.display = 'none';
-            });
-            const titles = { dashboard: 'Dashboard', comics: 'Comics Management', categories: 'Category Management', users: 'User Management', settings: 'Settings' };
-            sectionTitle.textContent = titles[section];
+            Object.values(sectionContents).forEach(el => el.style.display = 'none');
+            sectionContents[section].style.display = 'block';
+            document.getElementById('section-title').textContent = section.charAt(0).toUpperCase() + section.slice(1);
+        };
+
+        const showToast = (type, title, message) => {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
+            toast.innerHTML = `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div><div><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close">&times;</button>`;
+            toastContainer.appendChild(toast);
+            const timer = setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+            toast.querySelector('.toast-close').onclick = () => {
+                clearTimeout(timer);
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            };
+        };
+
+        // ====[ NEW FUNCTION: To log activities ]====
+        async function logActivity(action, details) {
+            try {
+                const user = auth.currentUser;
+                await db.collection('activity_log').add({
+                    action: action,
+                    details: details,
+                    userEmail: user ? user.email : 'Unknown',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Error logging activity:", error);
+            }
         }
 
-        async function adminLogin(e) {
-            e.preventDefault();
+        // ====[ NEW FUNCTION: To format time like "5 minutes ago" ]====
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Just now';
+            const now = new Date();
+            const seconds = Math.floor((now - timestamp.toDate()) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes ago";
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        // ====[ NEW FUNCTION: To load and display recent activities ]====
+        function loadRecentActivity() {
+            const listContainer = document.getElementById('recent-activity-list');
+            db.collection('activity_log').orderBy('timestamp', 'desc').limit(5)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        listContainer.innerHTML = '<p>No recent activity found.</p>';
+                        return;
+                    }
+                    let activityHtml = '<ul class="activity-list" style="list-style:none; padding:0;">';
+                    snapshot.forEach(doc => {
+                        const activity = doc.data();
+                        let icon = 'fa-plus-circle';
+                        if (activity.action.includes('Edited')) icon = 'fa-pencil-alt';
+                        if (activity.action.includes('Deleted')) icon = 'fa-trash-alt';
+                        if (activity.action.includes('Category')) icon = 'fa-tags';
+
+                        activityHtml += `
+                        <li class="activity-item">
+                            <div class="activity-details">
+                                <i class="fas ${icon}" style="margin-right: 12px; color: var(--text-gray);"></i>
+                                <strong>${activity.action}:</strong> ${activity.details}
+                            </div>
+                            <div class="activity-time">${formatTimeAgo(activity.timestamp)}</div>
+                        </li>`;
+                    });
+                    activityHtml += '</ul>';
+                    listContainer.innerHTML = activityHtml;
+                }, err => {
+                    console.error("Error loading activity:", err);
+                    listContainer.innerHTML = '<p style="color:red;">Could not load activity.</p>';
+                });
+        }
+
+        async function adminLogin() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            if (!email || !password) {
-                loginError.textContent = 'Please fill all fields';
-                return;
-            }
-            loginText.style.display = 'none';
-            loginSpinner.style.display = 'inline-block';
-            loginBtn.disabled = true;
+            const btn = document.getElementById('login-btn');
+            const spinner = document.getElementById('login-spinner');
+            const text = document.getElementById('login-text');
+            const errorEl = document.getElementById('login-error');
+
+            errorEl.textContent = '';
+            spinner.style.display = 'inline-block';
+            text.style.display = 'none';
+            btn.disabled = true;
+
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                showToast('success', 'Login Successful', 'Welcome back!');
+                showToast('success', 'Login Successful', 'Welcome!');
             } catch (err) {
-                loginError.textContent = getAuthError(err.code);
+                errorEl.textContent = 'Invalid credentials. Please try again.';
             } finally {
-                loginText.style.display = 'inline-block';
-                loginSpinner.style.display = 'none';
-                loginBtn.disabled = false;
+                spinner.style.display = 'none';
+                text.style.display = 'inline-block';
+                btn.disabled = false;
             }
-        }
-
-        function adminLogout() {
-            auth.signOut().then(() => {
-                showToast('success', 'Logged Out', 'You have been successfully logged out.');
-            });
         }
 
         async function handleComicSubmit(e) {
             e.preventDefault();
-            // User is using Cloudinary, so we don't need the complex upload logic here.
-            // We just need the thumbnail URL.
-            const thumbnailUrl = document.getElementById('comic-thumbnail').value;
-            
+            const submitBtn = document.getElementById('submit-comic');
+            submitBtn.disabled = true;
+
             const comicData = {
                 title: document.getElementById('comic-title').value,
                 author: document.getElementById('comic-author').value,
                 folderName: document.getElementById('comic-folder').value,
-                manifestUrl: document.getElementById('comic-manifest-url').value,
                 category: document.getElementById('comic-category').value,
                 tags: document.getElementById('comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
                 description: document.getElementById('comic-description').value,
-                thumbnailUrl: thumbnailUrl, // Using the URL from the input field
-                totalViews: 0, // Shuruwat mein totalViews 0 honge
-                views: 0, // Aapne kaha tha aap `views` field istemal nahi kar rahe, lekin agar purana data hai to error na aaye.
+                thumbnailUrl: document.getElementById('comic-thumbnail').value,
+                manifestUrl: document.getElementById('comic-manifest-url').value,
+                totalViews: 0,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            if (!comicData.title || !comicData.author || !comicData.folderName || !comicData.manifestUrl || !comicData.category || !comicData.thumbnailUrl) {
-                return showToast('error', 'Error', 'Please fill all required fields, including thumbnail URL.');
+            if (!comicData.title || !comicData.thumbnailUrl || !comicData.manifestUrl) {
+                showToast('error', 'Validation Error', 'Please fill Title, Thumbnail URL, and Manifest URL.');
+                submitBtn.disabled = false;
+                return;
             }
-
-            submitText.style.display = 'none';
-            submitSpinner.style.display = 'inline-block';
-            submitComic.disabled = true;
 
             try {
                 await db.collection('comics').add(comicData);
-                showToast('success', 'Success', 'Comic added successfully!');
+                await logActivity('Comic Added', comicData.title); // Log activity
+                showToast('success', 'Success!', 'Comic added successfully.');
                 comicForm.reset();
             } catch (err) {
-                console.error('Error adding comic:', err);
-                showToast('error', 'Error', 'Failed to add comic: ' + err.message);
+                showToast('error', 'Error', `Failed to add comic: ${err.message}`);
             } finally {
-                submitText.style.display = 'inline-block';
-                submitSpinner.style.display = 'none';
-                submitComic.disabled = false;
+                submitBtn.disabled = false;
             }
         }
 
-        // This function is for the Firebase Storage uploader, which you are not using.
-        // It's safe to keep it here, but the form won't use it effectively without Firebase Storage setup.
-        function uploadThumbnail(file) {
-            return new Promise((resolve, reject) => {
-                uploadProgress.style.display = 'block';
-                progressBar.style.width = '0%';
-                const fileRef = storage.ref().child(`thumbnails/${Date.now()}_${file.name}`);
-                const uploadTask = fileRef.put(file);
+        async function openEditModal(comic) {
+            currentComicToEdit = comic;
+            document.getElementById('edit-comic-id').value = comic.id;
+            document.getElementById('edit-comic-title').value = comic.title;
+            document.getElementById('edit-comic-author').value = comic.author || '';
+            document.getElementById('edit-comic-folder').value = comic.folderName;
+            document.getElementById('edit-comic-category').value = comic.category || '';
+            document.getElementById('edit-comic-tags').value = comic.tags?.join(', ') || '';
+            document.getElementById('edit-comic-thumbnail').value = comic.thumbnailUrl;
+            document.getElementById('edit-comic-description').value = comic.description || '';
+            document.getElementById('edit-comic-manifest-url').value = comic.manifestUrl || '';
 
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        progressBar.style.width = `${progress}%`;
-                    },
-                    (error) => reject(error),
-                    async () => {
-                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                        resolve(downloadURL);
-                    }
-                );
-            });
-        }
-        
-        function handleThumbnailUrlInput() {
-            const url = comicThumbnailUrlInput.value;
-            if (url) {
-                thumbnailUpload.value = '';
-                thumbnailPreviewImg.src = url;
-                thumbnailPreview.style.display = 'block';
-            } else {
-                thumbnailPreview.style.display = 'none';
-            }
-        }
+            const overridesContainer = document.getElementById('part-overrides-container');
+            overridesContainer.innerHTML = '<p>Loading parts from Gist...</p>';
+            editModal.classList.add('show');
 
-        function handleThumbnailUpload(e) {
-            const file = e.target.files[0];
-            if (!file || !file.type.match('image.*')) return;
-            comicThumbnailUrlInput.value = '';
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                thumbnailPreviewImg.src = event.target.result;
-                thumbnailPreview.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-            showToast('warning', 'Using Cloudinary Recommended', 'For local upload to work, Firebase Storage setup is needed. It is recommended to upload to Cloudinary and paste the URL.');
-        }
+            try {
+                if (!comic.manifestUrl) throw new Error("Manifest URL is missing.");
+                const response = await fetch(comic.manifestUrl);
+                if (!response.ok) throw new Error("Could not fetch manifest file. Check URL.");
+                const manifest = await response.json();
+                const parts = manifest.parts || [];
 
-        function setupComicsListener() {
-            if (unsubscribeComics) unsubscribeComics();
-            unsubscribeComics = db.collection('comics').orderBy('createdAt', 'desc')
-                .onSnapshot(snapshot => {
-                    comics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAllComics(comics);
-                    // Update stats that depend on the comics collection
-                    totalComicsEl.textContent = snapshot.size;
-                    updateTotalViews(comics);
-                }, err => {
-                    console.error('Error loading comics:', err);
-                    showToast('error', 'Error', 'Failed to load comics.');
+                if (parts.length === 0) {
+                    overridesContainer.innerHTML = '<p>No parts found in the manifest file.</p>';
+                    return;
+                }
+
+                const overridesSnapshot = await db.collection('comics').doc(comic.id).collection('part_overrides').get();
+                const overridesMap = new Map(overridesSnapshot.docs.map(doc => [doc.id, doc.data().title]));
+
+                overridesContainer.innerHTML = '';
+                parts.forEach(part => {
+                    const defaultName = `${comic.title} - Part ${part.number}`;
+                    const overrideName = overridesMap.get(String(part.number)) || '';
+                    const item = document.createElement('div');
+                    item.style.display = 'grid';
+                    item.style.gridTemplateColumns = 'auto 1fr';
+                    item.style.gap = '1rem';
+                    item.style.alignItems = 'center';
+                    item.style.marginBottom = '1rem';
+                    item.innerHTML = `
+                    <label style="font-size:0.9em; color: var(--text-gray);" for="part-override-${part.number}">Part ${part.number}</label>
+                    <input type="text" id="part-override-${part.number}" data-part-number="${part.number}" class="form-control" value="${overrideName}" placeholder="Default: ${defaultName}">
+                `;
+                    overridesContainer.appendChild(item);
                 });
-        }
 
-        function renderAllComics(comicArray) {
-            comicsGrid.innerHTML = '';
-            if (comicArray.length === 0) {
-                comicsGrid.innerHTML = `<p style="color: var(--text-gray);">No comics found. Add one!</p>`;
-                return;
+            } catch (error) {
+                overridesContainer.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
             }
-            comicArray.forEach((comic, index) => renderComicCard(comic, index));
         }
 
-        function renderComicCard(comic, index) {
-            const card = document.createElement('div');
-            card.className = 'comic-card';
-            card.style.setProperty('--i', index + 1);
-            card.innerHTML = `
-                <div class="image-container">
-                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
-                </div>
-                <div class="comic-body">
-                    <h3 class="comic-title" title="${comic.title}">${comic.title}</h3>
-                    <p class="comic-author">${comic.author || 'Unknown Author'}</p>
-                </div>
-            `;
-            comicsGrid.appendChild(card);
-            
-            card.addEventListener('click', () => {
-                currentComicToEdit = comic;
-                openEditModal(currentComicToEdit);
+        async function saveComicEdit() {
+            if (!currentComicToEdit) return;
+            const saveBtn = document.getElementById('save-edit');
+            saveBtn.disabled = true;
+
+            const comicId = currentComicToEdit.id;
+            const updatedData = {
+                title: document.getElementById('edit-comic-title').value,
+                author: document.getElementById('edit-comic-author').value,
+                folderName: document.getElementById('edit-comic-folder').value,
+                category: document.getElementById('edit-comic-category').value,
+                tags: document.getElementById('edit-comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+                description: document.getElementById('edit-comic-description').value,
+                thumbnailUrl: document.getElementById('edit-comic-thumbnail').value,
+                manifestUrl: document.getElementById('edit-comic-manifest-url').value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            const batch = db.batch();
+            const comicRef = db.collection('comics').doc(comicId);
+            batch.update(comicRef, updatedData);
+
+            const overrideInputs = document.querySelectorAll('#part-overrides-container input');
+            overrideInputs.forEach(input => {
+                const partNumber = input.dataset.partNumber;
+                const customTitle = input.value.trim();
+                const overrideRef = comicRef.collection('part_overrides').doc(String(partNumber));
+
+                if (customTitle) {
+                    batch.set(overrideRef, { title: customTitle });
+                } else {
+                    batch.delete(overrideRef);
+                }
             });
-        }
 
-        function filterComics() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filtered = comics.filter(comic =>
-                comic.title.toLowerCase().includes(searchTerm) ||
-                (comic.author && comic.author.toLowerCase().includes(searchTerm))
-            );
-            renderAllComics(filtered);
+            try {
+                await batch.commit();
+                await logActivity('Comic Edited', updatedData.title); // Log activity
+                showToast('success', 'Updated!', 'Comic details and part names saved.');
+                editModal.classList.remove('show');
+            } catch (err) {
+                showToast('error', 'Save Failed', err.message);
+            } finally {
+                saveBtn.disabled = false;
+                currentComicToEdit = null;
+            }
         }
-
-        function openDeleteModal() { deleteModal.classList.add('show'); }
-        function closeDeleteModal() { deleteModal.classList.remove('show'); currentComicToDelete = null; }
 
         async function deleteComic() {
             if (!currentComicToDelete) return;
+            const comicId = currentComicToDelete.id;
+            const comicTitle = currentComicToDelete.title;
+
             try {
-                await db.collection('comics').doc(currentComicToDelete).delete();
-                showToast('success', 'Success', 'Comic deleted.');
-                closeDeleteModal();
+                const comicRef = db.collection('comics').doc(comicId);
+                const overridesSnapshot = await comicRef.collection('part_overrides').get();
+                const viewsSnapshot = await comicRef.collection('part_views').get();
+
+                const batch = db.batch();
+
+                // Delete subcollections
+                overridesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                viewsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+
+                // Delete main doc
+                batch.delete(comicRef);
+
+                await batch.commit();
+                await logActivity('Comic Deleted', comicTitle); // Log activity
+
+                showToast('success', 'Deleted', `Comic "${comicTitle}" removed.`);
+                deleteModal.classList.remove('show');
+                currentComicToDelete = null;
             } catch (err) {
                 showToast('error', 'Error', 'Failed to delete comic.');
             }
         }
 
-        function openEditModal(comic) {
-            document.getElementById('edit-comic-id').value = comic.id;
-            document.getElementById('edit-comic-title').value = comic.title;
-            document.getElementById('edit-comic-author').value = comic.author || '';
-            document.getElementById('edit-comic-folder').value = comic.folderName;
-            document.getElementById('edit-comic-manifest-url').value = comic.manifestUrl || '';
-            document.getElementById('edit-comic-category').value = comic.category || '';
-            document.getElementById('edit-comic-tags').value = comic.tags?.join(', ') || '';
-            document.getElementById('edit-comic-thumbnail').value = comic.thumbnailUrl;
-            document.getElementById('edit-comic-description').value = comic.description || '';
-            editModal.classList.add('show');
-        }
-
-        function closeEditModal() { editModal.classList.remove('show'); currentComicToEdit = null; }
-
-        async function saveComicEdit() {
-            const id = document.getElementById('edit-comic-id').value;
-            const comicData = {
-                title: document.getElementById('edit-comic-title').value,
-                author: document.getElementById('edit-comic-author').value,
-                folderName: document.getElementById('edit-comic-folder').value,
-                manifestUrl: document.getElementById('edit-comic-manifest-url').value,
-                category: document.getElementById('edit-comic-category').value,
-                thumbnailUrl: document.getElementById('edit-comic-thumbnail').value,
-                tags: document.getElementById('edit-comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
-                description: document.getElementById('edit-comic-description').value,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                await db.collection('comics').doc(id).update(comicData);
-                showToast('success', 'Success', 'Comic updated successfully!');
-                closeEditModal();
-            } catch (err) {
-                showToast('error', 'Error', 'Failed to update comic.');
-            }
-        }
-
-        // --- DASHBOARD FUNCTIONS ---
-
-        function updateTotalViews(comicsArray) {
-            // Hum `totalViews` field ko jodenge, jo aap apni user-site se update karenge
-            const totalViews = comicsArray.reduce((sum, comic) => sum + (comic.totalViews || 0), 0);
-            
-            if (totalViews >= 1000000) {
-                pageViewsEl.textContent = (totalViews / 1000000).toFixed(1) + 'M';
-            } else if (totalViews >= 1000) {
-                pageViewsEl.textContent = (totalViews / 1000).toFixed(1) + 'K';
-            } else {
-                pageViewsEl.textContent = totalViews;
-            }
-        }
-
-        async function updateTotalUsers() {
-            // Yeh `users` collection se ginti karke total users dikhayega
-            activeUsersEl.textContent = '...';
-            try {
-                const snapshot = await db.collection('users').get();
-                activeUsersEl.textContent = snapshot.size;
-            } catch (err) {
-                console.error("Error fetching user count:", err);
-                activeUsersEl.textContent = 'N/A';
-                showToast('error', 'User Count Error', 'Could not fetch total users.');
-            }
-        }
-
-        // --- CATEGORY FUNCTIONS ---
-
-        async function handleAddCategory(e) {
-            e.preventDefault();
-            const categoryName = categoryNameInput.value.trim();
-            if (!categoryName) return showToast('error', 'Error', 'Category name is required.');
-            const categoryValue = categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-            const query = await db.collection('categories').where('value', '==', categoryValue).get();
-            if (!query.empty) return showToast('warning', 'Duplicate', 'This category already exists.');
-            try {
-                await db.collection('categories').add({ name: categoryName, value: categoryValue, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                showToast('success', 'Success', `Category "${categoryName}" added.`);
-                categoryForm.reset();
-            } catch (err) { showToast('error', 'Error', 'Could not add category.'); }
-        }
-
-        async function handleDeleteCategory(id) {
-            if (confirm('Are you sure? This will delete the category permanently.')) {
-                try {
-                    await db.collection('categories').doc(id).delete();
-                    showToast('success', 'Deleted', 'Category removed.');
-                } catch (err) { showToast('error', 'Error', 'Failed to delete category.'); }
-            }
-        }
-
         function loadAdminCategories() {
             db.collection('categories').orderBy('name').onSnapshot(snapshot => {
-                categoriesListAdmin.innerHTML = '';
-                if (snapshot.empty) {
-                    categoriesListAdmin.innerHTML = '<p style="color: var(--text-gray);">No categories found.</p>';
-                    return;
-                }
-                let index = 0;
-                snapshot.forEach(doc => {
-                    const category = { id: doc.id, ...doc.data() };
+                const listEl = document.getElementById('categories-list-admin');
+                listEl.innerHTML = '';
+                snapshot.forEach((doc, i) => {
+                    const cat = { id: doc.id, ...doc.data() };
                     const item = document.createElement('li');
                     item.className = 'category-admin-item';
-                    item.style.setProperty('--i', index++);
-                    item.innerHTML = `<span>${category.name}</span><button class="btn btn-danger btn-sm">Delete</button>`;
-                    item.querySelector('button').addEventListener('click', () => handleDeleteCategory(category.id));
-                    categoriesListAdmin.appendChild(item);
+                    item.style.setProperty('--i', i);
+                    item.innerHTML = `<span>${cat.name}</span><button class="btn btn-xs btn-danger">Delete</button>`;
+                    item.querySelector('button').onclick = async () => {
+                        if (confirm(`Delete "${cat.name}"? This is permanent.`)) {
+                            await db.collection('categories').doc(cat.id).delete();
+                            await logActivity('Category Deleted', cat.name); // Log activity
+                            showToast('success', 'Deleted', `Category "${cat.name}" removed.`);
+                        }
+                    };
+                    listEl.appendChild(item);
                 });
             });
         }
 
         function loadCategoriesIntoSelects() {
             db.collection('categories').orderBy('name').onSnapshot(snapshot => {
-                allCategories = snapshot.docs.map(doc => doc.data());
                 let optionsHtml = '<option value="" disabled selected>Select a Category</option>';
-                allCategories.forEach(cat => { optionsHtml += `<option value="${cat.value}">${cat.name}</option>`; });
+                snapshot.forEach(doc => {
+                    const cat = doc.data();
+                    optionsHtml += `<option value="${cat.value}">${cat.name}</option>`;
+                });
                 comicCategorySelect.innerHTML = optionsHtml;
                 editComicCategorySelect.innerHTML = optionsHtml;
             });
         }
 
-        // --- MAIN DATA LOADING ---
-
-        async function loadDashboardData() {
-            // Hum sirf users aur recent activity load karenge.
-            // Storage ki zaroorat nahi kyunki aap Cloudinary istemal kar rahe hain.
-            updateTotalUsers();
-            loadRecentActivity();
-            storageUsedEl.textContent = 'N/A'; // Storage Not Applicable
+        function setupComicsListener() {
+            if (unsubscribeComics) unsubscribeComics();
+            unsubscribeComics = db.collection('comics').orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    allComics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderAllComics(allComics);
+                    totalComicsEl.textContent = snapshot.size;
+                    pageViewsEl.textContent = allComics.reduce((sum, comic) => sum + (comic.totalViews || 0), 0);
+                }, err => showToast('error', 'Error', 'Failed to load comics.'));
         }
 
-        async function loadRecentActivity() {
-            const activityEl = document.getElementById('recent-activity');
-            try {
-                const snapshot = await db.collection('comics').orderBy('createdAt', 'desc').limit(5).get();
-                if (snapshot.empty) return activityEl.innerHTML = '<p>No recent activity found.</p>';
-
-                let html = '<div style="display: grid; gap: 1rem;">';
-                snapshot.forEach(doc => {
-                    const comic = doc.data();
-                    html += `<div style="display: flex; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);"><img src="${comic.thumbnailUrl}" alt="${comic.title}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; margin-right: 1rem;" onerror="this.src='https://via.placeholder.com/40'"><div><div style="font-weight: 500;">${comic.title}</div><div style="font-size: 0.8rem; color: var(--text-gray);">${formatDate(comic.createdAt?.toDate())}</div></div></div>`;
-                });
-                activityEl.innerHTML = html.replace(/border-bottom[^>]+>$/, '>');
-            } catch (err) {
-                activityEl.innerHTML = '<p class="error-message">Error loading activity</p>';
+        function renderAllComics(comicsArray) {
+            comicsGrid.innerHTML = '';
+            if (comicsArray.length === 0) {
+                comicsGrid.innerHTML = `<p style="color: var(--text-gray);">No comics found.</p>`;
+                return;
             }
-        }
-        
-        // --- UTILITY FUNCTIONS ---
-
-        function formatDate(date) {
-            if (!date) return 'recently';
-            const diff = new Date() - date;
-            const seconds = Math.floor(diff / 1000);
-            if (seconds < 60) return 'just now';
-            const minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return `${minutes}m ago`;
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return `${hours}h ago`;
-            const days = Math.floor(hours / 24);
-            return `${days}d ago`;
-        }
-
-        function showToast(type, title, message) {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
-            toast.innerHTML = `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div><div class="toast-body"><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close">&times;</button>`;
-            toastContainer.appendChild(toast);
-            const timer = setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 400);
-            }, 5000);
-            toast.querySelector('.toast-close').addEventListener('click', () => {
-                clearTimeout(timer);
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 400);
+            comicsArray.forEach((comic, index) => {
+                const card = document.createElement('div');
+                card.className = 'comic-card';
+                card.style.setProperty('--i', index + 1);
+                card.innerHTML = `
+                <div class="image-container">
+                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
+                </div>
+                <div class="comic-body">
+                    <h3 class="comic-title" title="${comic.title}">${comic.title}</h3>
+                    <p class="comic-author">${comic.author || 'N/A'}</p>
+                </div>
+             `;
+                card.addEventListener('click', () => openEditModal(comic));
+                comicsGrid.appendChild(card);
             });
         }
 
-        function getAuthError(code) {
-            const messages = { 'auth/user-not-found': 'User not found.', 'auth/wrong-password': 'Invalid password.', 'auth/invalid-credential': 'Invalid email or password.', 'auth/too-many-requests': 'Too many attempts. Try again later.' };
-            return messages[code] || 'Authentication failed. Please try again.';
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            applyInitialTheme();
+            themeToggleBtn.addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-        document.addEventListener('DOMContentLoaded', init);
-   </script>
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    authContainer.classList.add('hidden');
+                    adminDashboard.classList.remove('hidden');
+                    setupComicsListener();
+                    loadAdminCategories();
+                    loadCategoriesIntoSelects();
+                    loadRecentActivity(); // Load recent activity on login
+                    activeUsersEl.textContent = 'N/A';
+                } else {
+                    adminDashboard.classList.add('hidden');
+                    authContainer.classList.remove('hidden');
+                    if (unsubscribeComics) unsubscribeComics();
+                }
+            });
+
+            loginBtn.addEventListener('click', adminLogin);
+            logoutBtn.addEventListener('click', () => auth.signOut());
+
+            document.querySelectorAll('.menu-item').forEach(item => item.addEventListener('click', (e) => showSection(e.currentTarget.dataset.section)));
+
+            comicForm.addEventListener('submit', handleComicSubmit);
+
+            document.getElementById('save-edit').addEventListener('click', saveComicEdit);
+            document.getElementById('cancel-edit').addEventListener('click', () => editModal.classList.remove('show'));
+            document.getElementById('edit-modal-close').addEventListener('click', () => editModal.classList.remove('show'));
+
+            document.getElementById('delete-from-modal-btn').addEventListener('click', () => {
+                if (currentComicToEdit) {
+                    currentComicToDelete = currentComicToEdit; // Store the whole object
+                    editModal.classList.remove('show');
+                    deleteModal.classList.add('show');
+                }
+            });
+            document.getElementById('confirm-delete').addEventListener('click', deleteComic);
+            document.getElementById('cancel-delete').addEventListener('click', () => deleteModal.classList.remove('show'));
+            deleteModal.querySelector('.modal-close').addEventListener('click', () => deleteModal.classList.remove('show'));
+
+            document.getElementById('category-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('category-name-input');
+                const name = input.value.trim();
+                if (!name) return;
+                const value = name.toLowerCase().replace(/\s+/g, '-');
+                try {
+                    await db.collection('categories').add({ name, value });
+                    await logActivity('Category Added', name); // Log activity
+                    showToast('success', 'Added!', `Category "${name}" created.`);
+                    input.value = '';
+                } catch (err) {
+                    showToast('error', 'Error', err.message);
+                }
+            });
+
+            searchInput.addEventListener('input', () => {
+                const term = searchInput.value.toLowerCase();
+                const filtered = allComics.filter(c => c.title.toLowerCase().includes(term) || c.author.toLowerCase().includes(term));
+                renderAllComics(filtered);
+            });
+
+            showSection('dashboard');
+        });
+    </script>
 </body>
 
 </html>
