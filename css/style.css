@@ -1,6 +1,5 @@
-/* Base Styles */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f5f5f5;
@@ -18,7 +17,9 @@ header {
   flex-wrap: wrap;
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin: 0;
 }
 
@@ -67,7 +68,6 @@ button:hover {
   background-color: #2980b9;
 }
 
-/* Comics Grid */
 .comics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -110,7 +110,6 @@ button:hover {
   font-size: 0.9rem;
 }
 
-/* Admin Styles */
 .auth-form {
   max-width: 500px;
   margin: 2rem auto;
@@ -120,7 +119,8 @@ button:hover {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.auth-form input, .auth-form textarea {
+.auth-form input,
+.auth-form textarea {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -137,7 +137,6 @@ button:hover {
   display: none;
 }
 
-/* Comic Detail Page */
 .comic-detail-header {
   display: flex;
   flex-wrap: wrap;
@@ -214,26 +213,25 @@ button:hover {
   color: #7f8c8d;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   header {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .search-container {
     width: 100%;
     margin: 0.5rem 0;
   }
-  
+
   .comics-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   }
-  
+
   .comic-detail-header {
     flex-direction: column;
   }
-  
+
   .detail-thumbnail {
     width: 100%;
     height: auto;
@@ -242,11 +240,14 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-  .comics-grid, .parts-grid {
+  .comics-grid,
+  .parts-grid {
     grid-template-columns: 1fr;
   }
-  
-  .comic-detail-header, .comics-grid, .parts-grid {
+
+  .comic-detail-header,
+  .comics-grid,
+  .parts-grid {
     margin: 1rem;
     padding: 1rem;
   }

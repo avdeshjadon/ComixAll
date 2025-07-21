@@ -10,836 +10,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --primary: #4A55A2;
-            --secondary: #3A4282;
-            --error: #E53E3E;
-            --success: #38A169;
-            --warning: #DD6B20;
-            --text-dark: #2D3748;
-            --text-light: #F7FAFC;
-            --text-gray: #718096;
-            --bg-main: #EDF2F7;
-            --bg-card: #FFFFFF;
-            --border-color: #E2E8F0;
-            --border-radius: 12px;
-            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        html[data-theme='dark'] {
-            --primary: #90CDF4;
-            --secondary: #63B3ED;
-            --text-dark: #EDF2F7;
-            --text-light: #1A202C;
-            --text-gray: #A0AEC0;
-            --bg-main: #1A202C;
-            --bg-card: #2D3748;
-            --border-color: #4A5568;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-            line-height: 1.6;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(110%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-
-        .auth-card {
-            background: var(--bg-card);
-            width: 100%;
-            max-width: 420px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-lg);
-            animation: scaleIn 0.5s ease-out forwards;
-        }
-
-        .auth-header {
-            background: var(--primary);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        #search-comics {
-            margin-bottom: 20px;
-        }
-
-        .auth-header h2 {
-            font-weight: 600;
-            margin: 0;
-            font-size: 1.5rem;
-        }
-
-        .auth-body {
-            padding: 2rem 2.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-dark);
-            font-size: 0.875rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: var(--transition);
-            background-color: var(--bg-main);
-            color: var(--text-dark);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
-            background-color: var(--bg-card);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem 1.5rem;
-            border: 1px solid transparent;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-        }
-
-        .btn-xs {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 6px;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-block {
-            display: flex;
-            width: 100%;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: var(--box-shadow);
-        }
-
-        .btn-primary:hover {
-            background: var(--secondary);
-            box-shadow: var(--box-shadow-lg);
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #C53030;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border-color: var(--border-color);
-            color: var(--text-dark);
-        }
-
-        .btn-outline:hover {
-            background: var(--bg-main);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .error-message {
-            color: var(--error);
-            font-size: 0.875rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-left: 8px;
-        }
-
-        #login-spinner {
-            margin-left: 0;
-            margin-right: 8px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: var(--bg-card);
-            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            z-index: 1100;
-            transition: transform 0.3s ease-out;
-        }
-
-        .sidebar.show {
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .sidebar-header h2 {
-            color: var(--primary);
-            font-size: 1.3rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-        }
-
-        .sidebar-header h2 i {
-            margin-right: 0.75rem;
-        }
-
-        .sidebar-menu {
-            padding: 1rem 0;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.5rem;
-            color: var(--text-gray);
-            text-decoration: none;
-            transition: var(--transition);
-            margin: 0.25rem 1rem;
-            border-radius: var(--border-radius);
-        }
-
-        .menu-item:hover,
-        .menu-item.active {
-            color: var(--primary);
-            background: color-mix(in srgb, var(--primary) 8%, transparent);
-        }
-
-        .menu-item.active {
-            font-weight: 600;
-        }
-
-        .menu-item i {
-            margin-right: 0.75rem;
-            width: 20px;
-            text-align: center;
-            transition: transform 0.2s ease;
-        }
-
-        .menu-item:hover i {
-            transform: scale(1.1);
-        }
-
-        .main-content {
-            flex: 1;
-            margin-left: 250px;
-            padding: 2rem;
-            transition: margin-left 0.3s ease-out;
-        }
-
-        .section-content {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--text-dark);
-            cursor: pointer;
-        }
-
-        .header h1 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-right: auto;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .theme-toggle-btn,
-        .logout-btn {
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-        }
-
-        .theme-toggle-btn:hover,
-        .logout-btn:hover {
-            color: var(--primary);
-            background-color: color-mix(in srgb, var(--primary) 10%, transparent);
-        }
-
-        .logout-btn:hover {
-            color: var(--error);
-            background-color: color-mix(in srgb, var(--error) 10%, transparent);
-        }
-
-        .stats-container {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        }
-
-        .comics-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            align-items: stretch;
-        }
-
-        .stat-card,
-        .comic-card,
-        .form-card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0;
-        }
-
-        .comic-card {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .stats-container .stat-card,
-        .comics-grid .comic-card {
-            animation-delay: calc(0.1s * var(--i));
-        }
-
-        .stat-card:hover,
-        .comic-card:hover,
-        .form-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--box-shadow-lg);
-        }
-
-        .stat-card {
-            padding: 1.5rem;
-        }
-
-        .stat-card .stat-title {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-card .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .form-card {
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-card h2 {
-            font-size: 1.5rem;
-            margin: 0 0 1.5rem 0;
-            font-weight: 600;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .comic-card .image-container {
-            width: 100%;
-            aspect-ratio: 2 / 3;
-            overflow: hidden;
-            background-color: var(--bg-main);
-        }
-
-        .comic-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .comic-card:hover img {
-            transform: scale(1.05);
-        }
-
-        .comic-card .comic-body {
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .comic-title {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.1rem;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-height: 2.25rem;
-        }
-
-        .comic-author {
-            font-size: 0.75rem;
-            color: var(--text-gray);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 700px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--box-shadow-lg);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-            transform: scale(0.95);
-            opacity: 0;
-        }
-
-        .modal.show .modal-content {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-gray);
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            transform: rotate(90deg);
-            color: var(--text-dark);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .modal-footer {
-            padding: 1rem 1.5rem;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            gap: 0.75rem;
-            background-color: var(--bg-main);
-            border-bottom-left-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 3000;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-lg);
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            min-width: 320px;
-            opacity: 0;
-            animation: slideInRight 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .toast.hide {
-            transition: all 0.4s ease-in;
-            opacity: 0;
-            transform: translateX(110%);
-        }
-
-        .toast::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-        }
-
-        .toast-success::before {
-            background: var(--success);
-        }
-
-        .toast-error::before {
-            background: var(--error);
-        }
-
-        .toast-warning::before {
-            background: var(--warning);
-        }
-
-        .toast-icon {
-            margin-right: 1rem;
-            font-size: 1.5rem;
-        }
-
-        .toast-success .toast-icon {
-            color: var(--success);
-        }
-
-        .toast-error .toast-icon {
-            color: var(--error);
-        }
-
-        .toast-warning .toast-icon {
-            color: var(--warning);
-        }
-
-        .toast-title {
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .toast-message {
-            font-size: 0.875rem;
-            color: var(--text-gray);
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            color: var(--text-gray);
-            cursor: pointer;
-            margin-left: auto;
-            font-size: 1.25rem;
-            padding: 0.5rem;
-        }
-
-        .category-admin-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .category-admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--bg-main);
-            padding: 0.75rem 1.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            margin-bottom: 0.75rem;
-            transition: var(--transition);
-            animation: fadeInUp 0.3s ease-out forwards;
-            opacity: 0;
-            animation-delay: calc(0.05s * var(--i));
-        }
-
-        .category-admin-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--box-shadow);
-            border-color: var(--primary);
-        }
-
-        .category-admin-item span {
-            font-weight: 500;
-        }
-
-        /* NEW STYLES FOR RECENT ACTIVITY */
-        .activity-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .activity-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-details {
-            font-size: 0.9rem;
-        }
-
-        .activity-details strong {
-            color: var(--primary);
-        }
-
-        .activity-time {
-            font-size: 0.8rem;
-            color: var(--text-gray);
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .mobile-menu-btn {
-                display: inline-flex;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 1.5rem;
-            }
-
-            .header h1 {
-                font-size: 1.5rem;
-            }
-
-            .form-card,
-            .auth-body,
-            .auth-header {
-                padding: 1.5rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            #comics-section .header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            #comics-section .header .form-group {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 1rem;
-            }
-
-            .header h1 {
-                font-size: 1.25rem;
-            }
-
-            .toast {
-                width: calc(100% - 2rem);
-                right: 1rem;
-                top: 1rem;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 
 <body>
@@ -860,7 +34,7 @@
                             placeholder="Enter your password">
                     </div>
                     <button id="login-btn" class="btn btn-primary btn-block">
-                        <span id="login-spinner" class="loading-spinner" style="display: none;"></span>
+                        <span id="login-spinner" class="loading-spinner hidden"></span>
                         <span id="login-text">Login</span>
                     </button>
                     <p id="login-error" class="error-message"></p>
@@ -872,7 +46,7 @@
     <div id="admin-dashboard" class="admin-container hidden">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-shield-alt"></i> <span>ComixAll</span></h2>
+                <h2><i class="fas fa-book-open"></i> <span>ComixAll</span></h2>
             </div>
             <div class="sidebar-menu">
                 <a href="#" class="menu-item active" data-section="dashboard"><i
@@ -886,6 +60,8 @@
             </div>
         </div>
 
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
         <div class="main-content">
             <header class="header">
                 <button class="mobile-menu-btn" id="mobile-menu-btn"><i class="fas fa-bars"></i></button>
@@ -893,8 +69,9 @@
                 <div class="user-profile">
                     <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme"><i
                             class="fas fa-moon"></i></button>
-                    <img src="https://ui-avatars.com/api/?name=Admin&background=4A55A2&color=fff&font-size=0.5"
-                        alt="Admin">
+                    <img id="user-profile-img"
+                        src="https://ui-avatars.com/api/?name=Admin&background=4A55A2&color=fff&font-size=0.5"
+                        alt="Admin" title="Change Profile Picture">
                     <button class="logout-btn" id="logout-btn" title="Logout"><i
                             class="fas fa-sign-out-alt"></i></button>
                 </div>
@@ -920,58 +97,58 @@
                     </div>
                 </div>
 
-                <div class="form-card" style="margin-top: 2rem;">
-                    <h2>Recent Activity</h2>
+                <div class="form-card" style="margin-top: 2rem; --i: 5;">
+                    <div class="card-header">
+                        <h2>Recent Activity</h2>
+                        <button id="delete-all-activities-btn" class="btn btn-danger btn-sm">Delete All</button>
+                    </div>
                     <div id="recent-activity-list">
                         <p>Loading recent activity...</p>
                     </div>
                 </div>
-
             </div>
 
-            <div id="comics-section" class="section-content" style="display: none;">
-                <div class="form-card">
+            <div id="comics-section" class="section-content">
+                <div class="form-card" style="--i: 1;">
                     <h2>Add New Comic</h2>
                     <form id="comic-form">
                         <div class="form-row">
                             <div class="form-group"><label for="comic-title">Title</label><input type="text"
-                                    id="comic-title" class="form-control" placeholder="e.g., Milftoon" required></div>
+                                    id="comic-title" class="form-control" placeholder="e.g., Marvel" required></div>
                             <div class="form-group"><label for="comic-author">Author</label><input type="text"
-                                    id="comic-author" class="form-control" placeholder="e.g., CrazyDad3d" required>
-                            </div>
+                                    id="comic-author" class="form-control" placeholder="e.g., IronMan" required></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label for="comic-folder">Cloudinary Folder Name</label><input
-                                    type="text" id="comic-folder" class="form-control"
-                                    placeholder="e.g., Satisfying_Needs" required></div>
+                                    type="text" id="comic-folder" class="form-control" placeholder="e.g., Marvel_Comics"
+                                    required></div>
                             <div class="form-group"><label for="comic-category">Category</label><select
                                     id="comic-category" class="form-control" required>
                                     <option value="">Loading categories...</option>
                                 </select></div>
                         </div>
                         <div class="form-group"><label for="comic-tags">Tags (comma-separated)</label><input type="text"
-                                id="comic-tags" class="form-control" placeholder="e.g., brest, BigBoob, Incest"></div>
+                                id="comic-tags" class="form-control" placeholder="e.g., Action, Suspence, Thriller">
+                        </div>
                         <div class="form-group"><label>Thumbnail</label><input type="url" id="comic-thumbnail"
                                 class="form-control" placeholder="Paste Cloudinary image URL here" required></div>
                         <div class="form-group"><label for="comic-description">Description</label><textarea
                                 id="comic-description" class="form-control"
                                 placeholder="A brief summary of the comic..."></textarea></div>
-
                         <div class="form-group">
                             <label for="comic-manifest-url">Manifest JSON URL</label>
                             <input type="url" id="comic-manifest-url" class="form-control"
                                 placeholder="Paste GitHub Gist Raw URL here" required>
                         </div>
-
                         <div class="form-actions">
                             <button type="reset" class="btn btn-outline">Clear</button>
                             <button type="submit" id="submit-comic" class="btn btn-primary"><span id="submit-spinner"
-                                    class="loading-spinner" style="display: none;"></span><span id="submit-text">Add
+                                    class="loading-spinner hidden"></span><span id="submit-text">Add
                                     Comic</span></button>
                         </div>
                     </form>
                 </div>
-                <div class="form-card">
+                <div class="form-card" style="--i: 2;">
                     <div class="header">
                         <h2>Comics Library</h2>
                         <div class="form-group" style="margin-bottom: 0;"><input type="text" id="search-comics"
@@ -981,8 +158,8 @@
                 </div>
             </div>
 
-            <div id="categories-section" class="section-content" style="display: none;">
-                <div class="form-card">
+            <div id="categories-section" class="section-content">
+                <div class="form-card" style="--i: 1;">
                     <h2>Add New Category</h2>
                     <form id="category-form" style="display: flex; gap: 1rem; align-items: center;">
                         <div class="form-group" style="flex-grow: 1; margin-bottom: 0;">
@@ -993,7 +170,7 @@
                         <button type="submit" id="add-category-btn" class="btn btn-primary">Add Category</button>
                     </form>
                 </div>
-                <div class="form-card">
+                <div class="form-card" style="--i: 2;">
                     <h2>Existing Categories</h2>
                     <ul id="categories-list-admin" class="category-admin-list"></ul>
                 </div>
@@ -1005,11 +182,56 @@
                 <h2>User Management</h2>
                 <p style="color: var(--text-gray);">This feature is under construction.</p>
             </div>
-            <div id="settings-section" class="section-content"
-                style="display: none; flex-direction: column; align-items: center; justify-content: center;"><i
-                    class="fas fa-tools" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
-                <h2>Settings Panel</h2>
-                <p style="color: var(--text-gray);">This feature is under construction.</p>
+
+            <div id="settings-section" class="section-content">
+                <div class="form-card">
+                    <h2>Settings</h2>
+                    <div class="settings-item">
+                        <div class="settings-item-label">
+                            <h3>Dark Mode</h3>
+                            <p>Toggle the dashboard's color scheme.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dark-mode-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-label">
+                            <h3>Clear Cache</h3>
+                            <p>Clear temporary data stored in your browser.</p>
+                        </div>
+                        <button id="clear-cache-btn" class="btn btn-outline">Clear</button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-label">
+                            <h3>Backup Data</h3>
+                            <p>Download a backup of your Firestore data.</p>
+                        </div>
+                        <button id="backup-data-btn" class="btn btn-outline">
+                            <span class="loading-spinner hidden"></span>
+                            <span>Backup</span>
+                        </button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-label">
+                            <h3>Restore Data</h3>
+                            <p>Restore data from a backup file.</p>
+                        </div>
+                        <button id="restore-data-btn" class="btn btn-outline">
+                            <span class="loading-spinner hidden"></span>
+                            <span>Restore</span>
+                        </button>
+                        <input type="file" id="restore-file-input" class="hidden" accept=".zip">
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-label">
+                            <h3>Logout</h3>
+                            <p>Sign out of the admin dashboard.</p>
+                        </div>
+                        <button id="settings-logout-btn" class="btn btn-danger">Logout</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1056,23 +278,18 @@
                             id="edit-comic-thumbnail" class="form-control" required></div>
                     <div class="form-group"><label for="edit-comic-description">Description</label><textarea
                             id="edit-comic-description" class="form-control"></textarea></div>
-
                     <div class="form-group">
                         <label for="edit-comic-manifest-url">Manifest JSON URL</label>
                         <input type="url" id="edit-comic-manifest-url" class="form-control" required>
                     </div>
-
                     <div class="parts-management-section">
                         <h4 style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                             Part Name Overrides</h4>
-                        <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 1rem;">
-                            Yahan naam daalne se default naam ('Comic Title - Part X') ki jagah aapka diya hua naam
-                            dikhega. Box khaali chhodne par default naam istemal hoga.
-                        </p>
-                        <div id="part-overrides-container">
-                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 1rem;">Yahan naam daalne
+                            se default naam ('Comic Title - Part X') ki jagah aapka diya hua naam dikhega. Box khaali
+                            chhodne par default naam istemal hoga.</p>
+                        <div id="part-overrides-container"></div>
                     </div>
-
                 </form>
             </div>
             <div class="modal-footer">
@@ -1084,482 +301,27 @@
         </div>
     </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM",
-            authDomain: "comix-9be69.firebaseapp.com",
-            projectId: "comix-9be69",
-            storageBucket: "comix-9be69.appspot.com",
-            messagingSenderId: "346083786632",
-            appId: "1:346083786632:web:f95c8c3dacafe47f23843d"
-        };
+    <div class="modal" id="pfp-modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Change Profile Picture</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>Select a Preset Avatar</h4>
+                <div id="preset-avatars-grid" class="preset-avatars-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-pfp-change">Cancel</button>
+                <button class="btn btn-primary hidden" id="save-pfp-btn">
+                    <span class="loading-spinner hidden"></span>
+                    <span>Save Changes</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        let currentComicToDelete = null; // Changed to store the whole object
-        let currentComicToEdit = null;
-        let allComics = [];
-        let unsubscribeComics = null;
-
-        const authContainer = document.getElementById('auth-container');
-        const adminDashboard = document.getElementById('admin-dashboard');
-        const loginBtn = document.getElementById('login-btn');
-        const loginForm = document.getElementById('login-form');
-        const logoutBtn = document.getElementById('logout-btn');
-        const comicForm = document.getElementById('comic-form');
-        const comicsGrid = document.getElementById('admin-comics-grid');
-        const searchInput = document.getElementById('search-comics');
-        const deleteModal = document.getElementById('delete-modal');
-        const editModal = document.getElementById('edit-modal');
-        const totalComicsEl = document.getElementById('total-comics');
-        const activeUsersEl = document.getElementById('active-users');
-        const pageViewsEl = document.getElementById('page-views');
-        const toastContainer = document.getElementById('toast-container');
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const comicCategorySelect = document.getElementById('comic-category');
-        const editComicCategorySelect = document.getElementById('edit-comic-category');
-
-        const sectionContents = {
-            dashboard: document.getElementById('dashboard-section'),
-            comics: document.getElementById('comics-section'),
-            categories: document.getElementById('categories-section'),
-            users: document.getElementById('users-section'),
-            settings: document.getElementById('settings-section')
-        };
-
-        const applyInitialTheme = () => {
-            const theme = localStorage.getItem('theme') || 'light';
-            setTheme(theme);
-        };
-
-        const setTheme = (theme) => {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeToggleBtn.innerHTML = `<i class="fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}"></i>`;
-        };
-
-        const showSection = (section) => {
-            document.querySelectorAll('.menu-item').forEach(item => item.classList.toggle('active', item.dataset.section === section));
-            Object.values(sectionContents).forEach(el => el.style.display = 'none');
-            sectionContents[section].style.display = 'block';
-            document.getElementById('section-title').textContent = section.charAt(0).toUpperCase() + section.slice(1);
-        };
-
-        const showToast = (type, title, message) => {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle' };
-            toast.innerHTML = `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div><div><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close">&times;</button>`;
-            toastContainer.appendChild(toast);
-            const timer = setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 400);
-            }, 5000);
-            toast.querySelector('.toast-close').onclick = () => {
-                clearTimeout(timer);
-                toast.classList.add('hide');
-                setTimeout(() => toast.remove(), 400);
-            };
-        };
-
-        // ====[ NEW FUNCTION: To log activities ]====
-        async function logActivity(action, details) {
-            try {
-                const user = auth.currentUser;
-                await db.collection('activity_log').add({
-                    action: action,
-                    details: details,
-                    userEmail: user ? user.email : 'Unknown',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error("Error logging activity:", error);
-            }
-        }
-
-        // ====[ NEW FUNCTION: To format time like "5 minutes ago" ]====
-        function formatTimeAgo(timestamp) {
-            if (!timestamp) return 'Just now';
-            const now = new Date();
-            const seconds = Math.floor((now - timestamp.toDate()) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + " years ago";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + " months ago";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + " days ago";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + " hours ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + " minutes ago";
-            return Math.floor(seconds) + " seconds ago";
-        }
-
-        // ====[ NEW FUNCTION: To load and display recent activities ]====
-        function loadRecentActivity() {
-            const listContainer = document.getElementById('recent-activity-list');
-            db.collection('activity_log').orderBy('timestamp', 'desc').limit(5)
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        listContainer.innerHTML = '<p>No recent activity found.</p>';
-                        return;
-                    }
-                    let activityHtml = '<ul class="activity-list" style="list-style:none; padding:0;">';
-                    snapshot.forEach(doc => {
-                        const activity = doc.data();
-                        let icon = 'fa-plus-circle';
-                        if (activity.action.includes('Edited')) icon = 'fa-pencil-alt';
-                        if (activity.action.includes('Deleted')) icon = 'fa-trash-alt';
-                        if (activity.action.includes('Category')) icon = 'fa-tags';
-
-                        activityHtml += `
-                        <li class="activity-item">
-                            <div class="activity-details">
-                                <i class="fas ${icon}" style="margin-right: 12px; color: var(--text-gray);"></i>
-                                <strong>${activity.action}:</strong> ${activity.details}
-                            </div>
-                            <div class="activity-time">${formatTimeAgo(activity.timestamp)}</div>
-                        </li>`;
-                    });
-                    activityHtml += '</ul>';
-                    listContainer.innerHTML = activityHtml;
-                }, err => {
-                    console.error("Error loading activity:", err);
-                    listContainer.innerHTML = '<p style="color:red;">Could not load activity.</p>';
-                });
-        }
-
-        async function adminLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btn = document.getElementById('login-btn');
-            const spinner = document.getElementById('login-spinner');
-            const text = document.getElementById('login-text');
-            const errorEl = document.getElementById('login-error');
-
-            errorEl.textContent = '';
-            spinner.style.display = 'inline-block';
-            text.style.display = 'none';
-            btn.disabled = true;
-
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                showToast('success', 'Login Successful', 'Welcome!');
-            } catch (err) {
-                errorEl.textContent = 'Invalid credentials. Please try again.';
-            } finally {
-                spinner.style.display = 'none';
-                text.style.display = 'inline-block';
-                btn.disabled = false;
-            }
-        }
-
-        async function handleComicSubmit(e) {
-            e.preventDefault();
-            const submitBtn = document.getElementById('submit-comic');
-            submitBtn.disabled = true;
-
-            const comicData = {
-                title: document.getElementById('comic-title').value,
-                author: document.getElementById('comic-author').value,
-                folderName: document.getElementById('comic-folder').value,
-                category: document.getElementById('comic-category').value,
-                tags: document.getElementById('comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
-                description: document.getElementById('comic-description').value,
-                thumbnailUrl: document.getElementById('comic-thumbnail').value,
-                manifestUrl: document.getElementById('comic-manifest-url').value,
-                totalViews: 0,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            if (!comicData.title || !comicData.thumbnailUrl || !comicData.manifestUrl) {
-                showToast('error', 'Validation Error', 'Please fill Title, Thumbnail URL, and Manifest URL.');
-                submitBtn.disabled = false;
-                return;
-            }
-
-            try {
-                await db.collection('comics').add(comicData);
-                await logActivity('Comic Added', comicData.title); // Log activity
-                showToast('success', 'Success!', 'Comic added successfully.');
-                comicForm.reset();
-            } catch (err) {
-                showToast('error', 'Error', `Failed to add comic: ${err.message}`);
-            } finally {
-                submitBtn.disabled = false;
-            }
-        }
-
-        async function openEditModal(comic) {
-            currentComicToEdit = comic;
-            document.getElementById('edit-comic-id').value = comic.id;
-            document.getElementById('edit-comic-title').value = comic.title;
-            document.getElementById('edit-comic-author').value = comic.author || '';
-            document.getElementById('edit-comic-folder').value = comic.folderName;
-            document.getElementById('edit-comic-category').value = comic.category || '';
-            document.getElementById('edit-comic-tags').value = comic.tags?.join(', ') || '';
-            document.getElementById('edit-comic-thumbnail').value = comic.thumbnailUrl;
-            document.getElementById('edit-comic-description').value = comic.description || '';
-            document.getElementById('edit-comic-manifest-url').value = comic.manifestUrl || '';
-
-            const overridesContainer = document.getElementById('part-overrides-container');
-            overridesContainer.innerHTML = '<p>Loading parts from Gist...</p>';
-            editModal.classList.add('show');
-
-            try {
-                if (!comic.manifestUrl) throw new Error("Manifest URL is missing.");
-                const response = await fetch(comic.manifestUrl);
-                if (!response.ok) throw new Error("Could not fetch manifest file. Check URL.");
-                const manifest = await response.json();
-                const parts = manifest.parts || [];
-
-                if (parts.length === 0) {
-                    overridesContainer.innerHTML = '<p>No parts found in the manifest file.</p>';
-                    return;
-                }
-
-                const overridesSnapshot = await db.collection('comics').doc(comic.id).collection('part_overrides').get();
-                const overridesMap = new Map(overridesSnapshot.docs.map(doc => [doc.id, doc.data().title]));
-
-                overridesContainer.innerHTML = '';
-                parts.forEach(part => {
-                    const defaultName = `${comic.title} - Part ${part.number}`;
-                    const overrideName = overridesMap.get(String(part.number)) || '';
-                    const item = document.createElement('div');
-                    item.style.display = 'grid';
-                    item.style.gridTemplateColumns = 'auto 1fr';
-                    item.style.gap = '1rem';
-                    item.style.alignItems = 'center';
-                    item.style.marginBottom = '1rem';
-                    item.innerHTML = `
-                    <label style="font-size:0.9em; color: var(--text-gray);" for="part-override-${part.number}">Part ${part.number}</label>
-                    <input type="text" id="part-override-${part.number}" data-part-number="${part.number}" class="form-control" value="${overrideName}" placeholder="Default: ${defaultName}">
-                `;
-                    overridesContainer.appendChild(item);
-                });
-
-            } catch (error) {
-                overridesContainer.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
-            }
-        }
-
-        async function saveComicEdit() {
-            if (!currentComicToEdit) return;
-            const saveBtn = document.getElementById('save-edit');
-            saveBtn.disabled = true;
-
-            const comicId = currentComicToEdit.id;
-            const updatedData = {
-                title: document.getElementById('edit-comic-title').value,
-                author: document.getElementById('edit-comic-author').value,
-                folderName: document.getElementById('edit-comic-folder').value,
-                category: document.getElementById('edit-comic-category').value,
-                tags: document.getElementById('edit-comic-tags').value.split(',').map(t => t.trim()).filter(Boolean),
-                description: document.getElementById('edit-comic-description').value,
-                thumbnailUrl: document.getElementById('edit-comic-thumbnail').value,
-                manifestUrl: document.getElementById('edit-comic-manifest-url').value,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            const batch = db.batch();
-            const comicRef = db.collection('comics').doc(comicId);
-            batch.update(comicRef, updatedData);
-
-            const overrideInputs = document.querySelectorAll('#part-overrides-container input');
-            overrideInputs.forEach(input => {
-                const partNumber = input.dataset.partNumber;
-                const customTitle = input.value.trim();
-                const overrideRef = comicRef.collection('part_overrides').doc(String(partNumber));
-
-                if (customTitle) {
-                    batch.set(overrideRef, { title: customTitle });
-                } else {
-                    batch.delete(overrideRef);
-                }
-            });
-
-            try {
-                await batch.commit();
-                await logActivity('Comic Edited', updatedData.title); // Log activity
-                showToast('success', 'Updated!', 'Comic details and part names saved.');
-                editModal.classList.remove('show');
-            } catch (err) {
-                showToast('error', 'Save Failed', err.message);
-            } finally {
-                saveBtn.disabled = false;
-                currentComicToEdit = null;
-            }
-        }
-
-        async function deleteComic() {
-            if (!currentComicToDelete) return;
-            const comicId = currentComicToDelete.id;
-            const comicTitle = currentComicToDelete.title;
-
-            try {
-                const comicRef = db.collection('comics').doc(comicId);
-                const overridesSnapshot = await comicRef.collection('part_overrides').get();
-                const viewsSnapshot = await comicRef.collection('part_views').get();
-
-                const batch = db.batch();
-
-                // Delete subcollections
-                overridesSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-                viewsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
-
-                // Delete main doc
-                batch.delete(comicRef);
-
-                await batch.commit();
-                await logActivity('Comic Deleted', comicTitle); // Log activity
-
-                showToast('success', 'Deleted', `Comic "${comicTitle}" removed.`);
-                deleteModal.classList.remove('show');
-                currentComicToDelete = null;
-            } catch (err) {
-                showToast('error', 'Error', 'Failed to delete comic.');
-            }
-        }
-
-        function loadAdminCategories() {
-            db.collection('categories').orderBy('name').onSnapshot(snapshot => {
-                const listEl = document.getElementById('categories-list-admin');
-                listEl.innerHTML = '';
-                snapshot.forEach((doc, i) => {
-                    const cat = { id: doc.id, ...doc.data() };
-                    const item = document.createElement('li');
-                    item.className = 'category-admin-item';
-                    item.style.setProperty('--i', i);
-                    item.innerHTML = `<span>${cat.name}</span><button class="btn btn-xs btn-danger">Delete</button>`;
-                    item.querySelector('button').onclick = async () => {
-                        if (confirm(`Delete "${cat.name}"? This is permanent.`)) {
-                            await db.collection('categories').doc(cat.id).delete();
-                            await logActivity('Category Deleted', cat.name); // Log activity
-                            showToast('success', 'Deleted', `Category "${cat.name}" removed.`);
-                        }
-                    };
-                    listEl.appendChild(item);
-                });
-            });
-        }
-
-        function loadCategoriesIntoSelects() {
-            db.collection('categories').orderBy('name').onSnapshot(snapshot => {
-                let optionsHtml = '<option value="" disabled selected>Select a Category</option>';
-                snapshot.forEach(doc => {
-                    const cat = doc.data();
-                    optionsHtml += `<option value="${cat.value}">${cat.name}</option>`;
-                });
-                comicCategorySelect.innerHTML = optionsHtml;
-                editComicCategorySelect.innerHTML = optionsHtml;
-            });
-        }
-
-        function setupComicsListener() {
-            if (unsubscribeComics) unsubscribeComics();
-            unsubscribeComics = db.collection('comics').orderBy('createdAt', 'desc')
-                .onSnapshot(snapshot => {
-                    allComics = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAllComics(allComics);
-                    totalComicsEl.textContent = snapshot.size;
-                    pageViewsEl.textContent = allComics.reduce((sum, comic) => sum + (comic.totalViews || 0), 0);
-                }, err => showToast('error', 'Error', 'Failed to load comics.'));
-        }
-
-        function renderAllComics(comicsArray) {
-            comicsGrid.innerHTML = '';
-            if (comicsArray.length === 0) {
-                comicsGrid.innerHTML = `<p style="color: var(--text-gray);">No comics found.</p>`;
-                return;
-            }
-            comicsArray.forEach((comic, index) => {
-                const card = document.createElement('div');
-                card.className = 'comic-card';
-                card.style.setProperty('--i', index + 1);
-                card.innerHTML = `
-                <div class="image-container">
-                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
-                </div>
-                <div class="comic-body">
-                    <h3 class="comic-title" title="${comic.title}">${comic.title}</h3>
-                    <p class="comic-author">${comic.author || 'N/A'}</p>
-                </div>
-             `;
-                card.addEventListener('click', () => openEditModal(comic));
-                comicsGrid.appendChild(card);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applyInitialTheme();
-            themeToggleBtn.addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
-
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    authContainer.classList.add('hidden');
-                    adminDashboard.classList.remove('hidden');
-                    setupComicsListener();
-                    loadAdminCategories();
-                    loadCategoriesIntoSelects();
-                    loadRecentActivity(); // Load recent activity on login
-                    activeUsersEl.textContent = 'N/A';
-                } else {
-                    adminDashboard.classList.add('hidden');
-                    authContainer.classList.remove('hidden');
-                    if (unsubscribeComics) unsubscribeComics();
-                }
-            });
-
-            loginBtn.addEventListener('click', adminLogin);
-            logoutBtn.addEventListener('click', () => auth.signOut());
-
-            document.querySelectorAll('.menu-item').forEach(item => item.addEventListener('click', (e) => showSection(e.currentTarget.dataset.section)));
-
-            comicForm.addEventListener('submit', handleComicSubmit);
-
-            document.getElementById('save-edit').addEventListener('click', saveComicEdit);
-            document.getElementById('cancel-edit').addEventListener('click', () => editModal.classList.remove('show'));
-            document.getElementById('edit-modal-close').addEventListener('click', () => editModal.classList.remove('show'));
-
-            document.getElementById('delete-from-modal-btn').addEventListener('click', () => {
-                if (currentComicToEdit) {
-                    currentComicToDelete = currentComicToEdit; // Store the whole object
-                    editModal.classList.remove('show');
-                    deleteModal.classList.add('show');
-                }
-            });
-            document.getElementById('confirm-delete').addEventListener('click', deleteComic);
-            document.getElementById('cancel-delete').addEventListener('click', () => deleteModal.classList.remove('show'));
-            deleteModal.querySelector('.modal-close').addEventListener('click', () => deleteModal.classList.remove('show'));
-
-            document.getElementById('category-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const input = document.getElementById('category-name-input');
-                const name = input.value.trim();
-                if (!name) return;
-                const value = name.toLowerCase().replace(/\s+/g, '-');
-                try {
-                    await db.collection('categories').add({ name, value });
-                    await logActivity('Category Added', name); // Log activity
-                    showToast('success', 'Added!', `Category "${name}" created.`);
-                    input.value = '';
-                } catch (err) {
-                    showToast('error', 'Error', err.message);
-                }
-            });
-
-            searchInput.addEventListener('input', () => {
-                const term = searchInput.value.toLowerCase();
-                const filtered = allComics.filter(c => c.title.toLowerCase().includes(term) || c.author.toLowerCase().includes(term));
-                renderAllComics(filtered);
-            });
-
-            showSection('dashboard');
-        });
-    </script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>
