@@ -13,7 +13,999 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/admin.css">
+
+    <style>
+        :root {
+            --primary: #4a55a2;
+            --secondary: #3a4282;
+            --error: #e53e3e;
+            --success: #38a169;
+            --warning: #dd6b20;
+            --text-dark: #2d3748;
+            --text-light: #f7fafc;
+            --text-gray: #718096;
+            --bg-main: #edf2f7;
+            --bg-card: #ffffff;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        html[data-theme="dark"] {
+            --primary: #90cdf4;
+            --secondary: #63b3ed;
+            --text-dark: #edf2f7;
+            --text-light: #1a202c;
+            --text-gray: #a0aec0;
+            --bg-main: #1a202c;
+            --bg-card: #2d3748;
+            --border-color: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            transition: background-color 0.3s ease-out, color 0.3s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 420px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            animation: scaleIn 0.5s var(--ease-out-cubic) forwards;
+        }
+
+        .auth-header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        #search-comics {
+            margin-bottom: 20px;
+        }
+
+        .auth-header h2 {
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .auth-body {
+            padding: 2rem 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.875rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.25s ease-out, box-shadow 0.25s ease-out,
+                background-color 0.25s ease-out;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+            background-color: var(--bg-card);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-out, transform 0.2s ease-out,
+                box-shadow 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+            text-decoration: none;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-xs {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-block {
+            display: flex;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--box-shadow);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--secondary);
+            box-shadow: var(--box-shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c53030;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: var(--bg-main);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .btn .loading-spinner {
+            margin-right: 8px;
+        }
+
+        .btn-outline .loading-spinner {
+            border-top-color: var(--primary);
+            border-left-color: var(--primary);
+            border-bottom-color: var(--primary);
+            border-right-color: transparent;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--bg-card);
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 1100;
+            transition: transform 0.35s var(--ease-out-cubic);
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-header h2 i {
+            margin-right: 0.75rem;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            margin: 0.25rem 1rem;
+            border-radius: var(--border-radius);
+            transition: color 0.2s ease-out, background-color 0.2s ease-out;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            color: var(--primary);
+            background: color-mix(in srgb, var(--primary) 8%, transparent);
+        }
+
+        .menu-item.active {
+            font-weight: 600;
+        }
+
+        .menu-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin-left 0.35s var(--ease-out-cubic);
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.is-active {
+            display: block;
+            animation: fadeInUp 0.5s var(--ease-out-cubic) forwards;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-right: auto;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .theme-toggle-btn,
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            font-size: 1.25rem;
+            transition: color 0.2s ease-out, background-color 0.2s ease-out;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+
+        .theme-toggle-btn:hover,
+        .logout-btn:hover {
+            color: var(--primary);
+            background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+        }
+
+        .logout-btn:hover {
+            color: var(--error);
+            background-color: color-mix(in srgb, var(--error) 10%, transparent);
+        }
+
+        .stats-container {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .comics-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            align-items: stretch;
+        }
+
+        .stat-card,
+        .comic-card,
+        .form-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: transform 0.25s var(--ease-out-quint),
+                box-shadow 0.25s var(--ease-out-quint);
+            animation: fadeInUp 0.5s var(--ease-out-cubic) forwards;
+            opacity: 0;
+        }
+
+        .comic-card {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .stats-container .stat-card,
+        .comics-grid .comic-card {
+            animation-delay: calc(0.08s * var(--i));
+        }
+
+        .stat-card:hover,
+        .comic-card:hover,
+        .form-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--box-shadow-lg);
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-card .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .form-card {
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-card h2 {
+            font-size: 1.5rem;
+            margin: 0 0 1.5rem 0;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .comic-card .image-container {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            overflow: hidden;
+            background-color: var(--bg-main);
+        }
+
+        .comic-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease-out;
+        }
+
+        .comic-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .comic-card .comic-body {
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .comic-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 2.25rem;
+        }
+
+        .comic-author {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--box-shadow-lg);
+            transition: transform 0.3s var(--ease-out-cubic), opacity 0.3s ease;
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+            transition: transform 0.3s ease, color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            background-color: var(--bg-main);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            min-width: 320px;
+            opacity: 0;
+            animation: slideInRight 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast.hide {
+            transition: all 0.4s ease-in;
+            opacity: 0;
+            transform: translateX(110%);
+        }
+
+        .toast::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+
+        .toast-success::before {
+            background: var(--success);
+        }
+
+        .toast-error::before {
+            background: var(--error);
+        }
+
+        .toast-warning::before {
+            background: var(--warning);
+        }
+
+        .toast-icon {
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--error);
+        }
+
+        .toast-warning .toast-icon {
+            color: var(--warning);
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+        }
+
+        .category-admin-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .category-admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-main);
+            padding: 0.75rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 0.75rem;
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out,
+                border-color 0.2s ease-out;
+            animation: fadeInUp 0.4s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(0.05s * var(--i));
+        }
+
+        .category-admin-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+            border-color: var(--primary);
+        }
+
+        .category-admin-item span {
+            font-weight: 500;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-details {
+            font-size: 0.9rem;
+            flex-grow: 1;
+        }
+
+        .activity-details strong {
+            color: var(--primary);
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+            flex-shrink: 0;
+        }
+
+        .delete-activity-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            border-radius: 50%;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .delete-activity-btn:hover {
+            color: var(--error);
+            background-color: color-mix(in srgb, var(--error) 10%, transparent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h2 {
+            margin: 0;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-item-label h3 {
+            margin: 0 0 0.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .settings-item-label p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--text-gray);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 28px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        .preset-avatars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .preset-avatar {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, border-color 0.2s ease-out,
+                box-shadow 0.2s ease-out;
+            border: 3px solid transparent;
+            background-color: var(--bg-main);
+        }
+
+        .preset-avatar:hover {
+            transform: scale(1.1);
+            border-color: color-mix(in srgb, var(--primary) 50%, transparent);
+        }
+
+        .preset-avatar.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px color-mix(in srgb, var(--primary) 40%, transparent);
+            transform: scale(1.1);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1099;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-card,
+            .auth-body,
+            .auth-header {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #comics-section .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #comics-section .header .form-group {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .toast {
+                width: calc(100% - 2rem);
+                right: 1rem;
+                top: 1rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -321,7 +1313,668 @@
         </div>
     </div>
 
-    <script src="js/admin.js"></script>
+    <script>
+        // =================================================================
+        // =================   Firebase Configuration   ====================
+        // =================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM",
+            authDomain: "comix-9be69.firebaseapp.com",
+            projectId: "comix-9be69",
+            storageBucket: "comix-9be69.appspot.com",
+            messagingSenderId: "346083786632",
+            appId: "1:346083786632:web:f95c8c3dacafe47f23843d",
+        };
+
+        // Firebase services ko initialize karein
+        // Check karein ki app pehle se initialized hai ya nahi
+        let app;
+        if (!firebase.apps.length) {
+            app = firebase.initializeApp(firebaseConfig);
+        } else {
+            app = firebase.app();
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // =================================================================
+        // =====================   Global Variables   ======================
+        // =================================================================
+        let currentComicToDelete = null;
+        let currentComicToEdit = null;
+        let allComics = [];
+        let unsubscribeComics = null;
+        let selectedPfpUrl = null;
+
+        // =================================================================
+        // ===================   DOM Element Selectors   ===================
+        // =================================================================
+        const authContainer = document.getElementById("auth-container");
+        const adminDashboard = document.getElementById("admin-dashboard");
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        const comicForm = document.getElementById("comic-form");
+        const comicsGrid = document.getElementById("admin-comics-grid");
+        const searchInput = document.getElementById("search-comics");
+        const deleteModal = document.getElementById("delete-modal");
+        const editModal = document.getElementById("edit-modal");
+        const toastContainer = document.getElementById("toast-container");
+        const themeToggleBtn = document.getElementById("theme-toggle-btn");
+        const userProfileImg = document.getElementById("user-profile-img");
+        const pfpModal = document.getElementById("pfp-modal");
+        const presetAvatarsGrid = document.getElementById("preset-avatars-grid");
+        const savePfpBtn = document.getElementById("save-pfp-btn");
+        const deleteAllActivitiesBtn = document.getElementById(
+            "delete-all-activities-btn"
+        );
+        const recentActivityList = document.getElementById("recent-activity-list");
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+        const backupBtn = document.getElementById("backup-data-btn");
+        const restoreBtn = document.getElementById("restore-data-btn");
+        const restoreFileInput = document.getElementById("restore-file-input");
+        const totalComicsEl = document.getElementById("total-comics");
+        const activeUsersEl = document.getElementById("active-users");
+        const pageViewsEl = document.getElementById("page-views");
+        const comicCategorySelect = document.getElementById("comic-category");
+        const editComicCategorySelect = document.getElementById("edit-comic-category");
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+        const sectionContents = {
+            dashboard: document.getElementById("dashboard-section"),
+            comics: document.getElementById("comics-section"),
+            categories: document.getElementById("categories-section"),
+            users: document.getElementById("users-section"),
+            settings: document.getElementById("settings-section"),
+        };
+
+        // Preset Avatars ki poori list
+        const presetAvatars = [
+            { style: "fun-emoji", seed: "Angry" },
+            { style: "fun-emoji", seed: "Blushing" },
+            { style: "fun-emoji", seed: "Concerned" },
+            { style: "fun-emoji", seed: "Cool" },
+            { style: "fun-emoji", seed: "Crying" },
+            { style: "fun-emoji", seed: "Driven" },
+            { style: "fun-emoji", seed: "Excited" },
+            { style: "fun-emoji", seed: "Happy" },
+            { style: "fun-emoji", seed: "Hurt" },
+            { style: "fun-emoji", seed: "Innocent" },
+            { style: "fun-emoji", seed: "Love" },
+            { style: "fun-emoji", seed: "LOL" },
+            { style: "fun-emoji", seed: "Sad" },
+            { style: "fun-emoji", seed: "Shocked" },
+            { style: "fun-emoji", seed: "Sleeping" },
+            { style: "fun-emoji", seed: "Smile" },
+            { style: "fun-emoji", seed: "Surprised" },
+            { style: "fun-emoji", seed: "Tired" },
+            { style: "fun-emoji", seed: "Vomiting" },
+            { style: "fun-emoji", seed: "Winking" },
+            { style: "adventurer", seed: "Midnight" },
+            { style: "adventurer", seed: "Snowball" },
+        ];
+
+        // =================================================================
+        // =====================   Helper Functions   ======================
+        // =================================================================
+
+        const toggleButtonLoading = (btn, isLoading) => {
+            if (!btn) return;
+            const spinner = btn.querySelector(".loading-spinner");
+            const textSpan = btn.querySelector("span:not(.loading-spinner)");
+            btn.disabled = isLoading;
+            if (spinner) spinner.classList.toggle("hidden", !isLoading);
+            if (textSpan) textSpan.classList.toggle("hidden", isLoading);
+        };
+
+        const applyInitialTheme = () => {
+            const theme = localStorage.getItem("theme") || "light";
+            setTheme(theme);
+        };
+
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+            if (themeToggleBtn) {
+                themeToggleBtn.innerHTML = `<i class="fas ${theme === "dark" ? "fa-sun" : "fa-moon"
+                    }"></i>`;
+            }
+            if (darkModeToggle) {
+                darkModeToggle.checked = theme === "dark";
+            }
+        };
+
+        const showSection = (sectionKey) => {
+            document
+                .querySelectorAll(".menu-item")
+                .forEach((item) =>
+                    item.classList.toggle("active", item.dataset.section === sectionKey)
+                );
+            Object.values(sectionContents).forEach((el) =>
+                el.classList.remove("is-active")
+            );
+            const sectionToShow = sectionContents[sectionKey];
+            if (sectionToShow) {
+                sectionToShow.classList.add("is-active");
+            }
+            document.getElementById("section-title").textContent =
+                sectionKey.charAt(0).toUpperCase() + sectionKey.slice(1);
+        };
+
+        const showToast = (type, title, message) => {
+            const toast = document.createElement("div");
+            toast.className = `toast toast-${type}`;
+            const icons = {
+                success: "fa-check-circle",
+                error: "fa-exclamation-circle",
+                warning: "fa-exclamation-triangle",
+            };
+            toast.innerHTML = `<div class="toast-icon"><i class="fas ${icons[type]}"></i></div><div><div class="toast-title">${title}</div><div class="toast-message">${message}</div></div><button class="toast-close">&times;</button>`;
+            toastContainer.appendChild(toast);
+            const timer = setTimeout(() => {
+                toast.classList.add("hide");
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+            toast.querySelector(".toast-close").onclick = () => {
+                clearTimeout(timer);
+                toast.classList.add("hide");
+                setTimeout(() => toast.remove(), 400);
+            };
+        };
+
+        // =================================================================
+        // ====================   Firebase Functions   =====================
+        // =================================================================
+
+        async function logActivity(action, details) {
+            try {
+                const user = auth.currentUser;
+                await db.collection("activity_log").add({
+                    action: action,
+                    details: details,
+                    userEmail: user ? user.email : "Unknown",
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+            } catch (error) {
+                console.error("Error logging activity:", error);
+            }
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return "Just now";
+            const now = new Date();
+            const seconds = Math.floor((now - timestamp.toDate()) / 1000);
+            if (seconds < 5) return "Just now";
+            const intervals = {
+                year: 31536000,
+                month: 2592000,
+                day: 86400,
+                hour: 3600,
+                minute: 60,
+            };
+            for (let unit in intervals) {
+                let interval = seconds / intervals[unit];
+                if (interval > 1) {
+                    const value = Math.floor(interval);
+                    return `${value} ${unit}${value > 1 ? "s" : ""} ago`;
+                }
+            }
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        function loadRecentActivity() {
+            const listContainer = document.getElementById("recent-activity-list");
+            db.collection("activity_log")
+                .orderBy("timestamp", "desc")
+                .limit(10)
+                .onSnapshot(
+                    (snapshot) => {
+                        if (snapshot.empty) {
+                            listContainer.innerHTML = "<p>No recent activity found.</p>";
+                            return;
+                        }
+                        let activityHtml = '<ul class="activity-list">';
+                        snapshot.forEach((doc) => {
+                            const activity = doc.data();
+                            const docId = doc.id;
+                            let icon = "fa-plus-circle";
+                            if (activity.action.includes("Edited")) icon = "fa-pencil-alt";
+                            if (activity.action.includes("Deleted")) icon = "fa-trash-alt";
+                            if (activity.action.includes("Category")) icon = "fa-tags";
+                            activityHtml += `
+            <li class="activity-item">
+                <i class="fas ${icon}" style="margin-right: 12px; color: var(--text-gray);"></i>
+                <div class="activity-details">
+                    <strong>${activity.action}:</strong> ${activity.details}
+                </div>
+                <div class="activity-time">${formatTimeAgo(
+                                activity.timestamp
+                            )}</div>
+                <button class="delete-activity-btn" data-id="${docId}" title="Delete Activity"><i class="fas fa-trash"></i></button>
+            </li>`;
+                        });
+                        activityHtml += "</ul>";
+                        listContainer.innerHTML = activityHtml;
+                    },
+                    (err) => {
+                        console.error("Error loading activity:", err);
+                        showToast(
+                            "error",
+                            "Activity Error",
+                            "Could not load activity log. Check permissions."
+                        );
+                        listContainer.innerHTML =
+                            '<p style="color:red;">Could not load activity.</p>';
+                    }
+                );
+        }
+
+        async function adminLogin() {
+            const email = document.getElementById("login-email").value;
+            const password = document.getElementById("login-password").value;
+            const errorEl = document.getElementById("login-error");
+            errorEl.textContent = "";
+            toggleButtonLoading(loginBtn, true);
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // Yahan se success toast hata diya, kyunki onAuthStateChanged ab handle karega
+            } catch (err) {
+                errorEl.textContent = "Invalid credentials. Please try again.";
+                showToast("error", "Login Failed", err.message);
+            } finally {
+                toggleButtonLoading(loginBtn, false);
+            }
+        }
+
+        async function handleComicSubmit(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById("submit-comic");
+            toggleButtonLoading(submitBtn, true);
+            const comicData = {
+                title: document.getElementById("comic-title").value,
+                author: document.getElementById("comic-author").value,
+                folderName: document.getElementById("comic-folder").value,
+                category: document.getElementById("comic-category").value,
+                tags: document
+                    .getElementById("comic-tags")
+                    .value.split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean),
+                description: document.getElementById("comic-description").value,
+                thumbnailUrl: document.getElementById("comic-thumbnail").value,
+                manifestUrl: document.getElementById("comic-manifest-url").value,
+                totalViews: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            };
+            if (!comicData.title || !comicData.thumbnailUrl || !comicData.manifestUrl) {
+                showToast(
+                    "error",
+                    "Validation Error",
+                    "Title, Thumbnail, and Manifest URL are required."
+                );
+                toggleButtonLoading(submitBtn, false);
+                return;
+            }
+            try {
+                await db.collection("comics").add(comicData);
+                await logActivity("Comic Added", comicData.title);
+                showToast("success", "Success!", "Comic added successfully.");
+                comicForm.reset();
+            } catch (err) {
+                showToast("error", "Error", `Failed to add comic: ${err.message}`);
+            } finally {
+                toggleButtonLoading(submitBtn, false);
+            }
+        }
+
+        async function openEditModal(comic) {
+            currentComicToEdit = comic;
+            document.getElementById("edit-comic-id").value = comic.id;
+            document.getElementById("edit-comic-title").value = comic.title;
+            document.getElementById("edit-comic-author").value = comic.author || "";
+            document.getElementById("edit-comic-folder").value = comic.folderName;
+            document.getElementById("edit-comic-category").value = comic.category || "";
+            document.getElementById("edit-comic-tags").value =
+                comic.tags?.join(", ") || "";
+            document.getElementById("edit-comic-thumbnail").value = comic.thumbnailUrl;
+            document.getElementById("edit-comic-description").value =
+                comic.description || "";
+            document.getElementById("edit-comic-manifest-url").value =
+                comic.manifestUrl || "";
+            editModal.classList.add("show");
+        }
+
+        async function saveComicEdit() {
+            if (!currentComicToEdit) return;
+            const saveBtn = document.getElementById("save-edit");
+            toggleButtonLoading(saveBtn, true);
+            const comicId = currentComicToEdit.id;
+            const updatedData = {
+                title: document.getElementById("edit-comic-title").value,
+                author: document.getElementById("edit-comic-author").value,
+                folderName: document.getElementById("edit-comic-folder").value,
+                category: document.getElementById("edit-comic-category").value,
+                tags: document
+                    .getElementById("edit-comic-tags")
+                    .value.split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean),
+                description: document.getElementById("edit-comic-description").value,
+                thumbnailUrl: document.getElementById("edit-comic-thumbnail").value,
+                manifestUrl: document.getElementById("edit-comic-manifest-url").value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            };
+            try {
+                await db.collection("comics").doc(comicId).update(updatedData);
+                await logActivity("Comic Edited", updatedData.title);
+                showToast("success", "Updated!", "Comic details saved.");
+                editModal.classList.remove("show");
+            } catch (err) {
+                showToast("error", "Save Failed", err.message);
+            } finally {
+                toggleButtonLoading(saveBtn, false);
+                currentComicToEdit = null;
+            }
+        }
+
+        async function deleteComic() {
+            if (!currentComicToDelete) return;
+            const { id: comicId, title: comicTitle } = currentComicToDelete;
+            try {
+                await db.collection("comics").doc(comicId).delete();
+                await logActivity("Comic Deleted", comicTitle);
+                showToast("success", "Deleted", `Comic "${comicTitle}" removed.`);
+                deleteModal.classList.remove("show");
+                currentComicToDelete = null;
+            } catch (err) {
+                showToast("error", "Error", "Failed to delete comic.");
+            }
+        }
+
+        function setupComicsListener() {
+            if (unsubscribeComics) unsubscribeComics();
+            unsubscribeComics = db
+                .collection("comics")
+                .orderBy("createdAt", "desc")
+                .onSnapshot(
+                    (snapshot) => {
+                        allComics = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                        renderAllComics(allComics);
+                        if (totalComicsEl) totalComicsEl.textContent = snapshot.size;
+                        if (pageViewsEl) {
+                            pageViewsEl.textContent = allComics.reduce(
+                                (sum, comic) => sum + (comic.totalViews || 0),
+                                0
+                            );
+                        }
+                    },
+                    (err) => {
+                        console.error("Error loading comics:", err);
+                        showToast(
+                            "error",
+                            "Comics Error",
+                            "Failed to load comics. Check permissions."
+                        );
+                    }
+                );
+        }
+
+        function renderAllComics(comicsArray) {
+            if (!comicsGrid) return;
+            comicsGrid.innerHTML = "";
+            if (comicsArray.length === 0) {
+                comicsGrid.innerHTML = `<p style="color: var(--text-gray); grid-column: 1 / -1;">No comics found.</p>`;
+                return;
+            }
+            comicsArray.forEach((comic, index) => {
+                const card = document.createElement("div");
+                card.className = "comic-card";
+                card.style.setProperty("--i", index);
+                card.innerHTML = `
+            <div class="image-container">
+                <img src="${comic.thumbnailUrl}" alt="${comic.title
+                    }" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
+            </div>
+            <div class="comic-body">
+                <h3 class="comic-title" title="${comic.title}">${comic.title
+                    }</h3>
+                <p class="comic-author">${comic.author || "N/A"}</p>
+            </div>`;
+                card.addEventListener("click", () => openEditModal(comic));
+                comicsGrid.appendChild(card);
+            });
+        }
+
+        function loadAdminCategories() {
+            db.collection("categories")
+                .orderBy("name")
+                .onSnapshot((snapshot) => {
+                    const listEl = document.getElementById("categories-list-admin");
+                    if (!listEl) return;
+                    listEl.innerHTML = "";
+                    snapshot.forEach((doc, i) => {
+                        const cat = { id: doc.id, ...doc.data() };
+                        const item = document.createElement("li");
+                        item.className = "category-admin-item";
+                        item.style.setProperty("--i", i);
+                        item.innerHTML = `<span>${cat.name}</span><button class="btn btn-xs btn-danger">Delete</button>`;
+                        item.querySelector("button").onclick = async () => {
+                            if (confirm(`Delete "${cat.name}"? This is permanent.`)) {
+                                await db.collection("categories").doc(cat.id).delete();
+                                await logActivity("Category Deleted", cat.name);
+                                showToast("success", "Deleted", `Category "${cat.name}" removed.`);
+                            }
+                        };
+                        listEl.appendChild(item);
+                    });
+                });
+        }
+
+        function loadCategoriesIntoSelects() {
+            db.collection("categories")
+                .orderBy("name")
+                .onSnapshot((snapshot) => {
+                    let optionsHtml =
+                        '<option value="" disabled selected>Select a Category</option>';
+                    snapshot.forEach(
+                        (doc) =>
+                        (optionsHtml += `<option value="${doc.data().value}">${doc.data().name
+                            }</option>`)
+                    );
+                    if (comicCategorySelect) comicCategorySelect.innerHTML = optionsHtml;
+                    if (editComicCategorySelect)
+                        editComicCategorySelect.innerHTML = optionsHtml;
+                });
+        }
+
+        async function loadAdminProfile() {
+            try {
+                const doc = await db.collection("settings").doc("admin_profile").get();
+                if (doc.exists && doc.data().profilePictureUrl) {
+                    userProfileImg.src = doc.data().profilePictureUrl;
+                }
+            } catch (error) {
+                console.error("Could not load admin profile:", error);
+                showToast("error", "Profile Error", "Could not load admin profile.");
+            }
+        }
+
+        // =================================================================
+        // ====================   Main App Execution   =====================
+        // =================================================================
+
+        document.addEventListener("DOMContentLoaded", () => {
+            applyInitialTheme();
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // User logged in hai
+
+                    // Step 1: Token ko force refresh karein
+                    await user.getIdToken(true);
+                    const idTokenResult = await user.getIdTokenResult();
+                    console.log("User token refreshed. Checking for admin claim...");
+
+                    // Step 2: Check karein ki user ke paas admin claim hai ya nahi
+                    if (idTokenResult.claims.admin === true) {
+                        // User admin hai! Dashboard dikhayein aur data load karein.
+                        console.log("✅ Admin claim found. Loading admin dashboard.");
+                        showToast("success", "Welcome Admin!", "Successfully logged in.");
+                        authContainer.classList.add("hidden");
+                        adminDashboard.classList.remove("hidden");
+
+                        setupComicsListener();
+                        loadAdminCategories();
+                        loadCategoriesIntoSelects();
+                        loadRecentActivity();
+                        loadAdminProfile();
+                        if (activeUsersEl) activeUsersEl.textContent = "N/A";
+                        showSection("dashboard");
+                    } else {
+                        // User admin nahi hai. Error dikhayein aur logout kar dein.
+                        console.error("❌ Admin claim NOT found. Access denied.");
+                        showToast(
+                            "error",
+                            "Access Denied",
+                            "You do not have admin privileges."
+                        );
+                        await auth.signOut(); // User ko logout kar dein
+                    }
+                } else {
+                    // User logged out hai
+                    adminDashboard.classList.add("hidden");
+                    authContainer.classList.remove("hidden");
+                    if (unsubscribeComics) {
+                        unsubscribeComics(); // Error se bachne ke liye listener ko band karein
+                    }
+                }
+            });
+
+            // =================================================================
+            // =====================   Event Listeners   =======================
+            // =================================================================
+
+            if (loginBtn) loginBtn.addEventListener("click", adminLogin);
+            if (logoutBtn) logoutBtn.addEventListener("click", () => auth.signOut());
+
+            document
+                .querySelectorAll(".menu-item")
+                .forEach((item) =>
+                    item.addEventListener("click", (e) =>
+                        showSection(e.currentTarget.dataset.section)
+                    )
+                );
+
+            if (comicForm) comicForm.addEventListener("submit", handleComicSubmit);
+
+            if (document.getElementById("save-edit"))
+                document
+                    .getElementById("save-edit")
+                    .addEventListener("click", saveComicEdit);
+            if (document.getElementById("cancel-edit"))
+                document
+                    .getElementById("cancel-edit")
+                    .addEventListener("click", () => editModal.classList.remove("show"));
+            if (document.getElementById("edit-modal-close"))
+                document
+                    .getElementById("edit-modal-close")
+                    .addEventListener("click", () => editModal.classList.remove("show"));
+
+            if (document.getElementById("delete-from-modal-btn")) {
+                document
+                    .getElementById("delete-from-modal-btn")
+                    .addEventListener("click", () => {
+                        if (currentComicToEdit) {
+                            currentComicToDelete = currentComicToEdit;
+                            editModal.classList.remove("show");
+                            deleteModal.classList.add("show");
+                        }
+                    });
+            }
+
+            if (document.getElementById("confirm-delete"))
+                document
+                    .getElementById("confirm-delete")
+                    .addEventListener("click", deleteComic);
+            if (document.getElementById("cancel-delete"))
+                document
+                    .getElementById("cancel-delete")
+                    .addEventListener("click", () => deleteModal.classList.remove("show"));
+            if (deleteModal)
+                deleteModal
+                    .querySelector(".modal-close")
+                    .addEventListener("click", () => deleteModal.classList.remove("show"));
+
+            if (document.getElementById("category-form")) {
+                document
+                    .getElementById("category-form")
+                    .addEventListener("submit", async (e) => {
+                        e.preventDefault();
+                        const input = document.getElementById("category-name-input");
+                        const name = input.value.trim();
+                        if (!name) return;
+                        try {
+                            await db
+                                .collection("categories")
+                                .add({ name, value: name.toLowerCase().replace(/\s+/g, "-") });
+                            await logActivity("Category Added", name);
+                            showToast("success", "Added!", `Category "${name}" created.`);
+                            input.value = "";
+                        } catch (err) {
+                            showToast("error", "Error", err.message);
+                        }
+                    });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener("input", () => {
+                    const term = searchInput.value.toLowerCase();
+                    renderAllComics(
+                        allComics.filter(
+                            (c) =>
+                                c.title.toLowerCase().includes(term) ||
+                                (c.author && c.author.toLowerCase().includes(term))
+                        )
+                    );
+                });
+            }
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener("click", () =>
+                    setTheme(
+                        document.documentElement.getAttribute("data-theme") === "dark"
+                            ? "light"
+                            : "dark"
+                    )
+                );
+            }
+
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener("change", (e) =>
+                    setTheme(e.target.checked ? "dark" : "light")
+                );
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener("click", () => {
+                    sidebar.classList.add("show");
+                    sidebarOverlay.classList.add("show");
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener("click", () => {
+                    sidebar.classList.remove("show");
+                    sidebarOverlay.classList.remove("show");
+                });
+            }
+        });
+
+    </script>
 </body>
 
 </html>
