@@ -395,6 +395,7 @@
             opacity: 0;
             transition: var(--transition);
             z-index: 1;
+            pointer-events: none;
         }
 
         .comic-card:hover {
@@ -405,6 +406,10 @@
 
         .comic-card:hover::before {
             opacity: 1;
+        }
+
+        html[data-theme="light"] .comic-card:hover::before {
+            background: linear-gradient(to top, rgba(231, 228, 229, 0.8) 0%, transparent 60%);
         }
 
         .comic-thumbnail-container {
@@ -450,6 +455,10 @@
 
         .comic-card:hover .comic-title {
             color: var(--accent);
+        }
+
+        html[data-theme="light"] .comic-card:hover .comic-description {
+            color: rgb(0, 0, 0);
         }
 
         .comic-description {
