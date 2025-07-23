@@ -235,6 +235,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background: #c05621;
+            transform: translateY(-2px);
+        }
+
         .btn-outline {
             background: transparent;
             border-color: var(--border-color);
@@ -1492,6 +1502,24 @@
         </div>
     </div>
 
+    <div class="modal" id="clear-cache-modal">
+        <div class="modal-content" style="max-width: 500px">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Clear Cache</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to clear the browser cache for this application?</p>
+                <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-gray);">This will remove locally
+                    stored settings, such as your preferred theme (light/dark mode). You will not be logged out.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-clear-cache">Cancel</button>
+                <button class="btn btn-warning" id="confirm-clear-cache">Yes, Clear Cache</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="add-user-modal">
         <div class="modal-content" style="max-width: 500px">
             <div class="modal-header">
@@ -1606,6 +1634,8 @@
         const restoreConfirmModal = document.getElementById('restore-confirm-modal');
         const addUserBtn = document.getElementById('add-user-btn');
         const addUserModal = document.getElementById('add-user-modal');
+        const clearCacheBtn = document.getElementById('clear-cache-btn');
+        const clearCacheModal = document.getElementById('clear-cache-modal');
 
         const sectionContents = {
             dashboard: document.getElementById("dashboard-section"),
@@ -1710,6 +1740,29 @@
             };
         };
 
+        function clearBrowserCache() {
+            const confirmBtn = document.getElementById('confirm-clear-cache');
+            toggleButtonLoading(confirmBtn, true);
+            try {
+                // Specifically remove the theme to avoid clearing Firebase auth keys from localStorage.
+                localStorage.removeItem('theme');
+                console.log('Cleared "theme" from localStorage.');
+
+                // Re-apply the default theme visually.
+                applyInitialTheme();
+
+                showToast('success', 'Cache Cleared', 'Local theme setting has been reset.');
+                logActivity('Settings', 'Cleared browser cache (theme setting).');
+
+            } catch (error) {
+                console.error('Error clearing cache:', error);
+                showToast('error', 'Error', 'Could not clear browser cache.');
+            } finally {
+                toggleButtonLoading(confirmBtn, false);
+                document.getElementById('clear-cache-modal').classList.remove('show');
+            }
+        }
+
         // =================================================================
         // ====================  Firebase Functions  =====================
         // =================================================================
@@ -1807,19 +1860,19 @@
             clientsArray.forEach(user => {
                 const joinedDate = user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A';
                 usersHtml += `
-                    <tr>
-                        <td><img src="${user.avatarUrl || 'https://via.placeholder.com/40'}" alt="${user.displayName}" class="user-avatar"></td>
-                        <td>${user.displayName || 'N/A'}</td>
-                        <td>${user.email || 'N/A'}</td>
-                        <td>${user.password || '********'}</td>
-                        <td>${joinedDate}</td>
-                        <td>
-                            <button class="btn btn-xs btn-danger delete-client-btn" data-id="${user.id}" title="Delete User Data">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                        <tr>
+                            <td><img src="${user.avatarUrl || 'https://via.placeholder.com/40'}" alt="${user.displayName}" class="user-avatar"></td>
+                            <td>${user.displayName || 'N/A'}</td>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.password || '********'}</td>
+                            <td>${joinedDate}</td>
+                            <td>
+                                <button class="btn btn-xs btn-danger delete-client-btn" data-id="${user.id}" title="Delete User Data">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
             });
             clientsListBody.innerHTML = usersHtml;
         }
@@ -2687,6 +2740,18 @@
                 restoreConfirmModal.querySelector('.modal-close').addEventListener('click', () => restoreConfirmModal.classList.remove('show'));
                 document.getElementById('cancel-restore').addEventListener('click', () => restoreConfirmModal.classList.remove('show'));
                 document.getElementById('confirm-restore').addEventListener('click', restoreData);
+            }
+
+            if (clearCacheBtn) {
+                clearCacheBtn.addEventListener('click', () => {
+                    clearCacheModal.classList.add('show');
+                });
+            }
+
+            if (clearCacheModal) {
+                clearCacheModal.querySelector('.modal-close').addEventListener('click', () => clearCacheModal.classList.remove('show'));
+                document.getElementById('cancel-clear-cache').addEventListener('click', () => clearCacheModal.classList.remove('show'));
+                document.getElementById('confirm-clear-cache').addEventListener('click', clearBrowserCache);
             }
 
             if (addUserBtn) {
