@@ -12,25 +12,25 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 $(function () {
-  let focusTimeout;
+  let focusTimeout; // Panda animation for password fields
 
-  $("#password, #confirm-password").focusin(function () {
-    clearTimeout(focusTimeout);
-    $("form").addClass("up");
-    $(".eye-ball").fadeOut(100);
-  });
-
-  $("#password, #confirm-password").focusout(function () {
-    focusTimeout = setTimeout(function () {
-      if (
-        !$("#password").is(":focus") &&
-        !$("#confirm-password").is(":focus")
-      ) {
-        $("form").removeClass("up");
-        $(".eye-ball").fadeIn(100);
-      }
-    }, 50);
-  });
+  $("#password, #confirm-password")
+    .focusin(function () {
+      clearTimeout(focusTimeout);
+      $("form").addClass("up");
+      $(".eye-ball").fadeOut(100);
+    })
+    .focusout(function () {
+      focusTimeout = setTimeout(function () {
+        if (
+          !$("#password").is(":focus") &&
+          !$("#confirm-password").is(":focus")
+        ) {
+          $("form").removeClass("up");
+          $(".eye-ball").fadeIn(100);
+        }
+      }, 50);
+    }); // Panda eye tracking
 
   $(document).on("mousemove", function (event) {
     if ($(".eye-ball").is(":visible")) {
@@ -38,12 +38,9 @@ $(function () {
       let dh = $(document).height() / 15;
       let x = event.pageX / dw;
       let y = event.pageY / dh;
-      $(".eye-ball").css({
-        width: x,
-        height: y,
-      });
+      $(".eye-ball").css({ width: x, height: y });
     }
-  });
+  }); // Show/hide password
 
   $(".view-password").on("click", function () {
     const passwordInput = $(this).siblings(".form-control");
@@ -51,15 +48,13 @@ $(function () {
       passwordInput.attr("type") === "password" ? "text" : "password";
     passwordInput.attr("type", type);
     $(this).toggleClass("fa-eye fa-eye-slash");
-  });
+  }); // Alert handling
 
   let alertTimeout;
   function showAlert(message, type = "error") {
     clearTimeout(alertTimeout);
     const alertBox = $("#alert-box");
-
     alertBox.text(message).removeClass("success error").addClass(type).fadeIn();
-
     if (type === "error") {
       $("form").addClass("wrong-entry");
       alertTimeout = setTimeout(function () {
@@ -67,23 +62,15 @@ $(function () {
         alertBox.fadeOut();
       }, 3000);
     }
-  }
+  } // Firebase auth error handling
 
   function handleAuthError(err) {
     let message = "An unknown error occurred.";
     switch (err.code) {
       case "auth/user-not-found":
       case "auth/invalid-credential":
-        message = "Incorrect email or password.";
-        break;
       case "auth/wrong-password":
-        message = "Incorrect password. Please try again.";
-        break;
-      case "auth/too-many-requests":
-        message = "Too many failed login attempts. Please try again later.";
-        break;
-      case "auth/user-disabled":
-        message = "This user account has been disabled.";
+        message = "Incorrect email or password.";
         break;
       case "auth/email-already-in-use":
         message = "This email is already registered.";
@@ -99,32 +86,27 @@ $(function () {
         break;
     }
     showAlert(message, "error");
-  }
+  } // Login form submission
 
   if ($("#login-form").length) {
     $("#login-form").on("submit", function (e) {
       e.preventDefault();
       const email = $("#email").val();
       const password = $("#password").val();
-
       if (!email || !password) {
-        showAlert("Please fill in all fields.", "error");
-        return;
+        return showAlert("Please fill in all fields.");
       }
-
       auth
         .signInWithEmailAndPassword(email, password)
-        .then((cred) => {
+        .then(() => {
           showAlert("Successfully logged in!", "success");
           setTimeout(() => {
             window.location.href = "index.html";
           }, 1500);
         })
-        .catch((err) => {
-          handleAuthError(err);
-        });
+        .catch(handleAuthError);
     });
-  }
+  } // Signup form submission
 
   if ($("#signup-form").length) {
     $("#signup-form").on("submit", function (e) {
@@ -134,18 +116,12 @@ $(function () {
       const password = $("#password").val();
       const confirmPassword = $("#confirm-password").val();
 
-      if (name.length < 3) {
-        showAlert("Name must be at least 3 characters.", "error");
-        return;
-      }
-      if (password.length < 8) {
-        showAlert("Password must be at least 8 characters.", "error");
-        return;
-      }
-      if (password !== confirmPassword) {
-        showAlert("Passwords do not match.", "error");
-        return;
-      }
+      if (name.length < 3)
+        return showAlert("Name must be at least 3 characters.");
+      if (password.length < 8)
+        return showAlert("Password must be at least 8 characters.");
+      if (password !== confirmPassword)
+        return showAlert("Passwords do not match.");
 
       auth
         .createUserWithEmailAndPassword(email, password)
@@ -155,9 +131,9 @@ $(function () {
             { length: 10 },
             (_, i) =>
               `https://api.dicebear.com/7.x/pixel-art/svg?seed=${i + 1}&size=40`
-          );
+          ); // MODIFIED: Changed collection from 'users' to 'clients'
           return db
-            .collection("users")
+            .collection("clients")
             .doc(cred.user.uid)
             .set({
               displayName: name,
@@ -165,6 +141,7 @@ $(function () {
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               avatarUrl:
                 presetAvatars[Math.floor(Math.random() * presetAvatars.length)],
+              favorites: [],
             });
         })
         .then(() => {
@@ -172,9 +149,7 @@ $(function () {
             window.location.href = "index.html";
           }, 1500);
         })
-        .catch((err) => {
-          handleAuthError(err);
-        });
+        .catch(handleAuthError);
     });
   }
 });

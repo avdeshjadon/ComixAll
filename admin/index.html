@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -766,6 +767,12 @@
             margin: 0;
         }
 
+        #recent-activity-list {
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
         .activity-item {
             display: flex;
             gap: 1rem;
@@ -813,6 +820,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .card-header h2 {
@@ -935,6 +944,82 @@
             visibility: visible;
         }
 
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .user-table th {
+            background-color: var(--bg-main);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .user-table th:last-child,
+        .user-table td:last-child {
+            text-align: right;
+        }
+
+        .user-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .user-table tbody tr:hover {
+            background-color: var(--bg-main);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .charts-container {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 992px) {
+            .charts-container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            animation: fadeInUp 0.5s var(--ease-out-cubic) forwards;
+            opacity: 0;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -976,12 +1061,14 @@
                 grid-template-columns: 1fr 1fr;
             }
 
-            #comics-section .header {
+            #comics-section .header,
+            #users-section .card-header {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            #comics-section .header .form-group {
+            #comics-section .header .form-group,
+            #users-section .card-header .form-group {
                 width: 100%;
             }
         }
@@ -1098,6 +1185,21 @@
                         <p>Loading recent activity...</p>
                     </div>
                 </div>
+
+                <div class="charts-container">
+                    <div class="chart-card" style="--i: 6;">
+                        <h3>Statistics Overview</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="main-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card" style="--i: 7;">
+                        <h3>Distribution</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="pie-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="comics-section" class="section-content">
@@ -1168,12 +1270,40 @@
                 </div>
             </div>
 
-            <div id="users-section" class="section-content"
-                style="display: none; flex-direction: column; align-items: center; justify-content: center;"><i
-                    class="fas fa-users-cog" style="font-size: 3rem; color: var(--text-gray); margin-bottom: 1rem;"></i>
-                <h2>User Management</h2>
-                <p style="color: var(--text-gray);">This feature is under construction.</p>
+            <div id="users-section" class="section-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>User Management</h2>
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <div class="form-group" style="margin-bottom: 0; min-width: 250px; flex-grow: 1;">
+                                <input type="text" id="search-clients" class="form-control"
+                                    placeholder="Search by name or email...">
+                            </div>
+                            <button id="add-user-btn" class="btn btn-primary">Add User</button>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Display Name</th>
+                                    <th>Email</th>
+                                    <th>Password</th>
+                                    <th>Joined Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-list-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center;">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+
 
             <div id="settings-section" class="section-content">
                 <div class="form-card">
@@ -1277,10 +1407,7 @@
                     <div class="parts-management-section">
                         <h4 style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                             Part Name Overrides</h4>
-                        <p style="font-size: 0.85rem; color: var(--text-gray); margin-bottom: 1rem;">Yahan naam daalne
-                            se default naam ('Comic Title - Part X') ki jagah aapka diya hua naam dikhega. Box khaali
-                            chhodne par default naam istemal hoga.</p>
-                        <div id="part-overrides-container"></div>
+                        <div id="part-overrides-container" style="margin-top: 1rem;"></div>
                     </div>
                 </form>
             </div>
@@ -1313,9 +1440,95 @@
         </div>
     </div>
 
+    <div class="modal" id="delete-client-modal">
+        <div class="modal-content" style="max-width: 500px">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm User Deletion</h3><button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this user's data from the database? This action cannot be undone.</p>
+                <p style="font-size: 0.8rem; color: var(--text-gray); margin-top: 1rem;"><strong>Note:</strong> This
+                    only removes the Firestore document. For full deletion, the user must be removed from Firebase
+                    Authentication via a backend function.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-delete-client">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete-client">Delete User Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="delete-all-activities-modal">
+        <div class="modal-content" style="max-width: 500px">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Clear All Activity</h3><button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>all</strong> activity logs? This action is permanent and
+                    cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-delete-all-activities">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete-all-activities">Yes, Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="restore-confirm-modal">
+        <div class="modal-content" style="max-width: 500px">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirm Data Restore</h3><button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--error); font-weight: bold;">Warning!</p>
+                <p>Restoring from a backup will <strong>permanently delete all existing comics, categories, and
+                        settings</strong> before importing the new data. This action cannot be undone.</p>
+                <p style="margin-top: 1rem;">Are you sure you want to proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-restore">Cancel</button>
+                <button class="btn btn-danger" id="confirm-restore">Yes, Restore Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content" style="max-width: 500px">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New User</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="new-user-name">Display Name</label>
+                        <input type="text" id="new-user-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-email">Email</label>
+                        <input type="email" id="new-user-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-password">Password</label>
+                        <input type="text" id="new-user-password" class="form-control" required>
+                    </div>
+                </form>
+                <p style="font-size: 0.8rem; color: var(--warning); margin-top: 1rem;"><strong>Security
+                        Warning:</strong> This method adds a user record to the database with a plain-text password and
+                    does NOT create a real authentication account. This user will NOT be able to log in. This is for
+                    data-entry purposes only.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancel-add-user">Cancel</button>
+                <button class="btn btn-primary" id="confirm-add-user">Add User</button>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // =================================================================
-        // =================   Firebase Configuration   ====================
+        // =================  Firebase Configuration  ====================
         // =================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM",
@@ -1327,7 +1540,6 @@
         };
 
         // Firebase services ko initialize karein
-        // Check karein ki app pehle se initialized hai ya nahi
         let app;
         if (!firebase.apps.length) {
             app = firebase.initializeApp(firebaseConfig);
@@ -1340,16 +1552,21 @@
         const storage = firebase.storage();
 
         // =================================================================
-        // =====================   Global Variables   ======================
+        // =====================  Global Variables  ======================
         // =================================================================
         let currentComicToDelete = null;
         let currentComicToEdit = null;
         let allComics = [];
+        let allClients = [];
+        let currentClientToDelete = null;
         let unsubscribeComics = null;
         let selectedPfpUrl = null;
+        let dataToRestore = null;
+        let mainChart = null;
+        let pieChart = null;
 
         // =================================================================
-        // ===================   DOM Element Selectors   ===================
+        // ===================  DOM Element Selectors  ===================
         // =================================================================
         const authContainer = document.getElementById("auth-container");
         const adminDashboard = document.getElementById("admin-dashboard");
@@ -1382,6 +1599,13 @@
         const mobileMenuBtn = document.getElementById("mobile-menu-btn");
         const sidebar = document.getElementById("sidebar");
         const sidebarOverlay = document.getElementById("sidebar-overlay");
+        const deleteAllActivitiesModal = document.getElementById('delete-all-activities-modal');
+        const searchClientsInput = document.getElementById('search-clients');
+        const clientsListBody = document.getElementById('clients-list-body');
+        const deleteClientModal = document.getElementById('delete-client-modal');
+        const restoreConfirmModal = document.getElementById('restore-confirm-modal');
+        const addUserBtn = document.getElementById('add-user-btn');
+        const addUserModal = document.getElementById('add-user-modal');
 
         const sectionContents = {
             dashboard: document.getElementById("dashboard-section"),
@@ -1391,34 +1615,35 @@
             settings: document.getElementById("settings-section"),
         };
 
-        // Preset Avatars ki poori list
         const presetAvatars = [
-            { style: "fun-emoji", seed: "Angry" },
-            { style: "fun-emoji", seed: "Blushing" },
-            { style: "fun-emoji", seed: "Concerned" },
-            { style: "fun-emoji", seed: "Cool" },
-            { style: "fun-emoji", seed: "Crying" },
-            { style: "fun-emoji", seed: "Driven" },
-            { style: "fun-emoji", seed: "Excited" },
-            { style: "fun-emoji", seed: "Happy" },
-            { style: "fun-emoji", seed: "Hurt" },
-            { style: "fun-emoji", seed: "Innocent" },
-            { style: "fun-emoji", seed: "Love" },
-            { style: "fun-emoji", seed: "LOL" },
-            { style: "fun-emoji", seed: "Sad" },
-            { style: "fun-emoji", seed: "Shocked" },
-            { style: "fun-emoji", seed: "Sleeping" },
-            { style: "fun-emoji", seed: "Smile" },
-            { style: "fun-emoji", seed: "Surprised" },
-            { style: "fun-emoji", seed: "Tired" },
-            { style: "fun-emoji", seed: "Vomiting" },
-            { style: "fun-emoji", seed: "Winking" },
-            { style: "adventurer", seed: "Midnight" },
-            { style: "adventurer", seed: "Snowball" },
+            { style: "adventurer", seed: "Midnight" }, { style: "adventurer", seed: "Snowball" },
+            { style: "adventurer", seed: "Patches" }, { style: "adventurer", seed: "Sheba" },
+            { style: "pixel-art", seed: "Max" }, { style: "pixel-art", seed: "Lucy" },
+            { style: "pixel-art", seed: "Charlie" }, { style: "pixel-art", seed: "Daisy" },
+            { style: "fun-emoji", seed: "Happy" }, { style: "fun-emoji", seed: "Sad" },
+            { style: "fun-emoji", seed: "Winking" }, { style: "fun-emoji", seed: "Cool" },
+            { style: "fun-emoji", seed: "Love" }, { style: "fun-emoji", seed: "LOL" },
+            { style: "fun-emoji", seed: "Surprised" }, { style: "fun-emoji", seed: "Angry" },
+            { style: "bottts", seed: "Gizmo" }, { style: "bottts", seed: "Sparky" },
+            { style: "bottts", seed: "Clank" }, { style: "bottts", seed: "Bolt" },
+            { style: "micah", seed: "Leo" }, { style: "micah", seed: "Mia" },
+            { style: "micah", seed: "Zoe" }, { style: "micah", seed: "Sam" },
+            { style: "initials", seed: "Admin" }, { style: "initials", seed: "User" },
+            { style: "initials", seed: "Guest" }, { style: "initials", seed: "Panel" },
+            { style: "lorelei", seed: "Luna" }, { style: "lorelei", seed: "Oliver" },
+            { style: "lorelei", seed: "Bella" }, { style: "lorelei", seed: "Jasper" },
+            { style: "shapes", seed: "Circle" }, { style: "shapes", seed: "Square" },
+            { style: "shapes", seed: "Triangle" }, { style: "shapes", seed: "Diamond" },
+            { style: "thumbs", seed: "Up" }, { style: "thumbs", seed: "Down" },
+            { style: "thumbs", seed: "Cool" }, { style: "thumbs", seed: "Awesome" },
+            { style: "avataaars", seed: "Felix" }, { style: "avataaars", seed: "Milo" },
+            { style: "avataaars", seed: "Cleo" }, { style: "avataaars", seed: "Rocky" },
+            { style: "big-ears", seed: "Simba" }, { style: "big-ears", seed: "Nala" },
+            { style: "big-ears", seed: "Coco" }, { style: "big-ears", seed: "Oreo" }
         ];
 
         // =================================================================
-        // =====================   Helper Functions   ======================
+        // =====================  Helper Functions  ======================
         // =================================================================
 
         const toggleButtonLoading = (btn, isLoading) => {
@@ -1486,7 +1711,7 @@
         };
 
         // =================================================================
-        // ====================   Firebase Functions   =====================
+        // ====================  Firebase Functions  =====================
         // =================================================================
 
         async function logActivity(action, details) {
@@ -1526,14 +1751,13 @@
         }
 
         function loadRecentActivity() {
-            const listContainer = document.getElementById("recent-activity-list");
             db.collection("activity_log")
                 .orderBy("timestamp", "desc")
-                .limit(10)
+                .limit(30)
                 .onSnapshot(
                     (snapshot) => {
                         if (snapshot.empty) {
-                            listContainer.innerHTML = "<p>No recent activity found.</p>";
+                            recentActivityList.innerHTML = "<p>No recent activity found.</p>";
                             return;
                         }
                         let activityHtml = '<ul class="activity-list">';
@@ -1545,19 +1769,19 @@
                             if (activity.action.includes("Deleted")) icon = "fa-trash-alt";
                             if (activity.action.includes("Category")) icon = "fa-tags";
                             activityHtml += `
-            <li class="activity-item">
-                <i class="fas ${icon}" style="margin-right: 12px; color: var(--text-gray);"></i>
-                <div class="activity-details">
-                    <strong>${activity.action}:</strong> ${activity.details}
-                </div>
-                <div class="activity-time">${formatTimeAgo(
+                <li class="activity-item">
+                    <i class="fas ${icon}" style="margin-right: 12px; color: var(--text-gray);"></i>
+                    <div class="activity-details">
+                        <strong>${activity.action}:</strong> ${activity.details}
+                    </div>
+                    <div class="activity-time">${formatTimeAgo(
                                 activity.timestamp
                             )}</div>
-                <button class="delete-activity-btn" data-id="${docId}" title="Delete Activity"><i class="fas fa-trash"></i></button>
-            </li>`;
+                    <button class="delete-activity-btn" data-id="${docId}" title="Delete Activity"><i class="fas fa-trash"></i></button>
+                </li>`;
                         });
                         activityHtml += "</ul>";
-                        listContainer.innerHTML = activityHtml;
+                        recentActivityList.innerHTML = activityHtml;
                     },
                     (err) => {
                         console.error("Error loading activity:", err);
@@ -1566,11 +1790,145 @@
                             "Activity Error",
                             "Could not load activity log. Check permissions."
                         );
-                        listContainer.innerHTML =
+                        recentActivityList.innerHTML =
                             '<p style="color:red;">Could not load activity.</p>';
                     }
                 );
         }
+
+        function renderClientsTable(clientsArray) {
+            if (!clientsListBody) return;
+            if (clientsArray.length === 0) {
+                clientsListBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users match your search.</td></tr>';
+                return;
+            }
+
+            let usersHtml = '';
+            clientsArray.forEach(user => {
+                const joinedDate = user.createdAt ? user.createdAt.toDate().toLocaleDateString() : 'N/A';
+                usersHtml += `
+                    <tr>
+                        <td><img src="${user.avatarUrl || 'https://via.placeholder.com/40'}" alt="${user.displayName}" class="user-avatar"></td>
+                        <td>${user.displayName || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>${user.password || '********'}</td>
+                        <td>${joinedDate}</td>
+                        <td>
+                            <button class="btn btn-xs btn-danger delete-client-btn" data-id="${user.id}" title="Delete User Data">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            clientsListBody.innerHTML = usersHtml;
+        }
+
+        function loadClientsData() {
+            db.collection("clients").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+                const userCount = snapshot.size;
+                if (activeUsersEl) activeUsersEl.textContent = userCount;
+                updateChartData();
+
+                allClients = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                if (snapshot.empty) {
+                    clientsListBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No users found.</td></tr>';
+                    return;
+                }
+
+                renderClientsTable(allClients);
+
+            }, err => {
+                console.error("Error loading clients:", err);
+                showToast('error', 'Error', 'Could not load user data.');
+                clientsListBody.innerHTML = '<tr><td colspan="6" style="color:red; text-align: center;">Error loading users. Check permissions.</td></tr>';
+            });
+        }
+
+        async function deleteClient() {
+            if (!currentClientToDelete) return;
+            const userId = currentClientToDelete.id;
+            const userEmail = currentClientToDelete.email;
+
+            try {
+                await db.collection('clients').doc(userId).delete();
+                await logActivity("User Data Deleted", `Deleted data for ${userEmail}`);
+                showToast('success', 'User Data Deleted', `Removed ${userEmail}'s data from the database.`);
+            } catch (err) {
+                showToast('error', 'Deletion Failed', err.message);
+                console.error("Error deleting client data:", err);
+            } finally {
+                currentClientToDelete = null;
+                if (deleteClientModal) deleteClientModal.classList.remove('show');
+            }
+        }
+
+        async function addNewClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-user-name').value;
+            const email = document.getElementById('new-user-email').value;
+            const password = document.getElementById('new-user-password').value;
+
+            if (!name || !email || !password) {
+                showToast('error', 'Missing Fields', 'Please fill out all fields.');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirm-add-user');
+            toggleButtonLoading(confirmBtn, true);
+
+            try {
+                await db.collection('clients').add({
+                    displayName: name,
+                    email: email,
+                    password: password,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${name}`,
+                    favorites: []
+                });
+
+                await logActivity('User Added (Admin)', `Created record for ${email}`);
+                showToast('success', 'User Record Added', `A database record for ${email} has been created.`);
+                addUserModal.classList.remove('show');
+                document.getElementById('add-user-form').reset();
+            } catch (err) {
+                showToast('error', 'Error', 'Could not add user record.');
+                console.error("Error adding new client:", err);
+            } finally {
+                toggleButtonLoading(confirmBtn, false);
+            }
+        }
+
+        async function deleteAllActivities() {
+            const confirmBtn = document.getElementById('confirm-delete-all-activities');
+            toggleButtonLoading(confirmBtn, true);
+            try {
+                const snapshot = await db.collection('activity_log').get();
+                if (snapshot.empty) {
+                    showToast('warning', 'No Logs', 'There are no activity logs to delete.');
+                    return;
+                }
+
+                const batch = db.batch();
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+
+                showToast('success', 'All Logs Deleted', 'The activity log has been cleared.');
+            } catch (err) {
+                showToast('error', 'Deletion Failed', 'Could not delete all activity logs.');
+                console.error("Error deleting all activities:", err);
+            } finally {
+                toggleButtonLoading(confirmBtn, false);
+                if (deleteAllActivitiesModal) {
+                    deleteAllActivitiesModal.classList.remove('show');
+                }
+            }
+        }
+
 
         async function adminLogin() {
             const email = document.getElementById("login-email").value;
@@ -1580,7 +1938,6 @@
             toggleButtonLoading(loginBtn, true);
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Yahan se success toast hata diya, kyunki onAuthStateChanged ab handle karega
             } catch (err) {
                 errorEl.textContent = "Invalid credentials. Please try again.";
                 showToast("error", "Login Failed", err.message);
@@ -1646,6 +2003,48 @@
             document.getElementById("edit-comic-manifest-url").value =
                 comic.manifestUrl || "";
             editModal.classList.add("show");
+
+            const overridesContainer = document.getElementById('part-overrides-container');
+            overridesContainer.innerHTML = 'Loading parts...';
+
+            if (comic.manifestUrl) {
+                try {
+                    const response = await fetch(comic.manifestUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const manifestData = await response.json();
+                    const parts = manifestData.parts;
+
+                    if (Array.isArray(parts) && parts.length > 0) {
+                        overridesContainer.innerHTML = '';
+                        parts.forEach((part, index) => {
+                            const overrideValue = comic.partNameOverrides && comic.partNameOverrides[index] ? comic.partNameOverrides[index] : '';
+
+                            const formGroup = document.createElement('div');
+                            formGroup.className = 'form-group';
+                            formGroup.style.marginBottom = '0.75rem';
+
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'form-control';
+                            input.placeholder = `Part ${index + 1} Name (Default: ${comic.title} - Part ${index + 1})`;
+                            input.dataset.index = index;
+                            input.value = overrideValue;
+
+                            formGroup.appendChild(input);
+                            overridesContainer.appendChild(formGroup);
+                        });
+                    } else {
+                        overridesContainer.innerHTML = '<p style="color: var(--text-gray);">No parts found in manifest or manifest is not a valid array.</p>';
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch or parse comic manifest:", err);
+                    overridesContainer.innerHTML = '<p style="color: var(--error);">Could not load parts from manifest URL. Please check the URL and its content.</p>';
+                }
+            } else {
+                overridesContainer.innerHTML = '<p style="color: var(--text-gray);">No manifest URL provided.</p>';
+            }
         }
 
         async function saveComicEdit() {
@@ -1653,6 +2052,17 @@
             const saveBtn = document.getElementById("save-edit");
             toggleButtonLoading(saveBtn, true);
             const comicId = currentComicToEdit.id;
+
+            const partNameOverrides = {};
+            const overrideInputs = document.querySelectorAll('#part-overrides-container .form-control');
+            overrideInputs.forEach(input => {
+                const index = input.dataset.index;
+                const value = input.value.trim();
+                if (value) {
+                    partNameOverrides[index] = value;
+                }
+            });
+
             const updatedData = {
                 title: document.getElementById("edit-comic-title").value,
                 author: document.getElementById("edit-comic-author").value,
@@ -1667,6 +2077,7 @@
                 thumbnailUrl: document.getElementById("edit-comic-thumbnail").value,
                 manifestUrl: document.getElementById("edit-comic-manifest-url").value,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                partNameOverrides: partNameOverrides
             };
             try {
                 await db.collection("comics").doc(comicId).update(updatedData);
@@ -1704,13 +2115,14 @@
                     (snapshot) => {
                         allComics = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
                         renderAllComics(allComics);
-                        if (totalComicsEl) totalComicsEl.textContent = snapshot.size;
-                        if (pageViewsEl) {
-                            pageViewsEl.textContent = allComics.reduce(
-                                (sum, comic) => sum + (comic.totalViews || 0),
-                                0
-                            );
-                        }
+
+                        const comicCount = snapshot.size;
+                        const viewCount = allComics.reduce((sum, comic) => sum + (comic.totalViews || 0), 0);
+
+                        if (totalComicsEl) totalComicsEl.textContent = comicCount;
+                        if (pageViewsEl) pageViewsEl.textContent = viewCount;
+
+                        updateChartData();
                     },
                     (err) => {
                         console.error("Error loading comics:", err);
@@ -1735,15 +2147,15 @@
                 card.className = "comic-card";
                 card.style.setProperty("--i", index);
                 card.innerHTML = `
-            <div class="image-container">
-                <img src="${comic.thumbnailUrl}" alt="${comic.title
+                <div class="image-container">
+                    <img src="${comic.thumbnailUrl}" alt="${comic.title
                     }" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/160x240?text=No+Image';">
-            </div>
-            <div class="comic-body">
-                <h3 class="comic-title" title="${comic.title}">${comic.title
+                </div>
+                <div class="comic-body">
+                    <h3 class="comic-title" title="${comic.title}">${comic.title
                     }</h3>
-                <p class="comic-author">${comic.author || "N/A"}</p>
-            </div>`;
+                    <p class="comic-author">${comic.author || "N/A"}</p>
+                </div>`;
                 card.addEventListener("click", () => openEditModal(comic));
                 comicsGrid.appendChild(card);
             });
@@ -1763,11 +2175,9 @@
                         item.style.setProperty("--i", i);
                         item.innerHTML = `<span>${cat.name}</span><button class="btn btn-xs btn-danger">Delete</button>`;
                         item.querySelector("button").onclick = async () => {
-                            if (confirm(`Delete "${cat.name}"? This is permanent.`)) {
-                                await db.collection("categories").doc(cat.id).delete();
-                                await logActivity("Category Deleted", cat.name);
-                                showToast("success", "Deleted", `Category "${cat.name}" removed.`);
-                            }
+                            await db.collection("categories").doc(cat.id).delete();
+                            await logActivity("Category Deleted", cat.name);
+                            showToast("success", "Deleted", `Category "${cat.name}" removed.`);
                         };
                         listEl.appendChild(item);
                     });
@@ -1803,27 +2213,243 @@
             }
         }
 
+        function populatePresetAvatars() {
+            if (!presetAvatarsGrid) return;
+            presetAvatarsGrid.innerHTML = '';
+            presetAvatars.forEach(avatar => {
+                const url = `https://api.dicebear.com/8.x/${avatar.style}/svg?seed=${avatar.seed}`;
+                const img = document.createElement('img');
+                img.src = url;
+                img.alt = `${avatar.style} - ${avatar.seed}`;
+                img.className = 'preset-avatar';
+                img.dataset.url = url;
+                presetAvatarsGrid.appendChild(img);
+            });
+        }
+
+        async function savePfpChange() {
+            if (!selectedPfpUrl) {
+                showToast('warning', 'No Selection', 'Please select an avatar first.');
+                return;
+            }
+            toggleButtonLoading(savePfpBtn, true);
+            try {
+                await db.collection('settings').doc('admin_profile').set({
+                    profilePictureUrl: selectedPfpUrl
+                }, { merge: true });
+
+                userProfileImg.src = selectedPfpUrl;
+                await logActivity('Admin Profile', 'Updated profile picture.');
+                showToast('success', 'Avatar Updated', 'Your new profile picture has been saved.');
+                pfpModal.classList.remove('show');
+            } catch (err) {
+                showToast('error', 'Update Failed', 'Could not save the new avatar.');
+                console.error("Error saving PFP:", err);
+            } finally {
+                toggleButtonLoading(savePfpBtn, false);
+            }
+        }
+
+        async function backupData() {
+            toggleButtonLoading(backupBtn, true);
+            try {
+                const collectionsToBackup = ['comics', 'categories', 'settings'];
+                const backupObject = {};
+
+                for (const collectionName of collectionsToBackup) {
+                    const snapshot = await db.collection(collectionName).get();
+                    backupObject[collectionName] = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
+
+                const zip = new JSZip();
+                zip.file("data.json", JSON.stringify(backupObject, null, 2));
+
+                const content = await zip.generateAsync({ type: "blob" });
+
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(content);
+                const date = new Date().toISOString().slice(0, 10);
+                link.download = `comixall-backup-${date}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast('success', 'Backup Complete', 'Data has been downloaded.');
+            } catch (err) {
+                showToast('error', 'Backup Failed', 'Could not generate backup file.');
+                console.error("Backup error:", err);
+            } finally {
+                toggleButtonLoading(backupBtn, false);
+            }
+        }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            toggleButtonLoading(restoreBtn, true);
+
+            try {
+                const zip = await JSZip.loadAsync(file);
+                const dataFile = zip.file("data.json");
+                if (!dataFile) {
+                    throw new Error("data.json not found in zip file.");
+                }
+                const content = await dataFile.async("string");
+                dataToRestore = JSON.parse(content);
+
+                if (restoreConfirmModal) {
+                    restoreConfirmModal.classList.add('show');
+                }
+
+            } catch (err) {
+                showToast('error', 'Invalid File', 'Could not read the backup file.');
+                console.error("Restore file read error:", err);
+            } finally {
+                toggleButtonLoading(restoreBtn, false);
+                event.target.value = '';
+            }
+        }
+
+        async function restoreData() {
+            if (!dataToRestore) {
+                showToast('error', 'No Data', 'No data was loaded from the backup file.');
+                return;
+            }
+
+            const confirmBtn = document.getElementById('confirm-restore');
+            toggleButtonLoading(confirmBtn, true);
+
+            try {
+                const collections = Object.keys(dataToRestore);
+
+                for (const collectionName of collections) {
+                    const snapshot = await db.collection(collectionName).get();
+                    if (!snapshot.empty) {
+                        const batch = db.batch();
+                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    }
+                }
+
+                for (const collectionName of collections) {
+                    const items = dataToRestore[collectionName];
+                    if (items && items.length > 0) {
+                        const batch = db.batch();
+                        items.forEach(item => {
+                            const docRef = db.collection(collectionName).doc(item.id);
+                            const { id, ...data } = item;
+                            batch.set(docRef, data);
+                        });
+                        await batch.commit();
+                    }
+                }
+
+                await logActivity('Data Restore', 'Restored data from backup file.');
+                showToast('success', 'Restore Complete', 'All data has been restored successfully.');
+
+            } catch (err) {
+                showToast('error', 'Restore Failed', 'An error occurred during the restore process.');
+                console.error("Restore write error:", err);
+            } finally {
+                toggleButtonLoading(confirmBtn, false);
+                dataToRestore = null;
+                if (restoreConfirmModal) {
+                    restoreConfirmModal.classList.remove('show');
+                }
+            }
+        }
+
+        function initializeCharts() {
+            const mainCtx = document.getElementById('main-chart').getContext('2d');
+            const pieCtx = document.getElementById('pie-chart').getContext('2d');
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-dark')
+                        }
+                    }
+                }
+            };
+
+            mainChart = new Chart(mainCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Comics', 'Users', 'Views'],
+                    datasets: [{
+                        label: 'Total Count',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(74, 85, 162, 0.6)',
+                            'rgba(56, 161, 105, 0.6)',
+                            'rgba(221, 107, 32, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(74, 85, 162, 1)',
+                            'rgba(56, 161, 105, 1)',
+                            'rgba(221, 107, 32, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: { ...commonOptions, scales: { y: { beginAtZero: true, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-dark') } }, x: { ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-dark') } } } }
+            });
+
+            pieChart = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Comics', 'Users', 'Views'],
+                    datasets: [{
+                        label: 'Distribution',
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            'rgba(74, 85, 162, 0.8)',
+                            'rgba(56, 161, 105, 0.8)',
+                            'rgba(221, 107, 32, 0.8)'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        function updateChartData() {
+            if (!mainChart || !pieChart) return;
+
+            const comics = parseInt(totalComicsEl.textContent) || 0;
+            const users = parseInt(activeUsersEl.textContent) || 0;
+            const views = parseInt(pageViewsEl.textContent) || 0;
+
+            const newData = [comics, users, views];
+
+            mainChart.data.datasets[0].data = newData;
+            pieChart.data.datasets[0].data = newData;
+
+            mainChart.update();
+            pieChart.update();
+        }
+
+
         // =================================================================
-        // ====================   Main App Execution   =====================
+        // ====================  Main App Execution  =====================
         // =================================================================
 
         document.addEventListener("DOMContentLoaded", () => {
             applyInitialTheme();
+            populatePresetAvatars();
+            initializeCharts();
 
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
-                    // User logged in hai
-
-                    // Step 1: Token ko force refresh karein
                     await user.getIdToken(true);
                     const idTokenResult = await user.getIdTokenResult();
-                    console.log("User token refreshed. Checking for admin claim...");
 
-                    // Step 2: Check karein ki user ke paas admin claim hai ya nahi
                     if (idTokenResult.claims.admin === true) {
-                        // User admin hai! Dashboard dikhayein aur data load karein.
-                        console.log("✅ Admin claim found. Loading admin dashboard.");
-                        showToast("success", "Welcome Admin!", "Successfully logged in.");
                         authContainer.classList.add("hidden");
                         adminDashboard.classList.remove("hidden");
 
@@ -1832,30 +2458,28 @@
                         loadCategoriesIntoSelects();
                         loadRecentActivity();
                         loadAdminProfile();
-                        if (activeUsersEl) activeUsersEl.textContent = "N/A";
+                        loadClientsData();
                         showSection("dashboard");
                     } else {
-                        // User admin nahi hai. Error dikhayein aur logout kar dein.
                         console.error("❌ Admin claim NOT found. Access denied.");
                         showToast(
                             "error",
                             "Access Denied",
                             "You do not have admin privileges."
                         );
-                        await auth.signOut(); // User ko logout kar dein
+                        await auth.signOut();
                     }
                 } else {
-                    // User logged out hai
                     adminDashboard.classList.add("hidden");
                     authContainer.classList.remove("hidden");
                     if (unsubscribeComics) {
-                        unsubscribeComics(); // Error se bachne ke liye listener ko band karein
+                        unsubscribeComics();
                     }
                 }
             });
 
             // =================================================================
-            // =====================   Event Listeners   =======================
+            // =====================  Event Listeners  =======================
             // =================================================================
 
             if (loginBtn) loginBtn.addEventListener("click", adminLogin);
@@ -1972,8 +2596,109 @@
                     sidebarOverlay.classList.remove("show");
                 });
             }
-        });
 
+            if (recentActivityList) {
+                recentActivityList.addEventListener('click', async (e) => {
+                    const deleteBtn = e.target.closest('.delete-activity-btn');
+                    if (deleteBtn) {
+                        const docId = deleteBtn.dataset.id;
+                        if (!docId) return;
+                        try {
+                            await db.collection('activity_log').doc(docId).delete();
+                            showToast('success', 'Activity Deleted', 'Log entry removed.');
+                        } catch (err) {
+                            showToast('error', 'Error', 'Could not delete activity log.');
+                            console.error("Error deleting activity:", err);
+                        }
+                    }
+                });
+            }
+
+            if (deleteAllActivitiesBtn) {
+                deleteAllActivitiesBtn.addEventListener('click', () => {
+                    deleteAllActivitiesModal.classList.add('show');
+                });
+            }
+
+            if (deleteAllActivitiesModal) {
+                deleteAllActivitiesModal.querySelector('.modal-close').addEventListener('click', () => deleteAllActivitiesModal.classList.remove('show'));
+                document.getElementById('cancel-delete-all-activities').addEventListener('click', () => deleteAllActivitiesModal.classList.remove('show'));
+                document.getElementById('confirm-delete-all-activities').addEventListener('click', deleteAllActivities);
+            }
+
+            if (searchClientsInput) {
+                searchClientsInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredClients = allClients.filter(client =>
+                        (client.displayName && client.displayName.toLowerCase().includes(searchTerm)) ||
+                        (client.email && client.email.toLowerCase().includes(searchTerm))
+                    );
+                    renderClientsTable(filteredClients);
+                });
+            }
+
+            if (clientsListBody) {
+                clientsListBody.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-client-btn');
+                    if (deleteBtn) {
+                        const userId = deleteBtn.dataset.id;
+                        currentClientToDelete = allClients.find(c => c.id === userId);
+                        if (currentClientToDelete && deleteClientModal) {
+                            deleteClientModal.classList.add('show');
+                        }
+                    }
+                });
+            }
+
+            if (deleteClientModal) {
+                deleteClientModal.querySelector('.modal-close').addEventListener('click', () => deleteClientModal.classList.remove('show'));
+                document.getElementById('cancel-delete-client').addEventListener('click', () => deleteClientModal.classList.remove('show'));
+                document.getElementById('confirm-delete-client').addEventListener('click', deleteClient);
+            }
+
+            if (userProfileImg) {
+                userProfileImg.addEventListener('click', () => {
+                    pfpModal.classList.add('show');
+                });
+            }
+
+            if (pfpModal) {
+                pfpModal.querySelector('.modal-close').addEventListener('click', () => pfpModal.classList.remove('show'));
+                document.getElementById('cancel-pfp-change').addEventListener('click', () => pfpModal.classList.remove('show'));
+                savePfpBtn.addEventListener('click', savePfpChange);
+            }
+
+            if (presetAvatarsGrid) {
+                presetAvatarsGrid.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('preset-avatar')) {
+                        presetAvatarsGrid.querySelectorAll('.preset-avatar').forEach(img => img.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        selectedPfpUrl = e.target.dataset.url;
+                        savePfpBtn.classList.remove('hidden');
+                    }
+                });
+            }
+
+            if (backupBtn) backupBtn.addEventListener('click', backupData);
+            if (restoreBtn) restoreBtn.addEventListener('click', () => restoreFileInput.click());
+            if (restoreFileInput) restoreFileInput.addEventListener('change', handleFileSelect);
+
+            if (restoreConfirmModal) {
+                restoreConfirmModal.querySelector('.modal-close').addEventListener('click', () => restoreConfirmModal.classList.remove('show'));
+                document.getElementById('cancel-restore').addEventListener('click', () => restoreConfirmModal.classList.remove('show'));
+                document.getElementById('confirm-restore').addEventListener('click', restoreData);
+            }
+
+            if (addUserBtn) {
+                addUserBtn.addEventListener('click', () => addUserModal.classList.add('show'));
+            }
+            if (addUserModal) {
+                addUserModal.querySelector('.modal-close').addEventListener('click', () => addUserModal.classList.remove('show'));
+                document.getElementById('cancel-add-user').addEventListener('click', () => addUserModal.classList.remove('show'));
+                document.getElementById('confirm-add-user').addEventListener('click', addNewClient);
+            }
+
+        });
     </script>
 </body>
 
