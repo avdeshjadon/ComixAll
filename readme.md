@@ -9,7 +9,7 @@ It allows users to explore, read, and manage digital comics in a simple yet powe
 
 ## 🔗 Live Demo
 
-👉 [Explore ComixAll Live](https://avdeshjadon-dev.github.io/ComixAll/)
+👉 [Explore ComixAll Live](https://avdeshjadon.github.io/ComixAll/)
 
 ---
 
