@@ -2,3591 +2,578 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ComixAll - Digital Comics Showcase</title>
-    <link rel="icon" href="https://res.cloudinary.com/comixall/image/upload/favicon/favicon.ico" type="image/x-icon">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --accent: #ff2d75;
-            --accent-light: #ff5c8d;
-            --accent-dark: #d4004e;
-            --text-primary: #f1f1f1;
-            --text-secondary: #b0b0b0;
-            --border-color: #2a2a2a;
-            --success: #22c55e;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-        }
-
-        html[data-theme="light"] {
-            --bg-primary: #f4f4f5;
-            --bg-secondary: #ffffff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: "Poppins", sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        header {
-            background-color: rgba(10, 10, 10, 0.95);
-            padding: 0.5rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--border-color);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            will-change: transform;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        html[data-theme="light"] header {
-            background-color: rgba(255, 255, 255, 0.85);
-        }
-
-        .header-content {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            opacity: 0;
-            animation: slideIn 0.5s ease-out forwards;
-        }
-
-        @keyframes slideIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .theme-toggle-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: var(--transition);
-        }
-
-        .theme-toggle-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-            transform: scale(1.1);
-        }
-
-        .theme-toggle-btn i {
-            transition: transform 0.5s ease;
-        }
-
-        .theme-toggle-btn.toggled i {
-            transform: rotate(180deg);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            cursor: pointer;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .logo:hover {
-            color: var(--accent);
-        }
-
-        .logo-icon {
-            font-size: 1.4rem;
-            color: var(--accent);
-            transition: var(--transition);
-        }
-
-        .logo:hover .logo-icon {
-            transform: rotate(10deg);
-        }
-
-        .search-container {
-            display: flex;
-            flex-grow: 1;
-            max-width: 400px;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 1rem;
-            padding-right: 3rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(255, 45, 117, 0.3);
-        }
-
-        .search-input::placeholder {
-            color: var(--text-secondary);
-            opacity: 0.7;
-        }
-
-        .search-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 3rem;
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1rem;
-        }
-
-        .search-btn:hover {
-            color: var(--accent);
-            transform: scale(1.1);
-        }
-
-        .categories-section {
-            background-color: var(--bg-secondary);
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .categories-container {
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-
-        .categories-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .categories-list {
-            display: flex;
-            gap: 0.75rem;
-            list-style: none;
-            padding: 0.5rem 1rem;
-            margin: 0;
-        }
-
-        .category-item {
-            flex: 0 0 auto;
-            opacity: 0;
-            transform: translateX(-20px);
-            animation: slideInRight 0.5s ease-out forwards;
-        }
-
-        .category-item:nth-child(n) {
-            animation-delay: calc(0.1s * n);
-        }
-
-        @keyframes slideInRight {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .category-link {
-            display: block;
-            padding: 0.5rem 1rem;
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-            border-radius: var(--radius-sm);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            white-space: nowrap;
-            transition: var(--transition);
-            border: 1px solid var(--border-color);
-            position: relative;
-        }
-
-        html[data-theme="light"] .category-link {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .category-link:hover {
-            color: var(--accent);
-            background-color: rgba(255, 45, 117, 0.1);
-            border-color: var(--accent);
-        }
-
-        .category-link.active {
-            background-color: var(--accent);
-            color: white;
-            font-weight: 600;
-            border-color: var(--accent);
-        }
-
-        html[data-theme="light"] .category-link.active {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .category-link::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            z-index: 10;
-        }
-
-        .category-link:hover::after {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-        }
-
-        main {
-            flex: 1;
-            padding: 1.5rem 0;
-        }
-
-        .results-heading-badge {
-            display: none;
-            padding-top: 1.5rem;
-            padding-bottom: 0.5rem;
-        }
-
-        .results-heading-badge h2 {
-            display: inline-block;
-            background-color: rgba(255, 45, 117, 0.1);
-            border: 1px solid var(--accent);
-            color: var(--accent-light);
-            padding: 0.5rem 1.25rem;
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(255, 45, 117, 0.15);
-        }
-
-        .results-heading-badge h2 .filter-type {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        .results-heading-badge h2 .filter-value {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .comics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .comic-card {
-            background: var(--bg-secondary);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            position: relative;
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-            animation: fadeInUp 0.5s ease-out forwards;
-            will-change: transform, opacity;
-            transition: background-color 0.3s ease, border-color 0.3s ease,
-                transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .comic-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 50%);
-            opacity: 0;
-            transition: var(--transition);
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .comic-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--accent);
-        }
-
-        .comic-card:hover::before {
-            opacity: 1;
-        }
-
-        html[data-theme="light"] .comic-card:hover::before {
-            background: linear-gradient(to top, rgba(231, 228, 229, 0.8) 0%, transparent 60%);
-        }
-
-        .comic-thumbnail-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 4/5;
-            overflow: hidden;
-            background-color: var(--border-color);
-        }
-
-        .comic-thumbnail {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-            will-change: transform;
-        }
-
-        .comic-card:hover .comic-thumbnail {
-            transform: scale(1.08);
-        }
-
-        .comic-info {
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            position: relative;
-            z-index: 2;
-        }
-
-        .comic-title {
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-            font-weight: 500;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-
-        .comic-card:hover .comic-title {
-            color: var(--accent);
-        }
-
-        html[data-theme="light"] .comic-card:hover .comic-description {
-            color: rgb(0, 0, 0);
-        }
-
-        .comic-description {
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-            padding: 1rem;
-        }
-
-        .pagination-btn {
-            padding: 0.5rem 1rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            position: relative;
-        }
-
-        .pagination-btn:hover:not(:disabled) {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .pagination-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            z-index: 10;
-        }
-
-        .pagination-btn:hover::after {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-        }
-
-        .pagination-info {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .loading,
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 3rem;
-            grid-column: 1 / -1;
-            text-align: center;
-        }
-
-        .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border-color);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite, pulse 1.5s ease-in-out infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-        }
-
-        .loading-text,
-        .empty-text {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .empty-icon {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            opacity: 0.7;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .comic-detail {
-            padding-top: 1.5rem;
-        }
-
-        .comic-detail-header img {
-            margin-top: 0;
-        }
-
-        .comic-detail-header {
-            display: flex;
-            gap: 2.5rem;
-            margin-bottom: 2rem;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease-out forwards;
-            align-items: flex-start;
-        }
-
-        .detail-thumbnail-container {
-            flex: 1;
-            max-width: 350px;
-            min-width: 280px;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-            transition: var(--transition);
-            will-change: transform;
-            align-self: flex-start;
-        }
-
-        .detail-thumbnail-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .detail-thumbnail {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s ease;
-        }
-
-        .detail-thumbnail-container:hover .detail-thumbnail {
-            transform: scale(1.05);
-        }
-
-        .comic-detail-info {
-            flex: 2;
-        }
-
-        .detail-title {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-            font-weight: 700;
-            color: var(--accent);
-            opacity: 0;
-            animation: slideInRight 0.5s ease-out 0.2s forwards;
-        }
-
-        .detail-meta {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.3s forwards;
-        }
-
-        .detail-description {
-            line-height: 1.7;
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            max-width: 70ch;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.4s forwards;
-            transition: max-height 0.5s ease-in-out;
-        }
-
-        .detail-description.truncated {
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .show-more-btn {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--accent-light);
-            padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            margin-top: 1rem;
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .show-more-btn:hover {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .parts-section {
-            margin-top: 2.5rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-
-        .section-title i {
-            color: var(--accent);
-            font-size: 1.25rem;
-            transition: var(--transition);
-        }
-
-        .section-title:hover i {
-            transform: rotate(10deg);
-        }
-
-        .parts-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-
-        .part-item {
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            padding: 1rem;
-            border-radius: var(--radius-sm);
-            font-weight: 500;
-            cursor: pointer;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInUp 0.5s ease-out forwards;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            will-change: transform;
-            transition: background-color 0.3s ease, border-color 0.3s ease,
-                color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .part-item:hover {
-            border-color: var(--accent);
-            background-color: rgba(255, 45, 117, 0.1);
-            color: var(--accent);
-            box-shadow: var(--shadow-md);
-        }
-
-        .part-content {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .part-meta {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-
-        .part-views {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        .suggestions-section {
-            margin-top: 2.5rem;
-        }
-
-        .suggestions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 1.25rem;
-            margin-top: 1rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.25rem;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            text-decoration: none;
-            position: relative;
-        }
-
-        .back-btn:hover {
-            color: var(--accent);
-            border-color: var(--accent);
-            background-color: rgba(255, 45, 117, 0.1);
-        }
-
-        .back-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            z-index: 10;
-        }
-
-        .back-btn:hover::after {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-        }
-
-        .scroll-to-top-btn {
-            padding: 0.6rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        .scroll-to-top-btn.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .scroll-to-top-btn:hover {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            box-shadow: 0 0 8px rgba(255, 45, 117, 0.3);
-        }
-
-        .scroll-to-top-btn:active {
-            transform: scale(0.95);
-        }
-
-        .scroll-to-top-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            top: calc(-100% - 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            z-index: 10;
-        }
-
-        .scroll-to-top-btn:hover::after {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-        }
-
-        .reader-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background-color: rgba(10, 10, 10, 0.9);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out forwards;
-            gap: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        html[data-theme="light"] .reader-header {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .reader-nav {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .reader-title-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .reader-title {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--accent);
-        }
-
-        .progress-indicator {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            background: rgba(255, 45, 117, 0.1);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .reader-back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            transition: var(--transition);
-            font-size: 0.9rem;
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            text-decoration: none;
-            position: relative;
-            white-space: nowrap;
-        }
-
-        .reader-back-btn:hover {
-            background-color: var(--accent);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .reader-nav-btn {
-            padding: 0.6rem 1.2rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            position: relative;
-            white-space: nowrap;
-        }
-
-        .reader-nav-btn:hover:not(:disabled) {
-            background-color: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .reader-nav-btn:active:not(:disabled) {
-            transform: scale(0.95);
-        }
-
-        .reader-nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .reader-nav-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            top: calc(-100% - 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            padding: 0.3rem 0.6rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            opacity: 0;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-            z-index: 10;
-        }
-
-        .reader-nav-btn:hover::after {
-            transform: translateX(-50%) scale(1);
-            opacity: 1;
-        }
-
-        .reader-bottom-nav {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: rgba(10, 10, 10, 0.9);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            position: sticky;
-            bottom: 0;
-            z-index: 100;
-            opacity: 0;
-            animation: slideInUp 0.5s ease-out forwards;
-        }
-
-        html[data-theme="light"] .reader-bottom-nav {
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-
-        @keyframes slideInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .comic-pages-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .comic-page-img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            background-color: #000;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-md);
-            transition: var(--transition);
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInUp 0.5s ease-out forwards;
-            will-change: transform, opacity;
-        }
-
-        .comic-page-img:hover {
-            box-shadow: 0 5px 15px rgba(255, 45, 117, 0.2);
-            transform: scale(1.01);
-        }
-
-        .site-footer {
-            background-color: var(--bg-secondary);
-            padding: 4rem 0 0;
-            margin-top: 3rem;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.9rem;
-            position: relative;
-            overflow: hidden;
-            opacity: 0;
-            animation: fadeInUp 0.6s ease-out 0.5s forwards;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .site-footer::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-            opacity: 0.3;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2.5rem;
-            padding-bottom: 3rem;
-        }
-
-        .footer-column .footer-logo {
-            text-decoration: none;
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-
-        .footer-column .footer-logo:hover {
-            color: var(--accent);
-        }
-
-        .footer-column .footer-logo i {
-            color: var(--accent);
-            transition: var(--transition);
-        }
-
-        .footer-column .footer-logo:hover i {
-            transform: rotate(10deg);
-        }
-
-        .footer-description {
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.6s forwards;
-        }
-
-        .footer-column h4 {
-            color: var(--text-primary);
-            margin-bottom: 1.25rem;
-            margin-left: 1.75rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 0.7s forwards;
-        }
-
-        .footer-links {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .footer-links li a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-
-        .footer-links li:nth-child(n) a {
-            animation-delay: calc(0.8s + 0.1s * n);
-        }
-
-        .footer-links li a::before {
-            content: "\f105";
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-            color: var(--accent);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            opacity: 0;
-            width: 1em;
-            text-align: center;
-        }
-
-        .footer-links li a:hover {
-            color: var(--accent);
-            transform: translateX(5px);
-        }
-
-        .footer-links li a:hover::before {
-            opacity: 1;
-            transform: translateX(-5px);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.25rem;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            font-size: 1rem;
-            color: var(--text-secondary);
-            text-decoration: none;
-            opacity: 0;
-            transform: scale(1);
-            animation: popIn 0.5s ease-out forwards;
-        }
-
-        .social-link:nth-child(n) {
-            animation-delay: calc(0.9s + 0.1s * n);
-        }
-
-        @keyframes popIn {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .social-link:hover {
-            background-color: var(--accent);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(255, 45, 117, 0.2);
-        }
-
-        .newsletter-form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .newsletter-input {
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-
-        .newsletter-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 45, 117, 0.3);
-        }
-
-        .newsletter-button {
-            padding: 0.75rem 1.5rem;
-            background-color: var(--accent);
-            border: none;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            animation: pulseButton 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseButton {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.03);
-            }
-        }
-
-        .newsletter-button:hover {
-            background-color: var(--accent-dark);
-            box-shadow: var(--shadow-md);
-        }
-
-        .form-status-message {
-            font-size: 0.85rem;
-            text-align: left;
-            margin-top: 0.5rem;
-            height: 1.2em;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .form-status-message.visible {
-            opacity: 1;
-        }
-
-        .form-status-message.success {
-            color: var(--success);
-        }
-
-        .form-status-message.error {
-            color: var(--error);
-        }
-
-        .footer-bottom {
-            background-color: #000;
-            padding: 1rem 0;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
-            opacity: 0;
-            animation: fadeInUp 0.5s ease-out 1s forwards;
-            transition: background-color 0.3s ease;
-        }
-
-        html[data-theme="light"] .footer-bottom {
-            background-color: var(--bg-secondary);
-        }
-
-        .footer-bottom span a {
-            color: var(--accent-light);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-bottom span a:hover {
-            text-decoration: underline;
-            color: var(--accent);
-        }
-
-        .detail-rating {
-            margin-bottom: 0.75rem;
-            font-size: 1.1rem;
-            color: #f5b327;
-        }
-
-        .detail-meta-list {
-            list-style: none;
-            padding: 0;
-            margin: 1.25rem 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .detail-meta-list li {
-            background-color: var(--bg-secondary);
-            padding: 0.4rem 0.8rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .detail-meta-list li strong {
-            color: var(--text-primary);
-            margin-right: 0.5em;
-        }
-
-        .detail-tags-container {
-            margin-bottom: 1rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .tag-link {
-            background-color: var(--border-color);
-            color: var(--text-secondary);
-            padding: 0.3rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .tag-link:hover,
-        .tag-link.active {
-            background-color: var(--accent);
-            color: white;
-        }
-
-
-        /* --- NEW & MODIFIED STYLES FOR AUTH & FAVORITES --- */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: var(--bg-secondary);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-lg);
-            width: 90%;
-            max-width: 450px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-
-        /* Styles for larger modals */
-        .modal-content.large {
-            max-width: 800px;
-        }
-
-        .modal-content h3 {
-            color: var(--accent-light);
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-content p {
-            color: var(--text-secondary);
-            margin-bottom: 1rem;
-            line-height: 1.8;
-        }
-
-
-        .modal.visible .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .modal-close-btn:hover {
-            color: var(--accent);
-            transform: rotate(90deg);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            color: var(--accent-light);
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .password-wrapper .form-input {
-            padding-right: 3rem;
-            /* Make space for the icon */
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            top: 50%;
-            right: 0.5rem;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0.5rem;
-            line-height: 1;
-            transition: var(--transition);
-        }
-
-        .password-toggle-btn:hover {
-            color: var(--accent);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 45, 117, 0.3);
-        }
-
-        .auth-toggle-link {
-            text-align: center;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .auth-toggle-link a {
-            color: var(--accent-light);
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        .auth-toggle-link a:hover {
-            text-decoration: underline;
-        }
-
-
-        .form-submit-btn {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--accent);
-            border: none;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-top: 1rem;
-        }
-
-        .form-submit-btn:hover {
-            background: var(--accent-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .auth-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .nav-btn {
-            padding: 0.5rem 1rem;
-            background-color: var(--accent);
-            border: none;
-            border-radius: var(--radius-sm);
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .nav-btn:hover {
-            background-color: var(--accent-dark);
-            box-shadow: var(--shadow-md);
-        }
-
-        .nav-btn.secondary {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-        }
-
-        .nav-btn.secondary:hover {
-            background-color: var(--bg-secondary);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid var(--border-color);
-            transition: var(--transition);
-            object-fit: cover;
-        }
-
-        .user-avatar:hover {
-            border-color: var(--accent);
-            transform: scale(1.1);
-        }
-
-        .logout-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logout-btn:hover {
-            color: var(--error);
-            background-color: rgba(239, 68, 68, 0.1);
-        }
-
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 1rem;
-        }
-
-        .avatar-option {
-            width: 100%;
-            aspect-ratio: 1/1;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: var(--transition);
-            object-fit: cover;
-        }
-
-        .avatar-option:hover,
-        .avatar-option.selected {
-            border-color: var(--accent);
-            transform: scale(1.05);
-            box-shadow: var(--shadow-md);
-        }
-
-        .favorite-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background-color: rgba(0, 0, 0, 0.6);
-            border: none;
-            color: #fff;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 3;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: var(--transition);
-        }
-
-        .comic-card:hover .favorite-btn {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .favorite-btn:hover {
-            background-color: var(--accent);
-        }
-
-        .favorite-btn.favorited {
-            color: var(--accent);
-            opacity: 1;
-            background-color: rgba(255, 45, 117, 0.15);
-        }
-
-        .favorite-btn.favorited .fa-heart {
-            font-weight: 900;
-        }
-
-        /* --- END NEW STYLES --- */
-
-
-        @media (max-width: 992px) {
-            .comic-detail-header {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-
-            .comic-detail-info .detail-description {
-                text-align: left;
-            }
-
-            .detail-thumbnail-container {
-                width: 100%;
-                max-width: 320px;
-                margin-inline: auto;
-                margin-bottom: 1rem;
-            }
-
-            .modal-content {
-                width: 95%;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header-top {
-                flex-wrap: wrap;
-                justify-content: space-between;
-                gap: 0.75rem;
-            }
-
-            .logo {
-                order: 1;
-                flex-grow: 1;
-            }
-
-            .header-actions {
-                order: 3;
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .search-container {
-                order: 1;
-                flex-grow: 1;
-            }
-
-            .auth-container {
-                order: 2;
-            }
-
-            .theme-toggle-btn {
-                order: 3;
-            }
-
-            .comics-grid {
-                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            }
-
-            .reader-header {
-                flex-direction: column;
-                align-items: center;
-                gap: 1.25rem;
-            }
-
-            .reader-title-container {
-                order: 1;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .reader-nav {
-                order: 2;
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .footer-grid {
-                grid-template-columns: 1fr;
-                justify-items: start;
-                gap: 2.5rem;
-            }
-
-            ul.detail-meta-list {
-                display: none;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComixAll - Digital Comics Showcase</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="icon" href="https://res.cloudinary.com/comixall/image/upload/favicon/favicon.ico" type="image/x-icon">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div id="app-view">
-        <header>
-            <div class="container">
-                <div class="header-content">
-                    <div class="header-top">
-                        <a href="#" class="logo" id="logo-main" data-tooltip="Home">
-                            <i class="fas fa-book-open logo-icon"></i>
-                            <span>ComixAll</span>
-                        </a>
-                        <div class="header-actions">
-                            <div class="search-container">
-                                <input type="text" id="search-input" class="search-input"
-                                    placeholder="Search for comics...">
-                                <button class="search-btn" data-tooltip="Search">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <button id="favorites-btn" class="nav-btn secondary" data-tooltip="My Favorites"><i
-                                    class="fas fa-star"></i></button>
-                            <div id="auth-container" class="auth-container">
-                                <!-- Auth UI will be injected here -->
-                            </div>
-                            <button id="theme-toggle-btn" class="theme-toggle-btn" data-tooltip="Toggle Theme">
-                                <i class="fas fa-sun"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-        <div class="categories-section">
-            <div class="container">
-                <div class="categories-container">
-                    <ul class="categories-list" id="categories-list-container"></ul>
-                </div>
-            </div>
-        </div>
-        <div id="results-heading-container" class="container results-heading-badge">
-            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                <h2 id="results-heading-text" style="margin-bottom: 0;"></h2><button id="back-from-tag-btn"
-                    class="back-btn" style="display: none; margin: 0;"><i class="fas fa-arrow-left"></i> Back to
-                    Comic</button>
-            </div>
-        </div>
-        <main>
-            <div class="container">
-                <div class="comics-grid" id="comics-grid"></div>
-                <div class="pagination" id="pagination-container"></div>
-            </div>
-        </main>
-        <footer class="site-footer">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-column">
-                        <a href="#" class="footer-logo"><i class="fas fa-book-open"></i><span>ComixAll</span></a>
-                        <p class="footer-description">Your portal to infinite worlds of digital comics. Discover, read,
-                            and get lost in captivating stories and stunning art.</p>
-                        <div class="social-links">
-                            <a href="#" class="social-link" aria-label="Facebook" data-tooltip="Facebook"><i
-                                    class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-link" aria-label="Twitter" data-tooltip="Twitter"><i
-                                    class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-link" aria-label="Instagram" data-tooltip="Instagram"><i
-                                    class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-link" aria-label="Discord" data-tooltip="Discord"><i
-                                    class="fab fa-discord"></i></a>
-                        </div>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Explore</h4>
-                        <ul class="footer-links">
-                            <li><a href="#" data-tooltip="Popular Comics">Popular Comics</a></li>
-                            <li><a href="#" data-tooltip="New Releases">New Releases</a></li>
-                            <li><a href="#" data-tooltip="Trending Now">Trending Now</a></li>
-                            <li><a href="#" data-tooltip="All Genres">All Genres</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Support</h4>
-                        <ul class="footer-links">
-                            <li><a href="#" id="help-center-link" data-tooltip="Help Center">Help Center</a></li>
-                            <li><a href="#" id="privacy-policy-link" data-tooltip="Privacy Policy">Privacy Policy</a>
-                            </li>
-                            <li><a href="#" id="terms-service-link" data-tooltip="Terms of Service">Terms of Service</a>
-                            </li>
-                            <li><a href="#" id="about-us-link" data-tooltip="About Us">About Us</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Stay Connected</h4>
-                        <p class="footer-description">Get the latest comic news, updates, and special offers.</p>
-                        <form class="newsletter-form" id="newsletter-form-main" novalidate>
-                            <input type="email" class="newsletter-input" placeholder="your.email@example.com" required>
-                            <button type="submit" class="newsletter-button"
-                                data-tooltip="Join Newsletter"><span>Subscribe</span> <i
-                                    class="fas fa-paper-plane"></i></button>
-                            <div class="form-status-message"></div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="container"><span>© 2025 ComixAll. All Rights Reserved. Made with <span
-                            style="color:var(--accent)">❤️</span> by Avdesh Jadon</span></div>
-            </div>
-        </footer>
-    </div>
-
-    <div id="comic-detail-view" style="display: none;">
-        <header>
-            <div class="container">
-                <div class="header-content">
-                    <div class="header-top">
-                        <a href="#" class="logo" id="logo-main-detail" data-tooltip="Home">
-                            <i class="fas fa-book-open logo-icon"></i>
-                            <span>ComixAll</span>
-                        </a>
-                        <div class="header-actions">
-                            <div class="search-container">
-                                <input type="text" id="search-input-detail" class="search-input"
-                                    placeholder="Search for comics...">
-                                <button class="search-btn" data-tooltip="Search">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <div id="auth-container-detail" class="auth-container">
-                                <!-- Auth UI will be injected here -->
-                            </div>
-                            <button id="theme-toggle-btn-detail" class="theme-toggle-btn" data-tooltip="Toggle Theme">
-                                <i class="fas fa-sun"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-        <main>
-            <div class="container"><a class="back-btn" id="back-to-grid-btn" data-tooltip="Back to Comics"><i
-                        class="fas fa-arrow-left"></i> Back to All Comics</a>
-                <div class="comic-detail" id="comic-detail-content"></div>
-            </div>
-        </main>
-        <footer class="site-footer">
-            <div class="container">
-                <div class="footer-grid">
-                    <div class="footer-column">
-                        <a href="#" class="footer-logo"><i class="fas fa-book-open"></i><span>ComixAll</span></a>
-                        <p class="footer-description">Your portal to infinite worlds of digital comics. Discover, read,
-                            and get lost in captivating stories and stunning art.</p>
-                        <div class="social-links">
-                            <a href="#" class="social-link" aria-label="Facebook" data-tooltip="Facebook"><i
-                                    class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="social-link" aria-label="Twitter" data-tooltip="Twitter"><i
-                                    class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-link" aria-label="Instagram" data-tooltip="Instagram"><i
-                                    class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-link" aria-label="Discord" data-tooltip="Discord"><i
-                                    class="fab fa-discord"></i></a>
-                        </div>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Explore</h4>
-                        <ul class="footer-links">
-                            <li><a href="#" data-tooltip="Popular Comics">Popular Comics</a></li>
-                            <li><a href="#" data-tooltip="New Releases">New Releases</a></li>
-                            <li><a href="#" data-tooltip="Trending Now">Trending Now</a></li>
-                            <li><a href="#" data-tooltip="All Genres">All Genres</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h4 id="sup">Support</h4>
-                        <ul class="footer-links">
-                            <li><a href="#" id="help-center-link-detail" data-tooltip="Help Center">Help Center</a></li>
-                            <li><a href="#" id="privacy-policy-link-detail" data-tooltip="Privacy Policy">Privacy
-                                    Policy</a></li>
-                            <li><a href="#" id="terms-service-link-detail" data-tooltip="Terms of Service">Terms of
-                                    Service</a></li>
-                            <li><a href="#" id="about-us-link-detail" data-tooltip="About Us">About Us</a></li>
-                        </ul>
-                    </div>
-                    <div class="footer-column">
-                        <h4>Stay Connected</h4>
-                        <p class="footer-description">Get the latest comic news, updates, and special offers.</p>
-                        <form class="newsletter-form" id="newsletter-form-detail" novalidate>
-                            <input type="email" class="newsletter-input" placeholder="your.email@example.com" required>
-                            <button type="submit" class="newsletter-button"
-                                data-tooltip="Join Newsletter"><span>Subscribe</span> <i
-                                    class="fas fa-paper-plane"></i></button>
-                            <div class="form-status-message"></div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="container"><span>© 2025 ComixAll. All Rights Reserved. Made with <span
-                            style="color:var(--accent)">❤️</span>by Avdesh Jadon</span></div>
-            </div>
-        </footer>
-    </div>
-
-    <div id="comic-reader-view" style="display: none;">
-        <main>
-            <div class="container">
-                <div class="reader-header">
-                    <div class="reader-nav"><button class="reader-nav-btn" id="prev-part-btn-top"
-                            data-tooltip="Previous Part"><i class="fas fa-arrow-left"></i> Previous Part</button><button
-                            class="reader-nav-btn" id="next-part-btn-top" data-tooltip="Next Part">Next Part <i
-                                class="fas fa-arrow-right"></i></button></div>
-                    <div class="reader-title-container">
-                        <h2 id="reader-title" class="reader-title"></h2><span id="progress-indicator"
-                            class="progress-indicator"></span>
-                    </div><a class="reader-back-btn" id="back-to-detail-btn" data-tooltip="Back to Details"><i
-                            class="fas fa-arrow-left"></i> Back to Details</a>
-                </div>
-                <div id="comic-pages-container" class="comic-pages-container"></div>
-                <div class="reader-bottom-nav"><button class="reader-nav-btn" id="prev-part-btn-bottom"
-                        data-tooltip="Previous Part"><i class="fas fa-arrow-left"></i> Previous Part</button><button
-                        class="reader-nav-btn" id="next-part-btn-bottom" data-tooltip="Next Part">Next Part <i
-                            class="fas fa-arrow-right"></i></button><button class="scroll-to-top-btn"
-                        id="scroll-to-top-btn" data-tooltip="Back to Top"><i class="fas fa-arrow-up"></i> Top</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="login-modal-close">&times;</button>
-            <h2 class="modal-title" id="modal-title">Login</h2>
-            <form id="login-form" data-mode="login" novalidate>
-                <div class="form-group" id="username-group" style="display: none;">
-                    <label for="username"><i class="fas fa-user"></i> Username</label>
-                    <input type="text" id="username" class="form-input" placeholder="Choose a username">
-                </div>
-                <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" id="email" class="form-input" required placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="password" class="form-input" required placeholder="Your password">
-                        <button type="button" class="password-toggle-btn" data-tooltip="Show/Hide Password">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group" id="confirm-password-group" style="display: none;">
-                    <label for="confirm-password"><i class="fas fa-lock"></i> Confirm Password</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter password">
-                        <button type="button" class="password-toggle-btn" data-tooltip="Show/Hide Password">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" id="form-submit-btn" class="form-submit-btn">Login</button>
-                <div class="form-status-message" id="login-status"></div>
-            </form>
-            <p class="auth-toggle-link" id="auth-toggle-link">
-                Don't have an account? <a id="show-signup-btn">Sign Up</a>
-            </p>
-        </div>
-    </div>
-
-    <div id="avatar-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="avatar-modal-close">&times;</button>
-            <h2 class="modal-title">Choose Your Avatar</h2>
-            <div class="avatar-grid" id="avatar-grid">
-            </div>
-        </div>
-    </div>
-
-    <div id="favorites-modal" class="modal">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="favorites-modal-close">&times;</button>
-            <h2 class="modal-title"><i class="fas fa-star" style="color: var(--accent);"></i> My Favorites</h2>
-            <div class="comics-grid" id="favorites-grid">
-            </div>
-        </div>
-    </div>
-
-    <!-- NEW: Modals for Footer Links -->
-    <div id="about-us-modal" class="modal">
-        <div class="modal-content large">
-            <button class="modal-close-btn" id="about-us-modal-close">&times;</button>
-            <h2 class="modal-title">About ComixAll</h2>
-            <p>Welcome to ComixAll, your ultimate destination for digital comics from around the globe. Our mission is
-                to bring the captivating worlds of comics and manga to your fingertips, offering a seamless and
-                immersive reading experience.</p>
-
-            <h3>My Story</h3>
-            <p>I founded ComixAll as a passionate Computer Science student from Agra, Uttar Pradesh, currently pursuing
-                my B.Tech in Computer Science and Engineering.</p>
-
-            <p>I’m a self-taught full-stack developer with a deep love for coding, creative UI/UX design, and solving
-                real-world problems using technology. My focus lies in mastering Data Structures and Algorithms, core CS
-                fundamentals, and modern development tools.</p>
-
-            <p>I live with a clear mindset — no distractions from love or relationships, fully devoted to my craft and
-                my family. No one can replace the love I have for my parents, and that discipline drives everything I
-                build.</p>
-
-
-            <h3>Why ComixAll?</h3>
-            <p>During his personal project explorations, Avdesh noticed a lack of comic platforms that were visually
-                appealing, fast, and creator-friendly. Most platforms felt outdated or restrictive. That's when he
-                envisioned ComixAll — a modern comic reader and management platform that’s not only beautiful but also
-                scalable and easy to use for both readers and admins.</p>
-
-            <h3>What We Offer</h3>
-            <p>
-                <strong>Vast Library:</strong> Explore comics across genres — action, fantasy, sci-fi, slice-of-life,
-                and more.<br>
-                <strong>Smooth Comic Reader:</strong> Optimized vertical scrolling with a clean UI for distraction-free
-                reading.<br>
-                <strong>Powerful Admin Panel:</strong> Admins can upload full comic folders with auto-thumbnail
-                generation and Firebase + Cloudinary support.<br>
-                <strong>Category Management:</strong> Dynamic category-based comic browsing powered by Firestore.<br>
-                <strong>Community Vision:</strong> Future plans include creator uploads, comment sections, and smart
-                recommendations.
-            </p>
-
-            <h3>Built With Passion</h3>
-            <p>Everything — from idea to design to deployment — was built hands-on by Avdesh. His daily routine revolves
-                around development, learning, and improving ComixAll. This project is not just a website; it’s a
-                reflection of his journey, ambition, and dedication to becoming a top-tier software engineer.</p>
-        </div>
-
-    </div>
-
-    <div id="privacy-policy-modal" class="modal">
-        <div class="modal-content large">
-            <button class="modal-close-btn" id="privacy-policy-modal-close">&times;</button>
-            <h2 class="modal-title">Privacy Policy</h2>
-
-            <p>
-                Your privacy is extremely important to us. At ComixAll, we are committed to protecting any personal
-                information you share with us. This Privacy Policy outlines what data we collect, how we use it, and the
-                measures we take to ensure it remains safe and secure.
-            </p>
-
-            <h3>1. Information We Collect</h3>
-            <p>
-                We collect only the data necessary to provide and improve your experience on our platform. This
-                includes:
-            <ul>
-                <li>Your email address, username, and password for account creation and login purposes.</li>
-                <li>Your favorite comics, bookmarks, or reading preferences to offer personalized features.</li>
-                <li>Optional profile details you may provide, such as avatar selections or theme settings.</li>
-            </ul>
-            All data is collected with your knowledge and consent, and you may choose to limit or modify what you share
-            at any time.
-            </p>
-
-            <h3>2. How We Use Your Information</h3>
-            <p>
-                The information we collect is used solely to:
-            <ul>
-                <li>Provide access to your account and user-specific features.</li>
-                <li>Customize and enhance your reading experience on ComixAll.</li>
-                <li>Notify you of important changes, feature updates, or respond to your support queries.</li>
-            </ul>
-            We do not sell or share your data with third-party advertisers or marketing platforms.
-            </p>
-
-            <h3>3. Security of Your Data</h3>
-            <p>
-                We implement reasonable industry-standard measures to protect your personal data, including secure
-                authentication
-                methods and encrypted storage where possible. However, please understand that no online platform is
-                entirely immune
-                to risks. We recommend you use strong passwords and never share your login credentials with others.
-            </p>
-
-            <h3>4. Changes to This Policy</h3>
-            <p>
-                We may occasionally update our Privacy Policy to reflect improvements in our service or changes in
-                compliance
-                requirements. When we do, we will notify users via the website or email. Continued use of the service
-                after such
-                updates will be considered acceptance of the revised policy.
-            </p>
-
-            <h3>5. Contact Us</h3>
-            <p>
-                If you have any questions or concerns regarding our privacy practices, feel free to contact us directly
-                at:<br>
-                <strong>Email:</strong> theavdeshjadon@gmail.com
-            </p>
-        </div>
-
-    </div>
-
-    <div id="terms-service-modal" class="modal">
-        <div class="modal-content large">
-            <button class="modal-close-btn" id="terms-service-modal-close">&times;</button>
-            <h2 class="modal-title">Terms of Service</h2>
-
-            <p>
-                By accessing and using ComixAll, you agree to be bound by these Terms of Service, as well as all
-                applicable laws and regulations.
-                If you do not agree with any of these terms, you are prohibited from using or accessing this site.
-            </p>
-
-            <h3>1. Use License</h3>
-            <p>
-                Permission is granted to temporarily download one copy of the materials (such as comics, text, or
-                images) on ComixAll's website for
-                personal, non-commercial, and transitory viewing only. This is a grant of a limited license — not a
-                transfer of ownership. Under this
-                license, you may not:
-            </p>
-            <ul>
-                <li>Modify or copy the materials</li>
-                <li>Use the materials for any commercial purpose or public display</li>
-                <li>Attempt to reverse engineer or extract any source code or data from the website</li>
-                <li>Remove any copyright or proprietary notations</li>
-                <li>Transfer the materials to another person or "mirror" them on another server</li>
-            </ul>
-            <p>
-                This license shall automatically terminate if you violate any of these restrictions and may be
-                terminated by ComixAll at any time. Upon termination,
-                you must destroy any downloaded materials in your possession.
-            </p>
-
-            <h3>2. Disclaimer</h3>
-            <p>
-                The materials on ComixAll are provided "as is". ComixAll makes no warranties, expressed or implied, and
-                disclaims all other warranties including, without limitation,
-                implied warranties or conditions of merchantability, fitness for a particular purpose, and
-                non-infringement of intellectual property or other violation of rights.
-            </p>
-            <p>
-                ComixAll does not warrant or make any representations concerning the accuracy, likely results, or
-                reliability of the use of the materials on its website
-                or otherwise relating to such materials or on any sites linked to this site.
-            </p>
-
-            <h3>3. Limitations</h3>
-            <p>
-                In no event shall ComixAll or its developers be liable for any damages (including, without limitation,
-                damages for loss of data or profit,
-                or due to business interruption) arising out of the use or inability to use the materials on ComixAll,
-                even if ComixAll or a ComixAll-authorized
-                representative has been notified orally or in writing of the possibility of such damage.
-            </p>
-
-            <h3>4. Modifications</h3>
-            <p>
-                ComixAll may revise these terms of service at any time without notice. By using this website, you are
-                agreeing to be bound by the then-current version of these Terms of Service.
-            </p>
-
-            <h3>5. Governing Law</h3>
-            <p>
-                These terms and conditions are governed by and construed in accordance with the laws of India, and you
-                irrevocably submit to the exclusive jurisdiction of the courts in that location.
-            </p>
-        </div>
-
-    </div>
-
-    <div id="help-center-modal" class="modal">
-        <div class="modal-content large">
-            <button class="modal-close-btn" id="help-center-modal-close">&times;</button>
-            <h2 class="modal-title">Help Center</h2>
-
-            <h3>Frequently Asked Questions</h3>
-
-            <p>
-                <strong>Q: How do I create an account on ComixAll?</strong><br>
-                <span>
-                    Creating an account on ComixAll is quick and simple. Just click the <strong>"Login"</strong> button
-                    located at the top-right corner of the homepage.
-                    On the next screen, choose <strong>"Sign Up"</strong> and fill in your basic details such as your
-                    email address and a secure password.
-                    Once you've submitted the form, your account will be instantly created. You can then log in anytime
-                    to access your personalized dashboard, save your favorite comics, and track your reading history.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: How do I save a comic to my favorites?</strong><br>
-                <span>
-                    After logging into your ComixAll account, you’ll notice a <strong>heart icon</strong> on every comic
-                    card displayed throughout the site.
-                    Simply click on that heart icon to instantly add the comic to your <strong>Favorites list</strong>.
-                    To access your favorites later, click on the <strong>star icon</strong> located in the top
-                    navigation bar.
-                    This feature helps you bookmark comics you love and continue reading them later without having to
-                    search again.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: Is ComixAll free to use?</strong><br>
-                <span>
-                    Yes, ComixAll is completely free to use. You can browse through the library, read as many comics as
-                    you like, and mark your favorites — all without any subscription or hidden fees.
-                    We are committed to providing a high-quality reading experience that is accessible to everyone,
-                    regardless of location or budget.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: Do I need to download or install anything to use ComixAll?</strong><br>
-                <span>
-                    No downloads or installations are required. ComixAll is a fully web-based platform, meaning it works
-                    directly in your internet browser.
-                    Whether you are on a desktop, laptop, tablet, or smartphone, you can access your account and read
-                    comics on the go — without the need for any apps or extensions.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: What should I do if a comic doesn't load properly or seems broken?</strong><br>
-                <span>
-                    If a comic fails to load or displays incorrectly, try refreshing the page or checking your internet
-                    connection first.
-                    If the issue continues, please take note of the comic's title and the part/chapter where the problem
-                    occurred.
-                    You can then contact our support team, and we’ll work on fixing it as soon as possible to ensure a
-                    smooth reading experience.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: Can I access ComixAll from multiple devices?</strong><br>
-                <span>
-                    Yes, your ComixAll account is synced across devices. You can log in from any device — desktop,
-                    laptop, tablet, or phone — and your favorites, reading progress, and preferences will always stay
-                    updated.
-                </span>
-            </p>
-
-            <p>
-                <strong>Q: Is there a mobile app for ComixAll?</strong><br>
-                <span>
-                    Currently, ComixAll is accessible via your mobile browser with a fully responsive design.
-                    While we do not yet offer a dedicated mobile app, the website is optimized to function smoothly on
-                    all screen sizes for the best possible reading experience.
-                </span>
-            </p>
-
-            <h3>Contact Us</h3>
-            <p>
-                Have a question that's not covered above? Encountered a bug or want to suggest a feature?
-                We're here to help. Reach out to our support team directly at:<br><br>
-                <strong>Email:</strong> theavdeshjadon@gmail.com<br><br>
-                We typically respond within <strong>24 to 48 hours</strong>. Your feedback is valuable to us and helps
-                make ComixAll even better for readers worldwide.
-            </p>
-
-        </div>
-
-    </div>
-
-    <template id="comic-detail-template">
-        <div class="comic-detail-header">
-            <div class="detail-thumbnail-container"><img src="" alt="Comic Thumbnail" class="detail-thumbnail"
-                    id="detail-thumbnail"></div>
-            <div class="comic-detail-info">
-                <h1 class="detail-title" id="detail-title"></h1>
-                <div class="detail-rating" id="detail-rating"></div>
-                <div class="detail-meta" id="detail-author"></div>
-                <div class="detail-meta" id="detail-views"><i class="fas fa-eye"></i> <span></span></div>
-                <ul class="detail-meta-list">
-                    <li id="detail-category"></li>
-                    <li id="detail-publish-date"></li>
-                    <li id="detail-status"></li>
-                </ul>
-                <div class="detail-tags-container" id="detail-tags-container"><span
-                        style="font-weight: 500; color: var(--text-primary);">Tags:</span></div>
-                <div class="description-wrapper">
-                    <p class="detail-description" id="detail-description"></p><button class="show-more-btn"
-                        style="display: none;">Show More</button>
-                </div>
-            </div>
-        </div>
-        <div class="parts-section">
-            <h2 class="section-title"><i class="fas fa-bookmark"></i><span>Parts & Chapters</span></h2>
-            <div class="parts-list" id="parts-list-container"></div>
-        </div>
-        <div class="suggestions-section">
-            <h2 class="section-title"><i class="fas fa-star"></i><span>You Might Also Like</span></h2>
-            <div class="suggestions-grid" id="suggestions-grid"></div>
-        </div>
-    </template>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCwkRk12HxQlQS2DH12lcolRNvF2ALprZM", // Replace with your actual API key
-            authDomain: "comix-9be69.firebaseapp.com",
-            projectId: "comix-9be69",
-            storageBucket: "comix-9be69.appspot.com",
-            messagingSenderId: "346083786632",
-            appId: "1:346083786632:web:f95c8c3dacafe47f23843d",
-        };
-        const CLOUD_NAME = "comixall";
-
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // --- DOM ELEMENTS ---
-        const authContainer = document.getElementById('auth-container');
-        const authContainerDetail = document.getElementById('auth-container-detail');
-        const loginModal = document.getElementById('login-modal');
-        const loginForm = document.getElementById('login-form');
-        const loginModalClose = document.getElementById('login-modal-close');
-        const avatarModal = document.getElementById('avatar-modal');
-        const avatarModalClose = document.getElementById('avatar-modal-close');
-        const avatarGrid = document.getElementById('avatar-grid');
-        const favoritesModal = document.getElementById('favorites-modal');
-        const favoritesModalClose = document.getElementById('favorites-modal-close');
-        const favoritesGrid = document.getElementById('favorites-grid');
-        const favoritesBtn = document.getElementById('favorites-btn');
-        const modalTitle = document.getElementById('modal-title');
-        const usernameGroup = document.getElementById('username-group');
-        const confirmPasswordGroup = document.getElementById('confirm-password-group');
-        const formSubmitBtn = document.getElementById('form-submit-btn');
-        const authToggleLink = document.getElementById('auth-toggle-link');
-        const loginStatus = document.getElementById('login-status');
-        const appView = document.getElementById("app-view");
-        const comicDetailView = document.getElementById("comic-detail-view");
-        const comicReaderView = document.getElementById("comic-reader-view");
-        const comicsGrid = document.getElementById("comics-grid");
-        const comicDetailContent = document.getElementById("comic-detail-content");
-        const comicPagesContainer = document.getElementById("comic-pages-container");
-        const comicDetailTemplate = document.getElementById("comic-detail-template");
-        const searchInput = document.getElementById("search-input");
-        const categoriesListContainer = document.getElementById("categories-list-container");
-        const paginationContainer = document.getElementById("pagination-container");
-        const searchInputDetail = document.getElementById("search-input-detail");
-        const logoMainDetail = document.getElementById("logo-main-detail");
-        const prevPartBtnTop = document.getElementById("prev-part-btn-top");
-        const nextPartBtnTop = document.getElementById("next-part-btn-top");
-        const prevPartBtnBottom = document.getElementById("prev-part-btn-bottom");
-        const nextPartBtnBottom = document.getElementById("next-part-btn-bottom");
-        const backToDetailBtn = document.getElementById("back-to-detail-btn");
-        const scrollToTopBtn = document.getElementById("scroll-to-top-btn");
-        const progressIndicator = document.getElementById("progress-indicator");
-        const resultsHeadingContainer = document.getElementById("results-heading-container");
-        const resultsHeadingText = document.getElementById("results-heading-text");
-        const themeToggleBtn = document.getElementById("theme-toggle-btn");
-        const themeToggleBtnDetail = document.getElementById("theme-toggle-btn-detail");
-
-
-        // --- STATE VARIABLES ---
-        let allComics = [];
-        let currentComic = null;
-        let currentPage = 1;
-        let currentPartNumber = 1;
-        let totalParts = 0;
-        const comicsPerPage = 12;
-        let manifestCache = new Map();
-        let allPartsForCurrentComic = [];
-        let activeFilter = { type: "category", value: "all" };
-        let previousComicForTagFilter = null;
-        let currentUser = null; // State for the logged-in user
-
-        // --- AVATAR PRESETS (Using DiceBear for more variety) ---
-        const presetAvatars = [
-            "adventurer", "pixel-art", "bottts", "micah", "fun-emoji",
-            "initials", "lorelei", "shapes", "thumbs", "avataaars", "big-ears", "notionists"
-        ].map(style => `https://api.dicebear.com/8.x/${style}/svg?seed=${Math.random().toString(36).substring(7)}`);
-
-
-        // =================================================================
-        // JAVASCRIPT FUNCTIONS
-        // =================================================================
-
-        function debounce(func, wait) {
-            let timeout;
-            return function (...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        }
-
-        const handleSearch = debounce(() => {
-            const query = (
-                searchInput.value.trim() ||
-                searchInputDetail.value.trim()
-            ).toLowerCase();
-            currentPage = 1;
-            previousComicForTagFilter = null;
-            activeFilter = { type: "search", value: query };
-            updateActiveFilters();
-            renderComicsGrid(getFilteredComics());
-        }, 300);
-
-        // --- AUTHENTICATION & USER LOGIC (CUSTOM FLOW) ---
-        function updateAuthUI() {
-            authContainer.innerHTML = '';
-            authContainerDetail.innerHTML = '';
-
-            let authHTML;
-            if (currentUser) {
-                authHTML = `
-                    <div class="user-profile">
-                        <button class="logout-btn" data-tooltip="Logout"><i class="fas fa-sign-out-alt"></i></button>
-                        <img src="${currentUser.avatarUrl}" alt="User Avatar" class="user-avatar" data-tooltip="Change Avatar">
-                    </div>
-                `;
-            } else {
-                authHTML = `<button class="nav-btn login-btn">Login</button>`;
-            }
-
-            authContainer.innerHTML = authHTML;
-            authContainerDetail.innerHTML = authHTML;
-
-            if (currentUser) {
-                document.querySelectorAll('.logout-btn').forEach(btn => btn.addEventListener('click', handleLogout));
-                document.querySelectorAll('.user-avatar').forEach(avatar => avatar.addEventListener('click', () => avatarModal.classList.add('visible')));
-            } else {
-                document.querySelectorAll('.login-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        loginModal.classList.add('visible');
-                        toggleAuthMode('login');
-                    });
-                });
-            }
-        }
-
-        function toggleAuthMode(mode) {
-            if (mode === 'signup') {
-                loginForm.dataset.mode = 'signup';
-                modalTitle.textContent = 'Sign Up';
-                usernameGroup.style.display = 'block';
-                confirmPasswordGroup.style.display = 'block';
-                formSubmitBtn.textContent = 'Sign Up';
-                authToggleLink.innerHTML = 'Already have an account? <a id="show-login-btn">Log In</a>';
-                document.getElementById('show-login-btn').addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode('login'); });
-            } else {
-                loginForm.dataset.mode = 'login';
-                modalTitle.textContent = 'Login';
-                usernameGroup.style.display = 'none';
-                confirmPasswordGroup.style.display = 'none';
-                formSubmitBtn.textContent = 'Login';
-                authToggleLink.innerHTML = `Don't have an account? <a id="show-signup-btn">Sign Up</a>`;
-                document.getElementById('show-signup-btn').addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode('signup'); });
-            }
-            setStatusMessage('', 'none');
-            loginForm.reset();
-        }
-
-        function togglePasswordVisibility(e) {
-            const button = e.currentTarget;
-            const wrapper = button.parentElement;
-            const input = wrapper.querySelector('input');
-            const icon = button.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-
-        async function handleAuthFormSubmit(e) {
-            e.preventDefault();
-            const mode = loginForm.dataset.mode;
-            const email = loginForm.email.value.trim();
-            const password = loginForm.password.value;
-            const confirmPassword = loginForm['confirm-password'].value;
-            const username = loginForm.username.value.trim();
-
-            setStatusMessage('', 'none');
-
-            if (mode === 'signup') {
-                if (!username) return setStatusMessage('Please enter a username.', 'error');
-                if (password !== confirmPassword) {
-                    return setStatusMessage('Passwords do not match.', 'error');
-                }
-                await handleSignUp(email, password, username);
-            } else {
-                await handleSignIn(email, password);
-            }
-        }
-
-        async function handleSignUp(email, password, displayName) {
-            try {
-                // 1. Check if user already exists in 'clients' collection
-                const existingUserQuery = await db.collection('clients').where('email', '==', email).get();
-                if (!existingUserQuery.empty) {
-                    return setStatusMessage('An account with this email already exists.', 'error');
-                }
-
-                // 2. Add new user to 'clients' collection
-                const newUserRef = await db.collection('clients').add({
-                    displayName: displayName,
-                    email: email,
-                    password: password, // Storing password in plain text (NOT RECOMMENDED)
-                    avatarUrl: `https://api.dicebear.com/8.x/initials/svg?seed=${displayName}`,
-                    favorites: [],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // 3. Set current user and update UI
-                const newUserDoc = await newUserRef.get();
-                currentUser = { id: newUserDoc.id, ...newUserDoc.data() };
-                updateAuthUI();
-                loginModal.classList.remove('visible');
-
-            } catch (error) {
-                setStatusMessage('Failed to create account. Please try again.', 'error');
-                console.error("Sign up error:", error);
-            }
-        }
-
-        async function handleSignIn(email, password) {
-            try {
-                // 1. Find user by email in 'clients' collection
-                const userQuery = await db.collection('clients').where('email', '==', email).limit(1).get();
-
-                if (userQuery.empty) {
-                    return setStatusMessage('Invalid email or password.', 'error');
-                }
-
-                const userDoc = userQuery.docs[0];
-                const userData = userDoc.data();
-
-                // 2. Check if password matches
-                if (userData.password !== password) {
-                    return setStatusMessage('Invalid email or password.', 'error');
-                }
-
-                // 3. Set current user and update UI
-                currentUser = { id: userDoc.id, ...userData };
-                updateAuthUI();
-                loginModal.classList.remove('visible');
-
-            } catch (error) {
-                setStatusMessage('Sign in failed. Please try again.', 'error');
-                console.error("Sign in error:", error);
-            }
-        }
-
-        function setStatusMessage(message, type) {
-            loginStatus.textContent = message;
-            loginStatus.className = `form-status-message ${type}`;
-            loginStatus.classList.toggle('visible', !!message);
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            updateAuthUI();
-            renderComicsGrid(getFilteredComics()); // Re-render to update favorite icons
-        }
-
-        function populateAvatarGrid() {
-            avatarGrid.innerHTML = '';
-            presetAvatars.forEach(avatarUrl => {
-                const img = document.createElement('img');
-                img.src = avatarUrl;
-                img.className = 'avatar-option';
-                if (currentUser && currentUser.avatarUrl === avatarUrl) {
-                    img.classList.add('selected');
-                }
-                img.onclick = async () => {
-                    if (!currentUser) return;
-                    try {
-                        const userRef = db.collection('clients').doc(currentUser.id);
-                        await userRef.update({ avatarUrl });
-                        currentUser.avatarUrl = avatarUrl;
-                        updateAuthUI();
-                        avatarModal.classList.remove('visible');
-                    } catch (error) {
-                        console.error("Error updating avatar: ", error);
-                        alert("Failed to update avatar.");
-                    }
-                };
-                avatarGrid.appendChild(img);
-            });
-        }
-
-
-        // --- FAVORITES LOGIC ---
-        async function toggleFavorite(comicData, heartIcon) {
-            if (!currentUser) {
-                loginModal.classList.add('visible');
-                return;
-            }
-
-            const comicId = comicData.id;
-            const isFavorited = currentUser.favorites.some(fav => fav.id === comicId);
-            const userRef = db.collection('clients').doc(currentUser.id);
-
-            try {
-                if (isFavorited) {
-                    const favoriteToRemove = currentUser.favorites.find(fav => fav.id === comicId);
-                    await userRef.update({
-                        favorites: firebase.firestore.FieldValue.arrayRemove(favoriteToRemove)
-                    });
-                    currentUser.favorites = currentUser.favorites.filter(fav => fav.id !== comicId);
-                    heartIcon.classList.remove('favorited');
-                } else {
-                    const comicInfoForFavorite = {
-                        id: comicData.id,
-                        title: comicData.title,
-                        thumbnailUrl: comicData.thumbnailUrl,
-                        description: comicData.description || ''
-                    };
-                    await userRef.update({
-                        favorites: firebase.firestore.FieldValue.arrayUnion(comicInfoForFavorite)
-                    });
-                    currentUser.favorites.push(comicInfoForFavorite);
-                    heartIcon.classList.add('favorited');
-                }
-            } catch (error) {
-                console.error("Error updating favorites:", error);
-                alert("Could not update favorites. Please try again.");
-            }
-        }
-
-        function showFavorites() {
-            if (!currentUser) {
-                loginModal.classList.add('visible');
-                return;
-            }
-
-            favoritesGrid.innerHTML = '';
-            if (currentUser.favorites.length === 0) {
-                renderEmptyState(favoritesGrid, "You haven't favorited any comics yet.");
-            } else {
-                currentUser.favorites.forEach(favComicData => {
-                    const card = createComicCard(favComicData);
-                    favoritesGrid.appendChild(card);
-                });
-            }
-            favoritesModal.classList.add('visible');
-        }
-
-        // --- VIEW & RENDER FUNCTIONS ---
-        function createComicCard(comic) {
-            const card = document.createElement("div");
-            card.className = "comic-card";
-            card.dataset.comicId = comic.id;
-
-            const isFavorited = currentUser ? currentUser.favorites.some(fav => fav.id === comic.id) : false;
-
-            card.innerHTML = `
-                <button class="favorite-btn ${isFavorited ? 'favorited' : ''}" data-tooltip="Favorite">
-                    <i class="fas fa-heart"></i>
+  <div id="app-view">
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <div class="header-top">
+            <a href="#" class="logo" id="logo-main" data-tooltip="Home">
+              <i class="fas fa-book-open logo-icon"></i>
+              <span>ComixAll</span>
+            </a>
+            <div class="header-actions">
+              <div class="search-container">
+                <input type="text" id="search-input" class="search-input" placeholder="Search for comics...">
+                <button class="search-btn" data-tooltip="Search">
+                  <i class="fas fa-search"></i>
                 </button>
-                <div class="comic-thumbnail-container">
-                    <img src="${comic.thumbnailUrl}" alt="${comic.title}" class="comic-thumbnail" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x600/2a2a2a/ffffff?text=No+Image'">
-                </div>
-                <div class="comic-info">
-                    <h3 class="comic-title">${comic.title}</h3>
-                    <p class="comic-description">${(comic.description || "").substring(0, 60)}...</p>
-                </div>`;
+              </div>
+              <button id="favorites-btn" class="nav-btn secondary" data-tooltip="My Favorites"><i class="fas fa-star"></i></button>
+              <div id="auth-container" class="auth-container">
 
-            const favoriteBtn = card.querySelector('.favorite-btn');
-            favoriteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(comic, favoriteBtn);
-            });
+              </div>
+              <button id="theme-toggle-btn" class="theme-toggle-btn" data-tooltip="Toggle Theme">
+                <i class="fas fa-sun"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <div class="categories-section">
+      <div class="container">
+        <div class="categories-container">
+          <ul class="categories-list" id="categories-list-container"></ul>
+        </div>
+      </div>
+    </div>
+    <div id="results-heading-container" class="container results-heading-badge">
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <h2 id="results-heading-text" style="margin-bottom: 0;"></h2><button id="back-from-tag-btn" class="back-btn" style="display: none; margin: 0;"><i class="fas fa-arrow-left"></i> Back to
+          Comic</button>
+      </div>
+    </div>
+    <main>
+      <div class="container">
+        <div class="comics-grid" id="comics-grid"></div>
+        <div class="pagination" id="pagination-container"></div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-column">
+            <a href="#" class="footer-logo"><i class="fas fa-book-open"></i><span>ComixAll</span></a>
+            <p class="footer-description">Your portal to infinite worlds of digital comics. Discover, read,
+              and get lost in captivating stories and stunning art.</p>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Facebook" data-tooltip="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social-link" aria-label="Twitter" data-tooltip="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-link" aria-label="Instagram" data-tooltip="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" class="social-link" aria-label="Discord" data-tooltip="Discord"><i class="fab fa-discord"></i></a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h4>Explore</h4>
+            <ul class="footer-links">
+              <li><a href="#" data-tooltip="Popular Comics">Popular Comics</a></li>
+              <li><a href="#" data-tooltip="New Releases">New Releases</a></li>
+              <li><a href="#" data-tooltip="Trending Now">Trending Now</a></li>
+              <li><a href="#" data-tooltip="All Genres">All Genres</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Support</h4>
+            <ul class="footer-links">
+              <li><a href="#" id="help-center-link" data-tooltip="Help Center">Help Center</a></li>
+              <li><a href="#" id="privacy-policy-link" data-tooltip="Privacy Policy">Privacy Policy</a>
+              </li>
+              <li><a href="#" id="terms-service-link" data-tooltip="Terms of Service">Terms of Service</a>
+              </li>
+              <li><a href="#" id="about-us-link" data-tooltip="About Us">About Us</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Stay Connected</h4>
+            <p class="footer-description">Get the latest comic news, updates, and special offers.</p>
+            <form class="newsletter-form" id="newsletter-form-main" novalidate>
+              <input type="email" class="newsletter-input" placeholder="your.email@example.com" required>
+              <button type="submit" class="newsletter-button" data-tooltip="Join Newsletter"><span>Subscribe</span> <i class="fas fa-paper-plane"></i></button>
+              <div class="form-status-message"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container"><span>© 2025 ComixAll. All Rights Reserved. Made with <span style="color:var(--accent)">❤️</span> by Avdesh Jadon</span></div>
+      </div>
+    </footer>
+  </div>
 
-            card.querySelector('.comic-thumbnail-container').addEventListener('click', () => showDetailView(comic));
-            card.querySelector('.comic-info').addEventListener('click', () => showDetailView(comic));
+  <div id="comic-detail-view" style="display: none;">
+    <header>
+      <div class="container">
+        <div class="header-content">
+          <div class="header-top">
+            <a href="#" class="logo" id="logo-main-detail" data-tooltip="Home">
+              <i class="fas fa-book-open logo-icon"></i>
+              <span>ComixAll</span>
+            </a>
+            <div class="header-actions">
+              <div class="search-container">
+                <input type="text" id="search-input-detail" class="search-input" placeholder="Search for comics...">
+                <button class="search-btn" data-tooltip="Search">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+              <div id="auth-container-detail" class="auth-container">
 
-            return card;
-        }
+              </div>
+              <button id="theme-toggle-btn-detail" class="theme-toggle-btn" data-tooltip="Toggle Theme">
+                <i class="fas fa-sun"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="container"><a class="back-btn" id="back-to-grid-btn" data-tooltip="Back to Comics"><i class="fas fa-arrow-left"></i> Back to All Comics</a>
+        <div class="comic-detail" id="comic-detail-content"></div>
+      </div>
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-column">
+            <a href="#" class="footer-logo"><i class="fas fa-book-open"></i><span>ComixAll</span></a>
+            <p class="footer-description">Your portal to infinite worlds of digital comics. Discover, read,
+              and get lost in captivating stories and stunning art.</p>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Facebook" data-tooltip="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="social-link" aria-label="Twitter" data-tooltip="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-link" aria-label="Instagram" data-tooltip="Instagram"><i class="fab fa-instagram"></i></a>
+              <a href="#" class="social-link" aria-label="Discord" data-tooltip="Discord"><i class="fab fa-discord"></i></a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <h4>Explore</h4>
+            <ul class="footer-links">
+              <li><a href="#" data-tooltip="Popular Comics">Popular Comics</a></li>
+              <li><a href="#" data-tooltip="New Releases">New Releases</a></li>
+              <li><a href="#" data-tooltip="Trending Now">Trending Now</a></li>
+              <li><a href="#" data-tooltip="All Genres">All Genres</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4 id="sup">Support</h4>
+            <ul class="footer-links">
+              <li><a href="#" id="help-center-link-detail" data-tooltip="Help Center">Help Center</a></li>
+              <li><a href="#" id="privacy-policy-link-detail" data-tooltip="Privacy Policy">Privacy
+                  Policy</a></li>
+              <li><a href="#" id="terms-service-link-detail" data-tooltip="Terms of Service">Terms of
+                  Service</a></li>
+              <li><a href="#" id="about-us-link-detail" data-tooltip="About Us">About Us</a></li>
+            </ul>
+          </div>
+          <div class="footer-column">
+            <h4>Stay Connected</h4>
+            <p class="footer-description">Get the latest comic news, updates, and special offers.</p>
+            <form class="newsletter-form" id="newsletter-form-detail" novalidate>
+              <input type="email" class="newsletter-input" placeholder="your.email@example.com" required>
+              <button type="submit" class="newsletter-button" data-tooltip="Join Newsletter"><span>Subscribe</span> <i class="fas fa-paper-plane"></i></button>
+              <div class="form-status-message"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="container"><span>© 2025 ComixAll. All Rights Reserved. Made with <span style="color:var(--accent)">❤️</span>by Avdesh Jadon</span></div>
+      </div>
+    </footer>
+  </div>
 
+  <div id="comic-reader-view" style="display: none;">
+    <main>
+      <div class="container">
+        <div class="reader-header">
+          <div class="reader-nav"><button class="reader-nav-btn" id="prev-part-btn-top" data-tooltip="Previous Part"><i class="fas fa-arrow-left"></i> Previous Part</button><button class="reader-nav-btn" id="next-part-btn-top" data-tooltip="Next Part">Next Part <i class="fas fa-arrow-right"></i></button></div>
+          <div class="reader-title-container">
+            <h2 id="reader-title" class="reader-title"></h2><span id="progress-indicator" class="progress-indicator"></span>
+          </div><a class="reader-back-btn" id="back-to-detail-btn" data-tooltip="Back to Details"><i class="fas fa-arrow-left"></i> Back to Details</a>
+        </div>
+        <div id="comic-pages-container" class="comic-pages-container"></div>
+        <div class="reader-bottom-nav"><button class="reader-nav-btn" id="prev-part-btn-bottom" data-tooltip="Previous Part"><i class="fas fa-arrow-left"></i> Previous Part</button><button class="reader-nav-btn" id="next-part-btn-bottom" data-tooltip="Next Part">Next Part <i class="fas fa-arrow-right"></i></button><button class="scroll-to-top-btn" id="scroll-to-top-btn" data-tooltip="Back to Top"><i class="fas fa-arrow-up"></i> Top</button>
+        </div>
+      </div>
+    </main>
+  </div>
 
-        function renderComicsGrid(comicsToRender) {
-            comicsGrid.innerHTML = "";
-            if (comicsToRender.length === 0) {
-                renderEmptyState(comicsGrid, "No comics match your filter.");
-                paginationContainer.innerHTML = "";
-                return;
-            }
-            const startIndex = (currentPage - 1) * comicsPerPage;
-            const endIndex = startIndex + comicsPerPage;
-            const paginatedComics = comicsToRender.slice(startIndex, endIndex);
+  <div id="login-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="login-modal-close">&times;</button>
+      <h2 class="modal-title" id="modal-title">Login</h2>
+      <form id="login-form" data-mode="login" novalidate>
+        <div class="form-group" id="username-group" style="display: none;">
+          <label for="username"><i class="fas fa-user"></i> Username</label>
+          <input type="text" id="username" class="form-input" placeholder="Choose a username">
+        </div>
+        <div class="form-group">
+          <label for="email"><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="email" class="form-input" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label for="password"><i class="fas fa-lock"></i> Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" class="form-input" required placeholder="Your password">
+            <button type="button" class="password-toggle-btn" data-tooltip="Show/Hide Password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group" id="confirm-password-group" style="display: none;">
+          <label for="confirm-password"><i class="fas fa-lock"></i> Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter password">
+            <button type="button" class="password-toggle-btn" data-tooltip="Show/Hide Password">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" id="form-submit-btn" class="form-submit-btn">Login</button>
+        <div class="form-status-message" id="login-status"></div>
+      </form>
+      <p class="auth-toggle-link" id="auth-toggle-link">
+        Don't have an account? <a id="show-signup-btn">Sign Up</a>
+      </p>
+    </div>
+  </div>
 
-            const fragment = document.createDocumentFragment();
-            paginatedComics.forEach((comic, index) => {
-                const card = createComicCard(comic);
-                card.style.animationDelay = `${index * 0.05}s`;
-                fragment.appendChild(card);
-            });
-            comicsGrid.appendChild(fragment);
-            renderPagination(comicsToRender);
-        }
+  <div id="avatar-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="avatar-modal-close">&times;</button>
+      <h2 class="modal-title">Choose Your Avatar</h2>
+      <div class="avatar-grid" id="avatar-grid">
+      </div>
+    </div>
+  </div>
 
-        function getFilteredComics() {
-            let comicsToRender = allComics;
-            const filterType = activeFilter.type;
-            const filterValue = activeFilter.value;
+  <div id="favorites-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close-btn" id="favorites-modal-close">&times;</button>
+      <h2 class="modal-title"><i class="fas fa-star" style="color: var(--accent);"></i> My Favorites</h2>
+      <div class="comics-grid" id="favorites-grid">
+      </div>
+    </div>
+  </div>
 
-            if (filterType === 'search' && filterValue) {
-                comicsToRender = allComics.filter(
-                    (comic) =>
-                        comic.title.toLowerCase().includes(filterValue) ||
-                        (comic.description || "").toLowerCase().includes(filterValue) ||
-                        (comic.author || "").toLowerCase().includes(filterValue) ||
-                        (comic.tags || []).some((tag) => tag.toLowerCase().includes(filterValue))
-                );
-            } else if (filterType === 'category') {
-                if (filterValue === "trending") {
-                    comicsToRender = [...allComics].sort((a, b) => (b.recentViews || 0) - (a.recentViews || 0));
-                } else if (filterValue === "most-viewed") {
-                    comicsToRender = [...allComics].sort((a, b) => (b.totalViews || 0) - (a.totalViews || 0));
-                } else if (filterValue !== "all") {
-                    comicsToRender = allComics.filter((comic) => comic.category === filterValue);
-                }
-            } else if (filterType === 'tag') {
-                comicsToRender = allComics.filter(
-                    (comic) => comic.tags && Array.isArray(comic.tags) && comic.tags.includes(filterValue)
-                );
-            }
-            return comicsToRender;
-        }
+  <div id="about-us-modal" class="modal">
+    <div class="modal-content large">
+      <button class="modal-close-btn" id="about-us-modal-close">&times;</button>
+      <h2 class="modal-title">About ComixAll</h2>
+      <p>Welcome to ComixAll, your ultimate destination for digital comics from around the globe. Our mission is
+        to bring the captivating worlds of comics and manga to your fingertips, offering a seamless and
+        immersive reading experience.</p>
 
-        function generateFakeRating(comicId) {
-            let hash = 0;
-            if (!comicId || comicId.length === 0) {
-                return 4.0;
-            }
-            for (let i = 0; i < comicId.length; i++) {
-                const char = comicId.charCodeAt(i);
-                hash = (hash << 5) - hash + char;
-                hash |= 0;
-            }
-            const rating = 3.5 + (Math.abs(hash) % 16) / 10;
-            return parseFloat(rating.toFixed(1));
-        }
+      <h3>My Story</h3>
+      <p>I founded ComixAll as a passionate Computer Science student from Agra, Uttar Pradesh, currently pursuing
+        my B.Tech in Computer Science and Engineering.</p>
 
-        function renderStars(rating) {
-            let starsHtml = "";
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating - fullStars >= 0.5;
-            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-            for (let i = 0; i < fullStars; i++)
-                starsHtml += '<i class="fas fa-star"></i>';
-            if (hasHalfStar) starsHtml += '<i class="fas fa-star-half-alt"></i>';
-            for (let i = 0; i < emptyStars; i++)
-                starsHtml += '<i class="far fa-star"></i>';
-            return `${starsHtml} <span style="font-size: 0.8em; color: var(--text-secondary); vertical-align: middle; margin-left: 0.5em;">${rating}</span>`;
-        }
+      <p>I’m a self-taught full-stack developer with a deep love for coding, creative UI/UX design, and solving
+        real-world problems using technology. My focus lies in mastering Data Structures and Algorithms, core CS
+        fundamentals, and modern development tools.</p>
 
-        function filterComicsByTag(tag) {
-            activeFilter = {
-                type: "tag",
-                value: tag
-            };
-            showGridView();
-            updateActiveFilters();
-            renderComicsGrid(getFilteredComics());
-        }
-
-        function showGridView() {
-            appView.style.display = "block";
-            comicDetailView.style.display = "none";
-            comicReaderView.style.display = "none";
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-            removeKeyboardListeners();
-        }
-
-        function showDetailView(comic) {
-            currentComic = allComics.find(c => c.id === comic.id) || comic; // Ensure we have the full comic object
-            appView.style.display = "none";
-            comicDetailView.style.display = "block";
-            comicReaderView.style.display = "none";
-            renderComicDetail(currentComic);
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-            removeKeyboardListeners();
-        }
-
-        function showReaderView(comic, part) {
-            currentComic = comic;
-            currentPartNumber = part.number;
-            appView.style.display = "none";
-            comicDetailView.style.display = "none";
-            comicReaderView.style.display = "block";
-            renderComicReader(comic, part);
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-            addKeyboardListeners();
-            preloadNextPart(comic, part.number);
-        }
-
-        function renderLoadingState(container, text) {
-            container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><div class="loading-text">${text}</div></div>`;
-        }
-
-        function renderEmptyState(container, text) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-search empty-icon"></i><div class="empty-text">${text}</div></div>`;
-        }
-
-        function renderErrorState(container, text) {
-            container.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle empty-icon"></i><div class="empty-text" style="color: var(--error);">${text}</div></div>`;
-        }
-
-        function renderPagination(comicsToRender) {
-            const totalPages = Math.ceil(comicsToRender.length / comicsPerPage);
-            paginationContainer.innerHTML = "";
-            if (totalPages <= 1) return;
-            const prevButton = document.createElement("button");
-            prevButton.className = "pagination-btn";
-            prevButton.textContent = "Previous";
-            prevButton.dataset.tooltip = "Previous Page";
-            prevButton.disabled = currentPage === 1;
-            prevButton.addEventListener("click", () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    renderComicsGrid(comicsToRender);
-                }
-            });
-            const nextButton = document.createElement("button");
-            nextButton.className = "pagination-btn";
-            nextButton.textContent = "Next";
-            nextButton.dataset.tooltip = "Next Page";
-            nextButton.disabled = currentPage === totalPages;
-            nextButton.addEventListener("click", () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    renderComicsGrid(comicsToRender);
-                }
-            });
-            const pageInfo = document.createElement("span");
-            pageInfo.className = "pagination-info";
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-            paginationContainer.appendChild(prevButton);
-            paginationContainer.appendChild(pageInfo);
-            paginationContainer.appendChild(nextButton);
-        }
-        async function loadComics() {
-            renderLoadingState(comicsGrid, "Loading comics...");
-            try {
-                const snapshot = await db
-                    .collection("comics")
-                    .orderBy("createdAt", "desc")
-                    .get();
-                if (snapshot.empty) {
-                    renderEmptyState(comicsGrid, "No comics found.");
-                    return;
-                }
-                allComics = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                renderComicsGrid(allComics);
-            } catch (err) {
-                renderErrorState(comicsGrid, "Failed to load comics.");
-                console.error(err);
-            }
-        }
-
-        async function loadAndRenderCategories() {
-            categoriesListContainer.innerHTML = `<li class="category-item"><a href="#" class="category-link">Loading...</a></li>`;
-            try {
-                const snapshot = await db.collection("categories").orderBy("name").get();
-                let categoriesHtml = `<li class="category-item"><a href="#" class="category-link active" data-category-value="all" data-tooltip="All Comics">All</a></li><li class="category-item"><a href="#" class="category-link" data-category-value="trending" data-tooltip="Trending Comics">Trending</a></li><li class="category-item"><a href="#" class="category-link" data-category-value="most-viewed" data-tooltip="Most Viewed Comics">Most Viewed</a></li>`;
-                snapshot.forEach((doc) => {
-                    const cat = doc.data();
-                    categoriesHtml += `<li class="category-item"><a href="#" class="category-link" data-category-value="${cat.value}" data-tooltip="${cat.name}">${cat.name}</a></li>`;
-                });
-                categoriesListContainer.innerHTML = categoriesHtml;
-                addCategoryLinkListeners();
-            } catch (err) {
-                categoriesListContainer.innerHTML = `<li class="category-item"><a href="#" class="category-link">Error</a></li>`;
-                console.error("Failed to load categories:", err);
-            }
-        }
-
-        function updateActiveFilters() {
-            const backBtn = document.getElementById("back-from-tag-btn");
-            const categoryLinks =
-                categoriesListContainer.querySelectorAll(".category-link");
-            categoryLinks.forEach((link) => {
-                link.classList.toggle(
-                    "active",
-                    activeFilter.type === "category" &&
-                    link.dataset.categoryValue === activeFilter.value
-                );
-            });
-            backBtn.style.display =
-                previousComicForTagFilter && activeFilter.type === "tag" ?
-                    "inline-flex" :
-                    "none";
-            if (
-                (activeFilter.type === "category" && activeFilter.value === "all") ||
-                (activeFilter.type === "search" && !activeFilter.value)
-            ) {
-                resultsHeadingContainer.style.display = "none";
-            } else {
-                resultsHeadingContainer.style.display = "block";
-                let valueText = activeFilter.value;
-                if (activeFilter.type === "category") {
-                    const activeLink = document.querySelector(
-                        `.category-link[data-category-value="${valueText}"]`
-                    );
-                    if (activeLink) valueText = activeLink.textContent;
-                    resultsHeadingText.innerHTML = `<span class="filter-value">${valueText}</span>`;
-                } else if (activeFilter.type === "tag") {
-                    resultsHeadingText.innerHTML = `<span class="filter-value">${valueText}</span>`;
-                } else {
-                    let typeText =
-                        activeFilter.type.charAt(0).toUpperCase() + activeFilter.type.slice(1);
-                    resultsHeadingText.innerHTML = `<span class="filter-type">${typeText}:</span> <span class="filter-value">"${valueText}"</span>`;
-                }
-            }
-        }
-
-        function addCategoryLinkListeners() {
-            const dynamicCategoryLinks =
-                categoriesListContainer.querySelectorAll(".category-link");
-            dynamicCategoryLinks.forEach((link) => {
-                link.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    currentPage = 1;
-                    previousComicForTagFilter = null;
-                    const categoryValue = link.dataset.categoryValue;
-                    activeFilter = {
-                        type: "category",
-                        value: categoryValue
-                    };
-                    updateActiveFilters();
-                    renderComicsGrid(getFilteredComics());
-                });
-            });
-        }
-        async function renderComicDetail(comic) {
-            comicDetailContent.innerHTML = "";
-            const detailClone = comicDetailTemplate.content.cloneNode(true);
-            detailClone.getElementById("detail-thumbnail").src = comic.thumbnailUrl;
-            detailClone.getElementById("detail-thumbnail").alt = comic.title;
-            detailClone.getElementById("detail-title").textContent = comic.title;
-            detailClone.getElementById("detail-author").innerHTML = comic.author ?
-                `<strong>Author:</strong> ${comic.author}` :
-                "<strong>Author:</strong> N/A";
-            const descriptionElement = detailClone.getElementById("detail-description");
-            descriptionElement.textContent =
-                comic.description || "No description available.";
-            const ratingValue = generateFakeRating(comic.id);
-            detailClone.getElementById("detail-rating").innerHTML =
-                renderStars(ratingValue);
-            detailClone.getElementById(
-                "detail-category"
-            ).innerHTML = `<strong>Category:</strong> ${comic.category || "N/A"}`;
-            const publishDate = comic.createdAt?.toDate ?
-                comic.createdAt.toDate().toLocaleDateString() :
-                "N/A";
-            detailClone.getElementById(
-                "detail-publish-date"
-            ).innerHTML = `<strong>Published:</strong> ${publishDate}`;
-            const status = comic.title.length % 2 === 0 ? "Completed" : "Ongoing";
-            detailClone.getElementById(
-                "detail-status"
-            ).innerHTML = `<strong>Status:</strong> ${status}`;
-            const tagsContainer = detailClone.getElementById("detail-tags-container");
-            const tagsLabel = tagsContainer.querySelector("span");
-            tagsContainer.innerHTML = "";
-            tagsContainer.appendChild(tagsLabel);
-            if (comic.tags && comic.tags.length > 0) {
-                comic.tags.forEach((tag) => {
-                    const tagElement = document.createElement("a");
-                    tagElement.href = "#";
-                    tagElement.className = "tag-link";
-                    tagElement.textContent = tag;
-                    if (activeFilter.type === "tag" && activeFilter.value === tag) {
-                        tagElement.classList.add("active");
-                    }
-                    tagElement.onclick = (e) => {
-                        e.preventDefault();
-                        previousComicForTagFilter = currentComic;
-                        filterComicsByTag(tag);
-                    };
-                    tagsContainer.appendChild(tagElement);
-                });
-            } else {
-                tagsContainer.style.display = "none";
-            }
-            const showMoreBtn = detailClone.querySelector(".show-more-btn");
-            comicDetailContent.appendChild(detailClone);
-            setTimeout(() => {
-                if (descriptionElement.scrollHeight > descriptionElement.clientHeight) {
-                    descriptionElement.classList.add("truncated");
-                    showMoreBtn.style.display = "inline-block";
-                    showMoreBtn.textContent = "Show More";
-                    showMoreBtn.addEventListener("click", () => {
-                        descriptionElement.classList.toggle("truncated");
-                        showMoreBtn.textContent = descriptionElement.classList.contains(
-                            "truncated"
-                        ) ?
-                            "Show More" :
-                            "Show Less";
-                    });
-                }
-            }, 100);
-            loadAndDisplayPartsAndViews(comic);
-            renderSuggestions(
-                comicDetailContent.querySelector("#suggestions-grid"),
-                comic
-            );
-        }
-        async function loadAndDisplayPartsAndViews(comic) {
-            const partsContainer = comicDetailContent.querySelector(
-                "#parts-list-container"
-            );
-            const totalViewsContainer =
-                comicDetailContent.querySelector("#detail-views span");
-            totalViewsContainer.textContent = comic.totalViews ? comic.totalViews.toLocaleString() : "0";
-            if (!comic.manifestUrl) {
-                renderEmptyState(
-                    partsContainer,
-                    "This comic does not have any parts listed."
-                );
-                return;
-            }
-            renderLoadingState(partsContainer, "Loading comic parts...");
-            try {
-                let manifest = manifestCache.get(comic.manifestUrl);
-                if (!manifest) {
-                    const response = await fetch(comic.manifestUrl);
-                    if (!response.ok) throw new Error("Manifest file not found");
-                    manifest = await response.json();
-                    manifestCache.set(comic.manifestUrl, manifest);
-                }
-                const partsFromManifest = manifest.parts || [];
-                if (partsFromManifest.length === 0) {
-                    renderEmptyState(partsContainer, "No parts found in the manifest file.");
-                    return;
-                }
-                totalParts = partsFromManifest.length;
-
-                const overridesMap = comic.partNameOverrides || {};
-                const viewsSnapshot = await db.collection("comics").doc(comic.id).collection("part_views").get();
-
-                const viewsMap = new Map(
-                    viewsSnapshot.docs.map((doc) => [doc.id, doc.data().views || 0])
-                );
-                allPartsForCurrentComic = partsFromManifest.map((part, index) => {
-                    const partNumStr = String(part.number);
-                    const title =
-                        overridesMap[index] || `${comic.title} - Part ${part.number}`;
-                    const views = viewsMap.get(partNumStr) || 0;
-                    return {
-                        ...part,
-                        title,
-                        views
-                    };
-                });
-                renderPartsList(partsContainer, allPartsForCurrentComic, comic);
-            } catch (error) {
-                renderErrorState(partsContainer, "Could not load comic parts info.");
-                console.error(error);
-            }
-        }
-
-        function renderPartsList(container, parts, comic) {
-            container.innerHTML = "";
-            const fragment = document.createDocumentFragment();
-            parts.forEach((part, index) => {
-                const partItem = document.createElement("div");
-                partItem.className = "part-item";
-                partItem.style.animationDelay = `${index * 0.05}s`;
-                const uploadDate = comic.createdAt?.toDate ?
-                    new Date(comic.createdAt.toDate().getTime()).toLocaleDateString() :
-                    "Unknown";
-                partItem.innerHTML = `<div class="part-content"><div>${part.title
-                    }</div><div style="font-size: 0.8rem; color: var(--text-secondary);">${part.pages
-                    } pages</div><div class="part-meta">Uploaded: ${uploadDate}</div></div><div class="part-views"><i class="fas fa-eye"></i> ${part.views ? part.views.toLocaleString() : 0
-                    }</div>`;
-                partItem.addEventListener("click", async () => {
-                    await updateViewCount(comic.id, part.number);
-                    showReaderView(comic, part);
-                });
-                fragment.appendChild(partItem);
-            });
-            container.appendChild(fragment);
-        }
-        async function updateViewCount(comicId, partNumber) {
-            try {
-                const comicRef = db.collection("comics").doc(comicId);
-                const partRef = comicRef.collection("part_views").doc(String(partNumber));
-
-                await db.runTransaction(async (transaction) => {
-                    const partDoc = await transaction.get(partRef);
-                    const newPartViews = (partDoc.data()?.views || 0) + 1;
-                    transaction.set(partRef, { views: newPartViews }, { merge: true });
-                    transaction.update(comicRef, {
-                        totalViews: firebase.firestore.FieldValue.increment(1),
-                    });
-                });
-
-                // --- FIX STARTS HERE ---
-                // Update the local comic data to reflect the new total view count
-                const comicIndex = allComics.findIndex(c => c.id === comicId);
-                if (comicIndex !== -1) {
-                    allComics[comicIndex].totalViews = (allComics[comicIndex].totalViews || 0) + 1;
-                    currentComic = allComics[comicIndex]; // Update currentComic as well
-                }
-
-                // If currently on the detail page, re-render the views section
-                if (comicDetailView.style.display === "block") {
-                    const totalViewsContainer = comicDetailContent.querySelector("#detail-views span");
-                    if (totalViewsContainer) {
-                        totalViewsContainer.textContent = currentComic.totalViews.toLocaleString();
-                    }
-                }
-                // --- FIX ENDS HERE ---
-
-            } catch (err) {
-                console.error(`Failed to update views for part ${partNumber}:`, err);
-            }
-        }
-
-        function renderSuggestions(container, currentComic) {
-            let maxSuggestions =
-                window.innerWidth <= 992 ? (window.innerWidth <= 576 ? 30 : 40) : 50;
-            const categorySuggestions = allComics
-                .filter(
-                    (c) => c.id !== currentComic.id && c.category === currentComic.category
-                )
-                .sort(() => 0.5 - Math.random())
-                .slice(0, 20);
-            let finalSuggestions = [...categorySuggestions];
-            const suggestedIds = new Set(finalSuggestions.map((c) => c.id));
-            suggestedIds.add(currentComic.id);
-            if (finalSuggestions.length < maxSuggestions) {
-                const currentTags = new Set(currentComic.tags || []);
-                if (currentTags.size > 0) {
-                    const potentialTagSuggestions = allComics
-                        .filter((c) => !suggestedIds.has(c.id))
-                        .map((c) => ({
-                            comic: c,
-                            score: [...new Set(c.tags || [])].filter((tag) =>
-                                currentTags.has(tag)
-                            ).length,
-                        }))
-                        .filter((item) => item.score > 0)
-                        .sort((a, b) => b.score - a.score);
-                    const remainingSlots = maxSuggestions - finalSuggestions.length;
-                    finalSuggestions.push(
-                        ...potentialTagSuggestions
-                            .slice(0, remainingSlots)
-                            .map((item) => item.comic)
-                    );
-                }
-            }
-            container.innerHTML = "";
-            const suggestionsToRender = finalSuggestions.slice(0, maxSuggestions);
-            if (suggestionsToRender.length === 0) {
-                renderEmptyState(container, "No similar comics found.");
-                return;
-            }
-            const fragment = document.createDocumentFragment();
-            suggestionsToRender.forEach((comic, index) => {
-                const card = createComicCard(comic);
-                card.style.animationDelay = `${index * 0.05}s`;
-                fragment.appendChild(card);
-            });
-            container.appendChild(fragment);
-        }
-        async function renderComicReader(comic, part) {
-            document.getElementById("reader-title").textContent = part.title;
-            progressIndicator.textContent = `Part ${part.number} of ${totalParts}`;
-            comicPagesContainer.innerHTML = "";
-            if (!part.pages || part.pages < 1) {
-                renderEmptyState(comicPagesContainer, "No pages found for this part.");
-                return;
-            }
-            const fragment = document.createDocumentFragment();
-            for (let i = 1; i <= part.pages; i++) {
-                const pageNumFormatted = String(i).padStart(3, "0");
-                const imageName = `part${part.number}_image_${pageNumFormatted}`;
-                const imageUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_100,f_jpg/${comic.folderName}/${imageName}.jpg`;
-                const img = document.createElement("img");
-                img.src = imageUrl;
-                img.className = "comic-page-img";
-                img.loading = "lazy";
-                img.alt = `Page ${i} of ${part.title}`;
-                img.style.animationDelay = `${i * 0.05}s`;
-                img.onerror = function () {
-                    this.onerror = null;
-                    this.src =
-                        "https://via.placeholder.com/1200x1800/2a2a2a/ffffff?text=Page+Not+Found";
-                };
-                fragment.appendChild(img);
-            }
-            comicPagesContainer.appendChild(fragment);
-            prevPartBtnTop.disabled = part.number === 1;
-            nextPartBtnTop.disabled = part.number === totalParts;
-            prevPartBtnBottom.disabled = part.number === 1;
-            nextPartBtnBottom.disabled = part.number === totalParts;
-            scrollToTopBtn.classList.remove("visible");
-            window.onscroll = () => {
-                requestAnimationFrame(() => {
-                    scrollToTopBtn.classList.toggle("visible", window.scrollY > 300);
-                });
-            };
-        }
-        async function navigateToPart(comic, newPartNumber) {
-            const partToNavigate = allPartsForCurrentComic.find(
-                (p) => p.number === newPartNumber
-            );
-            if (partToNavigate) {
-                await updateViewCount(comic.id, newPartNumber);
-                showReaderView(comic, partToNavigate);
-            }
-        }
-        async function preloadNextPart(comic, currentPartNumber) {
-            if (currentPartNumber >= totalParts) return;
-            try {
-                let manifest = manifestCache.get(comic.manifestUrl);
-                if (!manifest) {
-                    const response = await fetch(comic.manifestUrl);
-                    if (!response.ok) return;
-                    manifest = await response.json();
-                    manifestCache.set(comic.manifestUrl, manifest);
-                }
-                const nextPart = manifest.parts.find(
-                    (p) => p.number === currentPartNumber + 1
-                );
-                if (!nextPart) return;
-                for (let i = 1; i <= nextPart.pages; i++) {
-                    const pageNumFormatted = String(i).padStart(3, "0");
-                    const imageName = `part${nextPart.number}_image_${pageNumFormatted}`;
-                    const imageUrl = `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/q_100,f_jpg/${comic.folderName}/${imageName}.jpg`;
-                    const img = new Image();
-                    img.src = imageUrl;
-                }
-            } catch (error) {
-                console.warn(
-                    `Failed to preload next part ${currentPartNumber + 1}:`,
-                    error
-                );
-            }
-        }
-
-        function resetToHomeView() {
-            showGridView();
-            currentPage = 1;
-            previousComicForTagFilter = null;
-            activeFilter = {
-                type: "category",
-                value: "all"
-            };
-            updateActiveFilters();
-            renderComicsGrid(allComics);
-        }
-        async function handleSubscribeForm(e, formId) {
-            e.preventDefault();
-            const form = document.getElementById(formId);
-            const emailInput = form.querySelector(".newsletter-input");
-            const statusMessage = form.querySelector(".form-status-message");
-            const email = emailInput.value.trim();
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                statusMessage.textContent = "Please enter a valid email address.";
-                statusMessage.className = "form-status-message error visible";
-                setTimeout(() => {
-                    statusMessage.classList.remove('visible');
-                    setTimeout(() => (statusMessage.textContent = ""), 300);
-                }, 3000);
-                return;
-            }
-            try {
-                await db
-                    .collection("emails") // CHANGED: Collection name updated to "emails"
-                    .add({
-                        email,
-                        subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    });
-                statusMessage.textContent = "Thank you for subscribing!";
-                statusMessage.className = "form-status-message success visible";
-                emailInput.value = "";
-                setTimeout(() => {
-                    statusMessage.classList.remove('visible');
-                    setTimeout(() => (statusMessage.textContent = ""), 300);
-                }, 3000);
-            } catch (err) {
-                statusMessage.textContent = "Failed to subscribe. Try again later.";
-                statusMessage.className = "form-status-message error visible";
-                console.error("Subscription error:", err);
-                setTimeout(() => {
-                    statusMessage.classList.remove('visible');
-                    setTimeout(() => (statusMessage.textContent = ""), 300);
-                }, 3000);
-            }
-        }
-
-        function addKeyboardListeners() {
-            document.addEventListener("keydown", handleKeyboardNavigation);
-        }
-
-        function removeKeyboardListeners() {
-            document.removeEventListener("keydown", handleKeyboardNavigation);
-        }
-
-        function handleKeyboardNavigation(e) {
-            if (comicReaderView.style.display !== "block") return;
-            switch (e.key) {
-                case "ArrowLeft":
-                    e.preventDefault();
-                    prevPartBtnTop.click();
-                    break;
-                case "ArrowRight":
-                    e.preventDefault();
-                    nextPartBtnTop.click();
-                    break;
-                case "Escape":
-                    e.preventDefault();
-                    backToDetailBtn.click();
-                    break;
-                case "Home":
-                    e.preventDefault();
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth"
-                    });
-                    break;
-                case "End":
-                    e.preventDefault();
-                    window.scrollTo({
-                        top: document.body.scrollHeight,
-                        behavior: "smooth"
-                    });
-                    break;
-            }
-        }
-
-        function applyTheme(theme) {
-            document.documentElement.setAttribute("data-theme", theme);
-            localStorage.setItem("theme", theme);
-            const iconClass = theme === "light" ? "fa-moon" : "fa-sun";
-            const iconHtml = `<i class="fas ${iconClass}"></i>`;
-            themeToggleBtn.innerHTML = iconHtml;
-            themeToggleBtnDetail.innerHTML = iconHtml;
-            themeToggleBtn.classList.toggle("toggled", theme === "light");
-            themeToggleBtnDetail.classList.toggle("toggled", theme === "light");
-        }
+      <p>I live with a clear mindset — no distractions from love or relationships, fully devoted to my craft and
+        my family. No one can replace the love I have for my parents, and that discipline drives everything I
+        build.</p>
 
 
-        // --- EVENT LISTENERS & INITIALIZATION ---
-        function setupEventListeners() {
-            // New Listeners for Auth Modal
-            loginForm.addEventListener('submit', handleAuthFormSubmit);
-            loginModalClose.addEventListener('click', () => loginModal.classList.remove('visible'));
-            avatarModalClose.addEventListener('click', () => avatarModal.classList.remove('visible'));
-            favoritesBtn.addEventListener('click', showFavorites);
-            favoritesModalClose.addEventListener('click', () => favoritesModal.classList.remove('visible'));
+      <h3>Why ComixAll?</h3>
+      <p>During his personal project explorations, Avdesh noticed a lack of comic platforms that were visually
+        appealing, fast, and creator-friendly. Most platforms felt outdated or restrictive. That's when he
+        envisioned ComixAll — a modern comic reader and management platform that’s not only beautiful but also
+        scalable and easy to use for both readers and admins.</p>
 
-            // Add listeners for password toggles
-            document.querySelectorAll('.password-toggle-btn').forEach(btn => {
-                btn.addEventListener('click', togglePasswordVisibility);
-            });
+      <h3>What We Offer</h3>
+      <p>
+        <strong>Vast Library:</strong> Explore comics across genres — action, fantasy, sci-fi, slice-of-life,
+        and more.<br>
+        <strong>Smooth Comic Reader:</strong> Optimized vertical scrolling with a clean UI for distraction-free
+        reading.<br>
+        <strong>Powerful Admin Panel:</strong> Admins can upload full comic folders with auto-thumbnail
+        generation and Firebase + Cloudinary support.<br>
+        <strong>Category Management:</strong> Dynamic category-based comic Browse powered by Firestore.<br>
+        <strong>Community Vision:</strong> Future plans include creator uploads, comment sections, and smart
+        recommendations.
+      </p>
 
-            // Initial toggle link setup
-            document.getElementById('show-signup-btn').addEventListener('click', (e) => { e.preventDefault(); toggleAuthMode('signup'); });
+      <h3>Built With Passion</h3>
+      <p>Everything — from idea to design to deployment — was built hands-on by Avdesh. His daily routine revolves
+        around development, learning, and improving ComixAll. This project is not just a website; it’s a
+        reflection of his journey, ambition, and dedication to becoming a top-tier software engineer.</p>
+    </div>
 
-            // Close modal on backdrop click
-            [loginModal, avatarModal, favoritesModal].forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('visible');
-                    }
-                });
-            });
+  </div>
 
-            // Footer Modals
-            const supportModals = [
-                { linkId: 'help-center-link', modalId: 'help-center-modal', closeId: 'help-center-modal-close' },
-                { linkId: 'privacy-policy-link', modalId: 'privacy-policy-modal', closeId: 'privacy-policy-modal-close' },
-                { linkId: 'terms-service-link', modalId: 'terms-service-modal', closeId: 'terms-service-modal-close' },
-                { linkId: 'about-us-link', modalId: 'about-us-modal', closeId: 'about-us-modal-close' },
-                { linkId: 'help-center-link-detail', modalId: 'help-center-modal', closeId: 'help-center-modal-close' },
-                { linkId: 'privacy-policy-link-detail', modalId: 'privacy-policy-modal', closeId: 'privacy-policy-modal-close' },
-                { linkId: 'terms-service-link-detail', modalId: 'terms-service-modal', closeId: 'terms-service-modal-close' },
-                { linkId: 'about-us-link-detail', modalId: 'about-us-modal', closeId: 'about-us-modal-close' },
-            ];
+  <div id="privacy-policy-modal" class="modal">
+    <div class="modal-content large">
+      <button class="modal-close-btn" id="privacy-policy-modal-close">&times;</button>
+      <h2 class="modal-title">Privacy Policy</h2>
 
-            supportModals.forEach(item => {
-                const link = document.getElementById(item.linkId);
-                const modal = document.getElementById(item.modalId);
-                const closeBtn = document.getElementById(item.closeId);
+      <p>
+        Your privacy is extremely important to us. At ComixAll, we are committed to protecting any personal
+        information you share with us. This Privacy Policy outlines what data we collect, how we use it, and the
+        measures we take to ensure it remains safe and secure.
+      </p>
 
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    modal.classList.add('visible');
-                });
+      <h3>1. Information We Collect</h3>
+      <p>
+        We collect only the data necessary to provide and improve your experience on our platform. This
+        includes:
+      <ul>
+        <li>Your email address, username, and password for account creation and login purposes.</li>
+        <li>Your favorite comics, bookmarks, or reading preferences to offer personalized features.</li>
+        <li>Optional profile details you may provide, such as avatar selections or theme settings.</li>
+      </ul>
+      All data is collected with your knowledge and consent, and you may choose to limit or modify what you share
+      at any time.
+      </p>
 
-                closeBtn.addEventListener('click', () => {
-                    modal.classList.remove('visible');
-                });
+      <h3>2. How We Use Your Information</h3>
+      <p>
+        The information we collect is used solely to:
+      <ul>
+        <li>Provide access to your account and user-specific features.</li>
+        <li>Customize and enhance your reading experience on ComixAll.</li>
+        <li>Notify you of important changes, feature updates, or respond to your support queries.</li>
+      </ul>
+      We do not sell or share your data with third-party advertisers or marketing platforms.
+      </p>
 
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('visible');
-                    }
-                });
-            });
+      <h3>3. Security of Your Data</h3>
+      <p>
+        We implement reasonable industry-standard measures to protect your personal data, including secure
+        authentication
+        methods and encrypted storage where possible. However, please understand that no online platform is
+        entirely immune
+        to risks. We recommend you use strong passwords and never share your login credentials with others.
+      </p>
 
+      <h3>4. Changes to This Policy</h3>
+      <p>
+        We may occasionally update our Privacy Policy to reflect improvements in our service or changes in
+        compliance
+        requirements. When we do, we will notify users via the website or email. Continued use of the service
+        after such
+        updates will be considered acceptance of the revised policy.
+      </p>
 
-            // Existing Listeners
-            document.getElementById("logo-main").addEventListener("click", (e) => {
-                e.preventDefault();
-                resetToHomeView();
-            });
-            logoMainDetail.addEventListener("click", (e) => {
-                e.preventDefault();
-                resetToHomeView();
-            });
-            searchInput.addEventListener("input", handleSearch);
-            document
-                .querySelectorAll(".search-btn")
-                .forEach((btn) => btn.addEventListener("click", handleSearch));
-            searchInputDetail.addEventListener("input", handleSearch);
-            document
-                .getElementById("back-from-tag-btn")
-                .addEventListener("click", (e) => {
-                    e.preventDefault();
-                    if (previousComicForTagFilter) {
-                        showDetailView(previousComicForTagFilter);
-                        previousComicForTagFilter = null;
-                    }
-                });
-            prevPartBtnTop.addEventListener("click", () => {
-                if (currentPartNumber > 1)
-                    navigateToPart(currentComic, currentPartNumber - 1);
-            });
-            nextPartBtnTop.addEventListener("click", () => {
-                if (currentPartNumber < totalParts)
-                    navigateToPart(currentComic, currentPartNumber + 1);
-            });
-            prevPartBtnBottom.addEventListener("click", () => {
-                if (currentPartNumber > 1)
-                    navigateToPart(currentComic, currentPartNumber - 1);
-            });
-            nextPartBtnBottom.addEventListener("click", () => {
-                if (currentPartNumber < totalParts)
-                    navigateToPart(currentComic, currentPartNumber + 1);
-            });
-            backToDetailBtn.addEventListener("click", (e) => {
-                e.preventDefault();
-                showDetailView(currentComic);
-            });
-            document.getElementById("back-to-grid-btn").addEventListener("click", (e) => {
-                e.preventDefault();
-                resetToHomeView();
-            });
-            scrollToTopBtn.addEventListener("click", () => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth"
-                });
-            });
-            document
-                .getElementById("newsletter-form-main")
-                .addEventListener("submit", (e) =>
-                    handleSubscribeForm(e, "newsletter-form-main")
-                );
-            document
-                .getElementById("newsletter-form-detail")
-                .addEventListener("submit", (e) =>
-                    handleSubscribeForm(e, "newsletter-form-detail")
-                );
+      <h3>5. Contact Us</h3>
+      <p>
+        If you have any questions or concerns regarding our privacy practices, feel free to contact us directly
+        at:<br>
+        <strong>Email:</strong> theavdeshjadon@gmail.com
+      </p>
+    </div>
 
-            [themeToggleBtn, themeToggleBtnDetail].forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const currentTheme = localStorage.getItem("theme") || "dark";
-                    applyTheme(currentTheme === "dark" ? "light" : "dark");
-                });
-            });
-        }
+  </div>
 
-        async function init() {
-            try {
-                const savedTheme = localStorage.getItem("theme") || "dark";
-                applyTheme(savedTheme);
-                setupEventListeners();
-                updateAuthUI(); // Initial UI setup for auth
-                populateAvatarGrid();
-                await loadComics();
-                await loadAndRenderCategories();
-            } catch (err) {
-                console.error("Initialization error:", err);
-                renderErrorState(comicsGrid, "Failed to initialize the app.");
-            }
-        }
+  <div id="terms-service-modal" class="modal">
+    <div class="modal-content large">
+      <button class="modal-close-btn" id="terms-service-modal-close">&times;</button>
+      <h2 class="modal-title">Terms of Service</h2>
 
-        init();
-    </script>
+      <p>
+        By accessing and using ComixAll, you agree to be bound by these Terms of Service, as well as all
+        applicable laws and regulations.
+        If you do not agree with any of these terms, you are prohibited from using or accessing this site.
+      </p>
+
+      <h3>1. Use License</h3>
+      <p>
+        Permission is granted to temporarily download one copy of the materials (such as comics, text, or
+        images) on ComixAll's website for
+        personal, non-commercial, and transitory viewing only. This is a grant of a limited license — not a
+        transfer of ownership. Under this
+        license, you may not:
+      </p>
+      <ul>
+        <li>Modify or copy the materials</li>
+        <li>Use the materials for any commercial purpose or public display</li>
+        <li>Attempt to reverse engineer or extract any source code or data from the website</li>
+        <li>Remove any copyright or proprietary notations</li>
+        <li>Transfer the materials to another person or "mirror" them on another server</li>
+      </ul>
+      <p>
+        This license shall automatically terminate if you violate any of these restrictions and may be
+        terminated by ComixAll at any time. Upon termination,
+        you must destroy any downloaded materials in your possession.
+      </p>
+
+      <h3>2. Disclaimer</h3>
+      <p>
+        The materials on ComixAll are provided "as is". ComixAll makes no warranties, expressed or implied, and
+        disclaims all other warranties including, without limitation,
+        implied warranties or conditions of merchantability, fitness for a particular purpose, and
+        non-infringement of intellectual property or other violation of rights.
+      </p>
+      <p>
+        ComixAll does not warrant or make any representations concerning the accuracy, likely results, or
+        reliability of the use of the materials on its website
+        or otherwise relating to such materials or on any sites linked to this site.
+      </p>
+
+      <h3>3. Limitations</h3>
+      <p>
+        In no event shall ComixAll or its developers be liable for any damages (including, without limitation,
+        damages for loss of data or profit,
+        or due to business interruption) arising out of the use or inability to use the materials on ComixAll,
+        even if ComixAll or a ComixAll-authorized
+        representative has been notified orally or in writing of the possibility of such damage.
+      </p>
+
+      <h3>4. Modifications</h3>
+      <p>
+        ComixAll may revise these terms of service at any time without notice. By using this website, you are
+        agreeing to be bound by the then-current version of these Terms of Service.
+      </p>
+
+      <h3>5. Governing Law</h3>
+      <p>
+        These terms and conditions are governed by and construed in accordance with the laws of India, and you
+        irrevocably submit to the exclusive jurisdiction of the courts in that location.
+      </p>
+    </div>
+
+  </div>
+
+  <div id="help-center-modal" class="modal">
+    <div class="modal-content large">
+      <button class="modal-close-btn" id="help-center-modal-close">&times;</button>
+      <h2 class="modal-title">Help Center</h2>
+
+      <h3>Frequently Asked Questions</h3>
+
+      <p>
+        <strong>Q: How do I create an account on ComixAll?</strong><br>
+        <span>
+          Creating an account on ComixAll is quick and simple. Just click the <strong>"Login"</strong> button
+          located at the top-right corner of the homepage.
+          On the next screen, choose <strong>"Sign Up"</strong> and fill in your basic details such as your
+          email address and a secure password.
+          Once you've submitted the form, your account will be instantly created. You can then log in anytime
+          to access your personalized dashboard, save your favorite comics, and track your reading history.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: How do I save a comic to my favorites?</strong><br>
+        <span>
+          After logging into your ComixAll account, you’ll notice a <strong>heart icon</strong> on every comic
+          card displayed throughout the site.
+          Simply click on that heart icon to instantly add the comic to your <strong>Favorites list</strong>.
+          To access your favorites later, click on the <strong>star icon</strong> located in the top
+          navigation bar.
+          This feature helps you bookmark comics you love and continue reading them later without having to
+          search again.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: Is ComixAll free to use?</strong><br>
+        <span>
+          Yes, ComixAll is completely free to use. You can browse through the library, read as many comics as
+          you like, and mark your favorites — all without any subscription or hidden fees.
+          We are committed to providing a high-quality reading experience that is accessible to everyone,
+          regardless of location or budget.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: Do I need to download or install anything to use ComixAll?</strong><br>
+        <span>
+          No downloads or installations are required. ComixAll is a fully web-based platform, meaning it works
+          directly in your internet browser.
+          Whether you are on a desktop, laptop, tablet, or smartphone, you can access your account and read
+          comics on the go — without the need for any apps or extensions.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: What should I do if a comic doesn't load properly or seems broken?</strong><br>
+        <span>
+          If a comic fails to load or displays incorrectly, try refreshing the page or checking your internet
+          connection first.
+          If the issue continues, please take note of the comic's title and the part/chapter where the problem
+          occurred.
+          You can then contact our support team, and we’ll work on fixing it as soon as possible to ensure a
+          smooth reading experience.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: Can I access ComixAll from multiple devices?</strong><br>
+        <span>
+          Yes, your ComixAll account is synced across devices. You can log in from any device — desktop,
+          laptop, tablet, or phone — and your favorites, reading progress, and preferences will always stay
+          updated.
+        </span>
+      </p>
+
+      <p>
+        <strong>Q: Is there a mobile app for ComixAll?</strong><br>
+        <span>
+          Currently, ComixAll is accessible via your mobile browser with a fully responsive design.
+          While we do not yet offer a dedicated mobile app, the website is optimized to function smoothly on
+          all screen sizes for the best possible reading experience.
+        </span>
+      </p>
+
+      <h3>Contact Us</h3>
+      <p>
+        Have a question that's not covered above? Encountered a bug or want to suggest a feature?
+        We're here to help. Reach out to our support team directly at:<br><br>
+        <strong>Email:</strong> theavdeshjadon@gmail.com<br><br>
+        We typically respond within <strong>24 to 48 hours</strong>. Your feedback is valuable to us and helps
+        make ComixAll even better for readers worldwide.
+      </p>
+
+    </div>
+
+  </div>
+
+  <template id="comic-detail-template">
+    <div class="comic-detail-header">
+      <div class="detail-thumbnail-container"><img src="" alt="Comic Thumbnail" class="detail-thumbnail" id="detail-thumbnail"></div>
+      <div class="comic-detail-info">
+        <h1 class="detail-title" id="detail-title"></h1>
+        <div class="detail-rating" id="detail-rating"></div>
+        <div class="detail-meta" id="detail-author"></div>
+        <div class="detail-meta" id="detail-views"><i class="fas fa-eye"></i> <span></span></div>
+        <ul class="detail-meta-list">
+          <li id="detail-category"></li>
+          <li id="detail-publish-date"></li>
+          <li id="detail-status"></li>
+        </ul>
+        <div class="detail-tags-container" id="detail-tags-container"><span style="font-weight: 500; color: var(--text-primary);">Tags:</span></div>
+        <div class="description-wrapper">
+          <p class="detail-description" id="detail-description"></p><button class="show-more-btn" style="display: none;">Show More</button>
+        </div>
+      </div>
+    </div>
+    <div class="parts-section">
+      <h2 class="section-title"><i class="fas fa-bookmark"></i><span>Parts & Chapters</span></h2>
+      <div class="parts-list" id="parts-list-container"></div>
+    </div>
+    <div class="suggestions-section">
+      <h2 class="section-title"><i class="fas fa-star"></i><span>You Might Also Like</span></h2>
+      <div class="suggestions-grid" id="suggestions-grid"></div>
+    </div>
+  </template>
+  <script src="js/script.js"></script>
 </body>
 
 </html>
