@@ -43,20 +43,18 @@ ComixAll/
 │   └── index.html                 # Admin panel for comic uploads
 │
 ├── css/
-│   ├── auth.css                  # Styles for login/signup pages
-│   └── style.css                 # Main website styles
+│   ├── style.css                 # Styles for render/comics
+│   └── index.css                 # Main website styles
 │
 ├── js/
-│   ├── auth.js                   # Login/signup logic
+│   ├── script.js                   # Login/signup logic
 │   ├── firebase.js               # Firebase configuration
 │   └── main.js                   # Core site functionality
 │
 ├── .gitignore                    # Ignore node_modules or credentials
 ├── comic.html                    # Comic listing per folder
 ├── index.html                    # Home page (categories, popular, etc.)
-├── login.html                    # Login page
 ├── reader.html                   # Comic reading UI (vertical scroll)
-├── signup.html                   # Signup/registration page
 └── README.md                     # Project info by Avdesh Jadon
 ```
 ---
